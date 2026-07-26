@@ -240,14 +240,13 @@
 }
 
 .task-control--detail {
-  height: 44rpx;
   border-color: #a8cfbb;
   background: #ffffff;
   color: #078d59;
 }
 
-.task-control:not(.task-control--detail) {
-  height: 44rpx;
+.task-control {
+  height: 40rpx;
 }
 
 .task-control--done {

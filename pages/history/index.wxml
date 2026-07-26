@@ -1,6 +1,6 @@
 <view class="page-shell history-page">
   <view class="filter-tabs">
-    <button
+    <view
       wx:for="{{filters}}"
       wx:key="value"
       class="filter-tab {{activeFilter === item.value ? 'filter-tab--active' : ''}}"
@@ -8,7 +8,7 @@
       bindtap="selectFilter"
     >
       {{item.label}}
-    </button>
+    </view>
   </view>
 
   <view wx:if="{{loading}}" class="loading-line">正在加载提交记录…</view>

@@ -28,7 +28,7 @@
   </view>
 
   <view class="filter-tabs">
-    <button
+    <view
       wx:for="{{filters}}"
       wx:key="value"
       class="filter-tab {{activeFilter === item.value ? 'filter-tab--active' : ''}}"
@@ -36,7 +36,7 @@
       bindtap="selectFilter"
     >
       {{item.label}}
-    </button>
+    </view>
   </view>
 
   <view wx:if="{{loading}}" class="loading-line">正在加载任务…</view>
@@ -63,19 +63,19 @@
         <text class="task-description">{{item.description}}</text>
       </view>
       <view class="task-actions">
-        <button class="task-control task-control--detail" data-id="{{item.id}}" bindtap="handleTaskDetail">详情</button>
-        <button
-          wx:if="{{!isParent}}"
-          class="{{item.completed ? 'task-control task-control--done' : 'task-control'}}"
+        <view class="task-control task-control--detail" data-id="{{item.id}}" bindtap="handleTaskDetail">详情</view>
+        <view
+          wx:if="{{!isParent && !item.completed}}"
+          class="task-control"
           data-id="{{item.id}}"
-          disabled="{{item.completed}}"
           bindtap="handleTaskAction"
         >
           {{item.actionText}}
-        </button>
-        <text wx:else class="task-status-text {{item.completed ? 'task-status-text--done' : ''}}">
+        </view>
+        <view wx:elif="{{!isParent}}" class="task-control task-control--done">{{item.actionText}}</view>
+        <view wx:else class="task-status-text {{item.completed ? 'task-status-text--done' : ''}}">
           {{item.completed ? "已完成" : "待完成"}}
-        </text>
+        </view>
       </view>
     </view>
   </view>
