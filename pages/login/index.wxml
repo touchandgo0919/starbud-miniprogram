@@ -39,9 +39,11 @@
           aria-label="{{passwordVisible ? '隐藏密码' : '显示密码'}}"
           bindtap="togglePassword"
         >
-          <view class="eye-icon {{passwordVisible ? '' : 'eye-icon--closed'}}">
-            <view class="eye-pupil" />
-          </view>
+          <image
+            class="password-icon"
+            src="{{passwordVisible ? '/assets/eye-open.png' : '/assets/eye-closed.png'}}"
+            mode="aspectFit"
+          />
         </button>
       </view>
     </view>
