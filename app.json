@@ -21,15 +21,21 @@
     "list": [
       {
         "pagePath": "pages/tasks/index",
-        "text": "今日任务"
+        "text": "今日",
+        "iconPath": "assets/tabbar/today.png",
+        "selectedIconPath": "assets/tabbar/today-selected.png"
       },
       {
         "pagePath": "pages/history/index",
-        "text": "提交记录"
+        "text": "提交",
+        "iconPath": "assets/tabbar/submit.png",
+        "selectedIconPath": "assets/tabbar/submit-selected.png"
       },
       {
         "pagePath": "pages/profile/index",
-        "text": "我的"
+        "text": "我的",
+        "iconPath": "assets/tabbar/profile.png",
+        "selectedIconPath": "assets/tabbar/profile-selected.png"
       }
     ]
   },
