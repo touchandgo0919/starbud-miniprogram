@@ -2,6 +2,7 @@ const api = require("../../services/api");
 const {
   clearSelectedTask,
   getSelectedTask,
+  getSession,
   setSelectedTask
 } = require("../../utils/storage");
 
@@ -15,9 +16,20 @@ Page({
   },
 
   async onLoad(options) {
-    const taskId = Number(options.taskId);
+    const session = getSession();
+    if (!session || !session.user || session.user.role !== "child") {
+      wx.showModal({
+        title: "无法提交作业",
+        content: "只有儿童账号可以拍照提交作业。",
+        showCancel: false,
+        success: () => wx.navigateBack()
+      });
+      return;
+    }
+
+    const taskId = String(options.taskId || "");
     const selectedTask = getSelectedTask();
-    if (selectedTask && Number(selectedTask.id) === taskId) {
+    if (selectedTask && String(selectedTask.id) === taskId) {
       this.setData({
         task: {
           ...selectedTask,
@@ -28,7 +40,7 @@ Page({
     }
 
     try {
-      const task = (await api.getTodayTasks()).find((item) => Number(item.id) === taskId);
+      const task = (await api.getTodayTasks()).find((item) => String(item.id) === taskId);
       if (!task) throw new Error("任务不存在或今天无需执行。");
       const taskView = {
         ...task,

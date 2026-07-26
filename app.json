@@ -2,6 +2,7 @@
   "pages": [
     "pages/login/index",
     "pages/tasks/index",
+    "pages/task-detail/index",
     "pages/submit/index",
     "pages/history/index",
     "pages/profile/index"

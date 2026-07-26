@@ -6,7 +6,7 @@
 
   <view class="login-copy">
     <text class="login-title">欢迎回来</text>
-    <text class="login-subtitle">领取今天的任务，完成后拍照提交</text>
+    <text class="login-subtitle">查看任务状态，完成后拍照提交</text>
   </view>
 
   <view class="login-form">
@@ -15,7 +15,7 @@
       <input
         class="field-input"
         value="{{username}}"
-        placeholder="请输入儿童账号"
+        placeholder="请输入家长或儿童账号"
         placeholder-class="field-placeholder"
         maxlength="40"
         bindinput="onUsernameInput"

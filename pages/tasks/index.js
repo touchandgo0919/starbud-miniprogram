@@ -16,6 +16,7 @@ function taskViewModel(task) {
 Page({
   data: {
     user: null,
+    isParent: false,
     dateLabel: friendlyDate(),
     tasks: [],
     completedCount: 0,
@@ -26,11 +27,11 @@ Page({
 
   onShow() {
     const session = getSession();
-    if (!session || !session.user || session.user.role !== "child") {
+    if (!session || !session.user || !["child", "parent"].includes(session.user.role)) {
       wx.reLaunch({ url: "/pages/login/index" });
       return;
     }
-    this.setData({ user: session.user });
+    this.setData({ user: session.user, isParent: session.user.role === "parent" });
     this.loadTasks();
   },
 
@@ -57,6 +58,8 @@ Page({
   },
 
   async handleTaskAction(event) {
+    if (this.data.isParent) return;
+
     const taskId = event.currentTarget.dataset.id;
     const task = this.data.tasks.find((item) => item.id === taskId);
     if (!task || task.completed) return;
@@ -74,5 +77,14 @@ Page({
 
     setSelectedTask(task);
     wx.navigateTo({ url: `/pages/submit/index?taskId=${encodeURIComponent(task.id)}` });
+  },
+
+  handleTaskDetail(event) {
+    const taskId = String(event.currentTarget.dataset.id || "");
+    const task = this.data.tasks.find((item) => String(item.id) === taskId);
+    if (!task) return;
+
+    setSelectedTask(task);
+    wx.navigateTo({ url: `/pages/task-detail/index?taskId=${encodeURIComponent(task.id)}` });
   }
 });

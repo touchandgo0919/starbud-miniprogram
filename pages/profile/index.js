@@ -7,7 +7,7 @@ Page({
 
   onShow() {
     const session = getSession();
-    if (!session || !session.user || session.user.role !== "child") {
+    if (!session || !session.user || !["child", "parent"].includes(session.user.role)) {
       wx.reLaunch({ url: "/pages/login/index" });
       return;
     }

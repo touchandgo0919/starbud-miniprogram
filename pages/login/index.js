@@ -12,7 +12,7 @@ Page({
 
   onLoad() {
     const session = getSession();
-    if (session && session.token && session.user && session.user.role === "child") {
+    if (session && session.token && session.user && ["child", "parent"].includes(session.user.role)) {
       wx.switchTab({ url: "/pages/tasks/index" });
     }
   },
@@ -40,8 +40,8 @@ Page({
     this.setData({ submitting: true, error: "" });
     try {
       const result = await api.login(username, password);
-      if (result.user.role !== "child") {
-        throw new Error("小程序仅供小朋友使用，请登录儿童账号。");
+      if (result.user.role !== "child" && result.user.role !== "parent") {
+        throw new Error("请使用家长或儿童账号登录。");
       }
       setSession(result);
       wx.switchTab({ url: "/pages/tasks/index" });

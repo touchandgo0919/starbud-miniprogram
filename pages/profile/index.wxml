@@ -5,10 +5,26 @@
       <text class="profile-name">{{user.displayName}}</text>
       <text class="profile-username">@{{user.username}}</text>
     </view>
-    <text class="profile-role">儿童账号</text>
+    <text class="profile-role">{{user.role === "parent" ? "家长账号" : "儿童账号"}}</text>
   </view>
 
-  <view class="responsibility surface">
+  <view wx:if="{{user.role === 'parent'}}" class="responsibility surface">
+    <text class="responsibility-title">家长可以查看什么</text>
+    <view class="responsibility-row">
+      <text class="responsibility-index">1</text>
+      <text>查看孩子的今日任务</text>
+    </view>
+    <view class="responsibility-row">
+      <text class="responsibility-index">2</text>
+      <text>查看任务完成状态和进度</text>
+    </view>
+    <view class="responsibility-row">
+      <text class="responsibility-index">3</text>
+      <text>查看孩子已提交的作业记录</text>
+    </view>
+  </view>
+
+  <view wx:else class="responsibility surface">
     <text class="responsibility-title">这个小程序用来做什么</text>
     <view class="responsibility-row">
       <text class="responsibility-index">1</text>
@@ -24,7 +40,10 @@
     </view>
   </view>
 
-  <view class="scope-note">
+  <view wx:if="{{user.role === 'parent'}}" class="scope-note">
+    家长仍可在网页端安排作业；小程序用于查看孩子的任务和提交状态。
+  </view>
+  <view wx:else class="scope-note">
     家长在网页端安排作业；电脑 App 负责语音提醒。小程序不提供任务创建或语音设置。
   </view>
 

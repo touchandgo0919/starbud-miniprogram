@@ -189,8 +189,34 @@
   font-weight: 700;
 }
 
+.task-actions {
+  display: flex;
+  min-width: 108rpx;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10rpx;
+}
+
+.task-detail-link {
+  color: #078d59;
+  font-size: 23rpx;
+  font-weight: 650;
+}
+
 .task-action--done {
   border-color: transparent;
+  color: #0aa868;
+}
+
+.task-status-text {
+  min-width: 96rpx;
+  color: #a07019;
+  font-size: 25rpx;
+  font-weight: 700;
+  text-align: right;
+}
+
+.task-status-text--done {
   color: #0aa868;
 }
 

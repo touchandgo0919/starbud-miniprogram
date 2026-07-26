@@ -1,0 +1,34 @@
+<view class="page-shell detail-page">
+  <view wx:if="{{loading}}" class="loading-line">正在加载任务详情…</view>
+  <block wx:elif="{{task}}">
+    <view class="detail-hero surface">
+      <view class="subject-mark">{{task.subjectMark}}</view>
+      <view class="detail-hero__copy">
+        <text class="detail-title">{{task.title}}</text>
+        <text class="detail-status {{task.completed ? 'detail-status--done' : ''}}">{{task.statusLabel}}</text>
+      </view>
+    </view>
+
+    <view class="detail-section surface">
+      <view class="detail-row"><text>执行日期</text><text>{{task.occurrenceDate || "今天"}}</text></view>
+      <view class="detail-row"><text>提醒时间</text><text>{{task.scheduleTime}}</text></view>
+      <view class="detail-row"><text>重复方式</text><text>{{task.repeatLabel}}</text></view>
+      <view class="detail-row"><text>提醒方式</text><text>{{task.voiceLabel}}</text></view>
+      <view class="detail-row"><text>领取状态</text><text>{{task.claimLabel}}</text></view>
+      <view class="detail-row"><text>提交状态</text><text>{{task.submissionLabel}}</text></view>
+    </view>
+
+    <view class="voice-section surface">
+      <text class="voice-title">提醒语音内容</text>
+      <text class="voice-content">{{task.voiceEnabled ? task.voiceContent : "未开启语音提醒"}}</text>
+    </view>
+
+    <button
+      wx:if="{{isChild && !task.completed}}"
+      class="primary-button detail-primary"
+      bindtap="handlePrimaryAction"
+    >
+      {{task.claimedAt ? "去完成任务" : "领取任务"}}
+    </button>
+  </block>
+</view>
