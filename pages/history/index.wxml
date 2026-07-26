@@ -1,4 +1,16 @@
 <view class="page-shell history-page">
+  <view class="history-search surface">
+    <text class="history-search__icon">⌕</text>
+    <input
+      class="history-search__input"
+      value="{{keyword}}"
+      placeholder="搜索任务名称"
+      confirm-type="search"
+      bindinput="onSearchInput"
+    />
+    <view wx:if="{{keyword}}" class="history-search__clear" bindtap="clearSearch">×</view>
+  </view>
+
   <view class="history-heading">
     <view class="history-title-group">
       <text>提交列表</text>
@@ -17,42 +29,50 @@
     </view>
   </view>
 
-  <view wx:if="{{loading}}" class="loading-line">正在加载提交记录…</view>
-  <view wx:elif="{{error}}" class="empty-state surface">
-    <text class="empty-state__mark">!</text>
-    <text class="empty-state__title">记录加载失败</text>
-    <text class="empty-state__copy">{{error}}</text>
-    <button class="secondary-button retry-button" bindtap="loadSubmissions">重新加载</button>
-  </view>
-  <view wx:elif="{{!submissions.length}}" class="empty-state surface">
-    <text class="empty-state__mark">照</text>
-    <text class="empty-state__title">暂无提交记录</text>
-    <text class="empty-state__copy">完成任务并上传作业照片后，会在这里留下记录。</text>
-  </view>
-  <view wx:else class="history-list surface">
-    <view wx:for="{{submissions}}" wx:key="id" class="history-row">
-      <view class="history-head">
-        <view class="subject-mark">{{item.subjectMark}}</view>
-        <view class="history-copy">
-          <text class="history-title">{{item.taskTitle}}</text>
-          <text class="history-time">提交时间：{{item.submittedLabel}}</text>
-        </view>
-        <text class="history-status">已提交</text>
-      </view>
-      <scroll-view class="photo-strip" scroll-x enhanced show-scrollbar="{{false}}">
-        <image
-          wx:for="{{item.photos}}"
-          wx:for-item="photo"
-          wx:key="id"
-          class="history-photo"
-          src="{{photo.url}}"
-          mode="aspectFill"
-          data-submission="{{item.id}}"
-          data-url="{{photo.url}}"
-          bindtap="previewPhoto"
-        />
-      </scroll-view>
-      <text wx:if="{{item.note}}" class="history-note">{{item.note}}</text>
+  <scroll-view
+    class="history-scroll"
+    scroll-y
+    refresher-enabled="{{true}}"
+    refresher-triggered="{{refreshing}}"
+    bindrefresherrefresh="onHistoryRefresh"
+  >
+    <view wx:if="{{loading}}" class="loading-line">正在加载提交记录…</view>
+    <view wx:elif="{{error}}" class="empty-state surface">
+      <text class="empty-state__mark">!</text>
+      <text class="empty-state__title">记录加载失败</text>
+      <text class="empty-state__copy">{{error}}</text>
+      <button class="secondary-button retry-button" bindtap="loadSubmissions">重新加载</button>
     </view>
-  </view>
+    <view wx:elif="{{!submissions.length}}" class="empty-state surface">
+      <text class="empty-state__mark">照</text>
+      <text class="empty-state__title">暂无提交记录</text>
+      <text class="empty-state__copy">完成任务并上传作业照片后，会在这里留下记录。</text>
+    </view>
+    <view wx:else class="history-list surface">
+      <view wx:for="{{submissions}}" wx:key="id" class="history-row">
+        <view class="history-head">
+          <view class="subject-mark">{{item.subjectMark}}</view>
+          <view class="history-copy">
+            <text class="history-title">{{item.taskTitle}}</text>
+            <text class="history-time">提交时间：{{item.submittedLabel}}</text>
+          </view>
+          <text class="history-status">已提交</text>
+        </view>
+        <scroll-view class="photo-strip" scroll-x enhanced show-scrollbar="{{false}}">
+          <image
+            wx:for="{{item.photos}}"
+            wx:for-item="photo"
+            wx:key="id"
+            class="history-photo"
+            src="{{photo.url}}"
+            mode="aspectFill"
+            data-submission="{{item.id}}"
+            data-url="{{photo.url}}"
+            bindtap="previewPhoto"
+          />
+        </scroll-view>
+        <text wx:if="{{item.note}}" class="history-note">{{item.note}}</text>
+      </view>
+    </view>
+  </scroll-view>
 </view>

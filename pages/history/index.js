@@ -20,7 +20,9 @@ Page({
     ],
     allSubmissions: [],
     submissions: [],
+    keyword: "",
     loading: true,
+    refreshing: false,
     error: ""
   },
 
@@ -36,6 +38,16 @@ Page({
   async onPullDownRefresh() {
     await this.loadSubmissions();
     wx.stopPullDownRefresh();
+  },
+
+  async onHistoryRefresh() {
+    if (this.data.refreshing) return;
+    this.setData({ refreshing: true });
+    try {
+      await this.loadSubmissions();
+    } finally {
+      this.setData({ refreshing: false });
+    }
   },
 
   async loadSubmissions() {
@@ -55,10 +67,24 @@ Page({
     this.applyFilter(event.currentTarget.dataset.value);
   },
 
-  applyFilter(activeFilter) {
+  onSearchInput(event) {
+    const keyword = event.detail.value;
+    this.setData({ keyword });
+    this.applyFilter(this.data.activeFilter, keyword);
+  },
+
+  clearSearch() {
+    this.setData({ keyword: "" });
+    this.applyFilter(this.data.activeFilter, "");
+  },
+
+  applyFilter(activeFilter, keyword = this.data.keyword) {
+    const normalizedKeyword = keyword.trim().toLowerCase();
     const submissions = this.data.allSubmissions.filter((submission) => {
-      if (activeFilter === "today") return submission.isToday;
-      return true;
+      const matchesDate = activeFilter !== "today" || submission.isToday;
+      const matchesKeyword = !normalizedKeyword
+        || submission.taskTitle.toLowerCase().includes(normalizedKeyword);
+      return matchesDate && matchesKeyword;
     });
     this.setData({ activeFilter, submissions });
   },
