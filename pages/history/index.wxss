@@ -3,22 +3,22 @@
 }
 
 .filter-tabs {
-  display: grid;
-  padding: 8rpx;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8rpx;
-  border-radius: 20rpx;
-  background: #e9eeeb;
+  display: flex;
+  gap: 12rpx;
+  align-items: center;
 }
 
 .filter-tab {
   display: flex;
-  height: 70rpx;
+  min-width: 72rpx;
+  height: 48rpx;
+  padding: 0 18rpx;
   align-items: center;
   justify-content: center;
-  border-radius: 16rpx;
-  color: #68716d;
-  font-size: 26rpx;
+  border-radius: 999rpx;
+  background: #f0f3f2;
+  color: #61706a;
+  font-size: 22rpx;
 }
 
 .filter-tab--active {

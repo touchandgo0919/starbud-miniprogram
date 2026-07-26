@@ -13,11 +13,10 @@ function submissionViewModel(submission) {
 
 Page({
   data: {
-    activeFilter: "all",
+    activeFilter: "today",
     filters: [
       { value: "all", label: "全部" },
-      { value: "today", label: "今天" },
-      { value: "earlier", label: "更早" }
+      { value: "today", label: "今日" }
     ],
     allSubmissions: [],
     submissions: [],
@@ -59,7 +58,6 @@ Page({
   applyFilter(activeFilter) {
     const submissions = this.data.allSubmissions.filter((submission) => {
       if (activeFilter === "today") return submission.isToday;
-      if (activeFilter === "earlier") return !submission.isToday;
       return true;
     });
     this.setData({ activeFilter, submissions });
