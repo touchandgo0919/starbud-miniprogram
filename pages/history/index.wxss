@@ -4,6 +4,7 @@
 
 .filter-tabs {
   display: flex;
+  margin-bottom: 28rpx;
   gap: 12rpx;
   align-items: center;
 }
@@ -29,7 +30,7 @@
 
 .history-list {
   overflow: hidden;
-  margin-top: 28rpx;
+  margin-top: 0;
 }
 
 .history-row {
