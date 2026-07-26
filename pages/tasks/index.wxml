@@ -54,7 +54,13 @@
     <text class="empty-state__copy">可以先休息一下，任务会由家长在网页端安排。</text>
   </view>
   <view wx:else class="task-list surface">
-    <view wx:for="{{tasks}}" wx:key="id" class="task-row">
+    <view
+      wx:for="{{tasks}}"
+      wx:key="id"
+      class="task-row"
+      data-id="{{item.id}}"
+      bindtap="handleTaskDetail"
+    >
       <view class="task-time">
         <text>{{item.scheduleTime}}</text>
         <view class="task-dot {{item.completed ? 'task-dot--done' : ''}}"></view>
@@ -64,12 +70,11 @@
         <text class="task-description">{{item.description}}</text>
       </view>
       <view class="task-actions">
-        <view class="task-control task-control--detail" data-id="{{item.id}}" bindtap="handleTaskDetail">详情</view>
         <view
           wx:if="{{!isParent && !item.completed}}"
           class="{{item.actionClass}}"
           data-id="{{item.id}}"
-          bindtap="handleTaskAction"
+          catchtap="handleTaskAction"
         >
           {{item.actionText}}
         </view>

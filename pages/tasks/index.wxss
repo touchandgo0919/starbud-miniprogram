@@ -247,12 +247,6 @@
   gap: 12rpx;
 }
 
-.task-control--detail {
-  border-color: #26312d;
-  background: #ffffff;
-  color: #26312d;
-}
-
 .task-control {
   height: 40rpx;
 }
