@@ -33,6 +33,7 @@ Page({
     completedCount: 0,
     progressPercent: 0,
     loading: true,
+    refreshing: false,
     error: ""
   },
 
@@ -49,6 +50,16 @@ Page({
   async onPullDownRefresh() {
     await this.loadTasks();
     wx.stopPullDownRefresh();
+  },
+
+  async onTaskRefresh() {
+    if (this.data.refreshing) return;
+    this.setData({ refreshing: true });
+    try {
+      await this.loadTasks();
+    } finally {
+      this.setData({ refreshing: false });
+    }
   },
 
   async loadTasks() {

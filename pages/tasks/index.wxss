@@ -1,29 +1,17 @@
 .tasks-page {
-  background: #ffffff;
-}
-
-.brand-line {
   display: flex;
-  align-items: center;
-  gap: 16rpx;
-}
-
-.brand-logo {
-  width: 64rpx;
-  height: 64rpx;
-  border-radius: 18rpx;
-}
-
-.brand-name {
-  color: #073b2c;
-  font-size: 31rpx;
-  font-weight: 800;
+  height: 100vh;
+  min-height: 0;
+  padding-bottom: 24rpx;
+  flex-direction: column;
+  overflow: hidden;
+  background: #ffffff;
 }
 
 .greeting {
   display: flex;
   min-height: 194rpx;
-  margin-top: 34rpx;
+  margin-top: 12rpx;
   padding: 36rpx 34rpx;
   align-items: center;
   justify-content: space-between;
@@ -147,9 +135,15 @@
   font-weight: 700;
 }
 
+.task-scroll {
+  min-height: 0;
+  margin-top: 24rpx;
+  flex: 1;
+}
+
 .task-list {
   overflow: hidden;
-  margin-top: 24rpx;
+  margin-top: 0;
   border-radius: 20rpx;
 }
 

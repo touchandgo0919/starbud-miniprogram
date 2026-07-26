@@ -1,9 +1,4 @@
 <view class="page-shell tasks-page">
-  <view class="brand-line">
-    <image class="brand-logo" src="/assets/starbud-icon.png" mode="aspectFill" />
-    <text class="brand-name">星星芽AI助手</text>
-  </view>
-
   <view class="greeting surface">
     <view>
       <text class="greeting-title">早上好，{{user.displayName}}</text>
@@ -40,49 +35,57 @@
     </view>
   </view>
 
-  <view wx:if="{{loading}}" class="loading-line">正在加载任务…</view>
-  <view wx:elif="{{error}}" class="empty-state surface">
-    <text class="empty-state__mark">!</text>
-    <text class="empty-state__title">任务加载失败</text>
-    <text class="empty-state__copy">{{error}}</text>
-    <button class="secondary-button retry-button" bindtap="loadTasks">重新加载</button>
-  </view>
-  <view wx:elif="{{!tasks.length}}" class="empty-state surface">
-    <text class="empty-state__mark">✓</text>
-    <text wx:if="{{activeFilter === 'today'}}" class="empty-state__title">今天还没有任务</text>
-    <text wx:else class="empty-state__title">暂无任务记录</text>
-    <text class="empty-state__copy">可以先休息一下，任务会由家长在网页端安排。</text>
-  </view>
-  <view wx:else class="task-list surface">
-    <view
-      wx:for="{{tasks}}"
-      wx:key="id"
-      class="task-row"
-      data-id="{{item.id}}"
-      bindtap="handleTaskDetail"
-    >
-      <view class="task-time">
-        <text>{{item.scheduleTime}}</text>
-        <view class="task-dot {{item.completed ? 'task-dot--done' : ''}}"></view>
-      </view>
-      <view class="task-copy">
-        <text class="task-title">{{item.title}}</text>
-        <text class="task-description">{{item.description}}</text>
-      </view>
-      <view class="task-actions">
-        <view
-          wx:if="{{!isParent && !item.completed}}"
-          class="{{item.actionClass}}"
-          data-id="{{item.id}}"
-          catchtap="handleTaskAction"
-        >
-          {{item.actionText}}
+  <scroll-view
+    class="task-scroll"
+    scroll-y
+    refresher-enabled="{{true}}"
+    refresher-triggered="{{refreshing}}"
+    bindrefresherrefresh="onTaskRefresh"
+  >
+    <view wx:if="{{loading}}" class="loading-line">正在加载任务…</view>
+    <view wx:elif="{{error}}" class="empty-state surface">
+      <text class="empty-state__mark">!</text>
+      <text class="empty-state__title">任务加载失败</text>
+      <text class="empty-state__copy">{{error}}</text>
+      <button class="secondary-button retry-button" bindtap="loadTasks">重新加载</button>
+    </view>
+    <view wx:elif="{{!tasks.length}}" class="empty-state surface">
+      <text class="empty-state__mark">✓</text>
+      <text wx:if="{{activeFilter === 'today'}}" class="empty-state__title">今天还没有任务</text>
+      <text wx:else class="empty-state__title">暂无任务记录</text>
+      <text class="empty-state__copy">可以先休息一下，任务会由家长在网页端安排。</text>
+    </view>
+    <view wx:else class="task-list surface">
+      <view
+        wx:for="{{tasks}}"
+        wx:key="id"
+        class="task-row"
+        data-id="{{item.id}}"
+        bindtap="handleTaskDetail"
+      >
+        <view class="task-time">
+          <text>{{item.scheduleTime}}</text>
+          <view class="task-dot {{item.completed ? 'task-dot--done' : ''}}"></view>
         </view>
-        <view wx:elif="{{!isParent}}" class="{{item.actionClass}}">{{item.actionText}}</view>
-        <view wx:else class="task-status-text {{item.completed ? 'task-status-text--done' : ''}}">
-          {{item.completed ? "已完成" : "待完成"}}
+        <view class="task-copy">
+          <text class="task-title">{{item.title}}</text>
+          <text class="task-description">{{item.description}}</text>
+        </view>
+        <view class="task-actions">
+          <view
+            wx:if="{{!isParent && !item.completed}}"
+            class="{{item.actionClass}}"
+            data-id="{{item.id}}"
+            catchtap="handleTaskAction"
+          >
+            {{item.actionText}}
+          </view>
+          <view wx:elif="{{!isParent}}" class="{{item.actionClass}}">{{item.actionText}}</view>
+          <view wx:else class="task-status-text {{item.completed ? 'task-status-text--done' : ''}}">
+            {{item.completed ? "已完成" : "待完成"}}
+          </view>
         </view>
       </view>
     </view>
-  </view>
+  </scroll-view>
 </view>
