@@ -176,9 +176,10 @@
 
 .task-action {
   display: flex;
-  min-width: 132rpx;
+  width: 108rpx;
+  min-width: 108rpx;
   height: 68rpx;
-  padding: 0 20rpx;
+  padding: 0;
   align-items: center;
   justify-content: center;
   border: 2rpx solid #0aa868;

@@ -7,7 +7,7 @@ function taskViewModel(task) {
   return {
     ...task,
     completed,
-    actionText: completed ? "已提交" : task.claimedAt ? "去完成" : "领取任务",
+    actionText: completed ? "已提交" : task.claimedAt ? "去完成" : "领取",
     subjectMark: task.title.slice(0, 1),
     description: task.voiceContent || "按时完成任务并拍照提交"
   };
