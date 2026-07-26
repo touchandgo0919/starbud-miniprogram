@@ -116,6 +116,7 @@
   display: flex;
   gap: 12rpx;
   align-items: center;
+  justify-content: flex-start;
 }
 
 .filter-tab {
