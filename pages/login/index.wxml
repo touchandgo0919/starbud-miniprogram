@@ -34,8 +34,14 @@
           maxlength="80"
           bindinput="onPasswordInput"
         />
-        <button class="password-toggle" bindtap="togglePassword">
-          {{passwordVisible ? "隐藏" : "显示"}}
+        <button
+          class="password-toggle"
+          aria-label="{{passwordVisible ? '隐藏密码' : '显示密码'}}"
+          bindtap="togglePassword"
+        >
+          <view class="eye-icon {{passwordVisible ? '' : 'eye-icon--closed'}}">
+            <view class="eye-pupil" />
+          </view>
         </button>
       </view>
     </view>

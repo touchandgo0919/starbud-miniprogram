@@ -74,20 +74,57 @@
 }
 
 .password-input {
-  padding-right: 116rpx;
+  padding-right: 96rpx;
 }
 
 .password-toggle {
   position: absolute;
-  top: 0;
-  right: 0;
+  top: 14rpx;
+  right: 14rpx;
   display: flex;
-  width: 104rpx;
-  height: 96rpx;
+  width: 68rpx;
+  height: 68rpx;
   align-items: center;
   justify-content: center;
+  border-radius: 16rpx;
+  color: #68736e;
+}
+
+.password-toggle:active {
+  background: #edf4f0;
   color: #078d59;
-  font-size: 25rpx;
+}
+
+.eye-icon {
+  position: relative;
+  width: 34rpx;
+  height: 24rpx;
+  border: 3rpx solid currentColor;
+  border-radius: 50%;
+}
+
+.eye-pupil {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 9rpx;
+  height: 9rpx;
+  border-radius: 50%;
+  background: currentColor;
+  transform: translate(-50%, -50%);
+}
+
+.eye-icon--closed::after {
+  position: absolute;
+  top: 8rpx;
+  left: -5rpx;
+  width: 40rpx;
+  height: 4rpx;
+  border-radius: 4rpx;
+  background: #fbfcfb;
+  box-shadow: 0 0 0 2rpx currentColor;
+  content: "";
+  transform: rotate(40deg);
 }
 
 .login-error {
