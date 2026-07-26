@@ -1,7 +1,7 @@
 <view class="page-shell tasks-page">
   <view class="brand-line">
     <image class="brand-logo" src="/assets/starbud-icon.png" mode="aspectFill" />
-    <text class="brand-name">星芽AI助手</text>
+    <text class="brand-name">星星芽AI助手</text>
   </view>
 
   <view class="greeting surface">

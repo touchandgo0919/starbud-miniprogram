@@ -1,6 +1,6 @@
 # starbud-miniprogram
 
-星芽 AI 助手的原生微信小程序端。
+星星芽AI助手的原生微信小程序端。
 
 ## 职责
 
