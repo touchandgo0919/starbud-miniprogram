@@ -248,9 +248,9 @@
 }
 
 .task-control--detail {
-  border-color: #a8cfbb;
+  border-color: #26312d;
   background: #ffffff;
-  color: #078d59;
+  color: #26312d;
 }
 
 .task-control {
@@ -261,6 +261,18 @@
   border-color: #b9dfca;
   background: #eff8f3;
   color: #3d8a65;
+}
+
+.task-control--claim {
+  border-color: #e2ad32;
+  background: #fff9e8;
+  color: #9a6500;
+}
+
+.task-control--complete {
+  border-color: #0aa868;
+  background: #eff8f3;
+  color: #078d59;
 }
 
 .task-status-text {

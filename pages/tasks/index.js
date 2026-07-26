@@ -4,10 +4,16 @@ const { getSession, setSelectedTask } = require("../../utils/storage");
 
 function taskViewModel(task) {
   const completed = task.status === "completed" || task.submissionStatus === "submitted";
+  const actionText = completed ? "已提交" : task.claimedAt ? "去完成" : "领取";
   return {
     ...task,
     completed,
-    actionText: completed ? "已提交" : task.claimedAt ? "去完成" : "领取",
+    actionText,
+    actionClass: completed
+      ? "task-control task-control--done"
+      : task.claimedAt
+        ? "task-control task-control--complete"
+        : "task-control task-control--claim",
     subjectMark: task.title.slice(0, 1),
     description: task.voiceContent || "按时完成任务并拍照提交"
   };
