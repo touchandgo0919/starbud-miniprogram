@@ -1,0 +1,78 @@
+const api = require("../../services/api");
+const { formatSubmittedAt, localDateKey } = require("../../utils/date");
+const { getSession } = require("../../utils/storage");
+
+function submissionViewModel(submission) {
+  return {
+    ...submission,
+    submittedLabel: formatSubmittedAt(submission.submittedAt),
+    subjectMark: submission.taskTitle.slice(0, 1),
+    isToday: submission.taskDate === localDateKey()
+  };
+}
+
+Page({
+  data: {
+    activeFilter: "all",
+    filters: [
+      { value: "all", label: "全部" },
+      { value: "today", label: "今天" },
+      { value: "earlier", label: "更早" }
+    ],
+    allSubmissions: [],
+    submissions: [],
+    loading: true,
+    error: ""
+  },
+
+  onShow() {
+    const session = getSession();
+    if (!session || !session.user || session.user.role !== "child") {
+      wx.reLaunch({ url: "/pages/login/index" });
+      return;
+    }
+    this.loadSubmissions();
+  },
+
+  async onPullDownRefresh() {
+    await this.loadSubmissions();
+    wx.stopPullDownRefresh();
+  },
+
+  async loadSubmissions() {
+    this.setData({ loading: true, error: "" });
+    try {
+      const allSubmissions = (await api.getSubmissions()).map(submissionViewModel);
+      this.setData({ allSubmissions });
+      this.applyFilter(this.data.activeFilter);
+    } catch (error) {
+      this.setData({ error: error.message || "提交记录加载失败。" });
+    } finally {
+      this.setData({ loading: false });
+    }
+  },
+
+  selectFilter(event) {
+    this.applyFilter(event.currentTarget.dataset.value);
+  },
+
+  applyFilter(activeFilter) {
+    const submissions = this.data.allSubmissions.filter((submission) => {
+      if (activeFilter === "today") return submission.isToday;
+      if (activeFilter === "earlier") return !submission.isToday;
+      return true;
+    });
+    this.setData({ activeFilter, submissions });
+  },
+
+  previewPhoto(event) {
+    const submissionId = event.currentTarget.dataset.submission;
+    const current = event.currentTarget.dataset.url;
+    const submission = this.data.submissions.find((item) => item.id === submissionId);
+    if (!submission) return;
+    wx.previewImage({
+      current,
+      urls: submission.photos.map((photo) => photo.url)
+    });
+  }
+});

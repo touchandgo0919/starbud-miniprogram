@@ -1,0 +1,62 @@
+<view class="page-shell tasks-page">
+  <view class="brand-line">
+    <image class="brand-logo" src="/assets/starbud-icon.png" mode="aspectFill" />
+    <text class="brand-name">星芽AI助手</text>
+  </view>
+
+  <view class="greeting surface">
+    <view>
+      <text class="greeting-title">早上好，{{user.displayName}}</text>
+      <text class="greeting-date">{{dateLabel}}</text>
+    </view>
+    <text class="greeting-mark">芽</text>
+  </view>
+
+  <view class="progress-block">
+    <view class="progress-copy">
+      <text class="progress-value">{{completedCount}} / {{tasks.length}}</text>
+      <text class="progress-label">已完成</text>
+    </view>
+    <view class="progress-track">
+      <view class="progress-fill" style="width: {{progressPercent}}%"></view>
+    </view>
+  </view>
+
+  <view class="section-heading">
+    <text>今日任务</text>
+    <text class="section-count">{{tasks.length}} 项</text>
+  </view>
+
+  <view wx:if="{{loading}}" class="loading-line">正在加载任务…</view>
+  <view wx:elif="{{error}}" class="empty-state surface">
+    <text class="empty-state__mark">!</text>
+    <text class="empty-state__title">任务加载失败</text>
+    <text class="empty-state__copy">{{error}}</text>
+    <button class="secondary-button retry-button" bindtap="loadTasks">重新加载</button>
+  </view>
+  <view wx:elif="{{!tasks.length}}" class="empty-state surface">
+    <text class="empty-state__mark">✓</text>
+    <text class="empty-state__title">今天还没有任务</text>
+    <text class="empty-state__copy">可以先休息一下，任务会由家长在网页端安排。</text>
+  </view>
+  <view wx:else class="task-list surface">
+    <view wx:for="{{tasks}}" wx:key="id" class="task-row">
+      <view class="task-time">
+        <text>{{item.scheduleTime}}</text>
+        <view class="task-dot {{item.completed ? 'task-dot--done' : ''}}"></view>
+      </view>
+      <view class="task-copy">
+        <text class="task-title">{{item.title}}</text>
+        <text class="task-description">{{item.description}}</text>
+      </view>
+      <button
+        class="{{item.completed ? 'task-action task-action--done' : 'task-action'}}"
+        data-id="{{item.id}}"
+        disabled="{{item.completed}}"
+        bindtap="handleTaskAction"
+      >
+        {{item.actionText}}
+      </button>
+    </view>
+  </view>
+</view>

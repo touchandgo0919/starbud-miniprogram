@@ -1,0 +1,104 @@
+.profile-card {
+  display: flex;
+  padding: 30rpx;
+  align-items: center;
+  gap: 22rpx;
+}
+
+.profile-logo {
+  width: 92rpx;
+  height: 92rpx;
+  border-radius: 24rpx;
+}
+
+.profile-copy {
+  min-width: 0;
+  flex: 1;
+}
+
+.profile-name,
+.profile-username {
+  display: block;
+}
+
+.profile-name {
+  color: #1d2924;
+  font-size: 36rpx;
+  font-weight: 800;
+}
+
+.profile-username {
+  margin-top: 8rpx;
+  color: #8a918e;
+  font-size: 23rpx;
+}
+
+.profile-role {
+  color: #078d59;
+  font-size: 24rpx;
+  font-weight: 700;
+}
+
+.responsibility {
+  margin-top: 28rpx;
+  padding: 30rpx;
+}
+
+.responsibility-title {
+  display: block;
+  margin-bottom: 18rpx;
+  color: #26312d;
+  font-size: 31rpx;
+  font-weight: 800;
+}
+
+.responsibility-row {
+  display: flex;
+  min-height: 92rpx;
+  align-items: center;
+  gap: 20rpx;
+  border-bottom: 1rpx solid #e6ece9;
+  color: #46524d;
+  font-size: 26rpx;
+  line-height: 1.5;
+}
+
+.responsibility-row:last-child {
+  border-bottom: 0;
+}
+
+.responsibility-index {
+  display: flex;
+  width: 48rpx;
+  height: 48rpx;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14rpx;
+  background: #eaf8f1;
+  color: #0aa868;
+  font-size: 24rpx;
+  font-weight: 800;
+}
+
+.scope-note {
+  margin: 28rpx 8rpx 0;
+  color: #7a817e;
+  font-size: 24rpx;
+  line-height: 1.75;
+  text-align: center;
+}
+
+.logout-button {
+  display: flex;
+  height: 88rpx;
+  margin-top: 48rpx;
+  align-items: center;
+  justify-content: center;
+  border: 2rpx solid #f0c8cc;
+  border-radius: 20rpx;
+  background: #ffffff;
+  color: #b83d48;
+  font-size: 28rpx;
+  font-weight: 700;
+}

@@ -1,0 +1,60 @@
+<view class="page-shell submit-page" wx:if="{{task}}">
+  <view class="task-summary surface">
+    <view class="subject-mark">{{task.subjectMark}}</view>
+    <view class="task-summary__copy">
+      <text class="task-summary__title">{{task.title}}</text>
+      <text class="task-summary__description">{{task.voiceContent}}</text>
+    </view>
+    <view class="task-meta">
+      <text>提醒时间</text>
+      <text class="task-meta__value">{{task.scheduleTime}}</text>
+    </view>
+  </view>
+
+  <view class="form-section">
+    <view class="form-heading">
+      <text class="form-title">作业照片</text>
+      <text class="form-hint">至少 1 张，最多 6 张</text>
+    </view>
+
+    <view class="photo-grid">
+      <view wx:for="{{photos}}" wx:key="path" class="photo-cell">
+        <image
+          class="photo-image"
+          src="{{item.path}}"
+          mode="aspectFill"
+          data-path="{{item.path}}"
+          bindtap="previewPhoto"
+        />
+        <button class="photo-remove" data-index="{{index}}" catchtap="removePhoto">×</button>
+      </view>
+      <button wx:if="{{photos.length < 6}}" class="photo-add" bindtap="choosePhotos">
+        <text class="photo-add__icon">＋</text>
+        <text>拍照 / 相册</text>
+      </button>
+    </view>
+  </view>
+
+  <view class="form-section">
+    <text class="form-title">补充说明（选填）</text>
+    <textarea
+      class="note-input"
+      value="{{note}}"
+      placeholder="可以填写作业中遇到的问题或想补充的内容…"
+      placeholder-class="note-placeholder"
+      maxlength="500"
+      show-confirm-bar="{{false}}"
+      bindinput="onNoteInput"
+    />
+    <text class="note-count">{{note.length}} / 500</text>
+  </view>
+
+  <view class="privacy-note">照片仅用于本次作业提交，请勿上传与作业无关的内容。</view>
+  <view class="submit-spacer"></view>
+  <view class="submit-bar">
+    <text wx:if="{{uploadProgress}}" class="upload-progress">{{uploadProgress}}</text>
+    <button class="primary-button" loading="{{submitting}}" disabled="{{submitting}}" bindtap="submit">
+      提交作业
+    </button>
+  </view>
+</view>

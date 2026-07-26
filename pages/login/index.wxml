@@ -1,0 +1,51 @@
+<view class="login-page">
+  <view class="login-brand">
+    <image class="login-logo" src="/assets/starbud-icon.png" mode="aspectFill" />
+    <text>星芽AI助手</text>
+  </view>
+
+  <view class="login-copy">
+    <text class="login-title">欢迎回来</text>
+    <text class="login-subtitle">领取今天的任务，完成后拍照提交</text>
+  </view>
+
+  <view class="login-form">
+    <view class="field">
+      <text class="field-label">用户名</text>
+      <input
+        class="field-input"
+        value="{{username}}"
+        placeholder="请输入儿童账号"
+        placeholder-class="field-placeholder"
+        maxlength="40"
+        bindinput="onUsernameInput"
+      />
+    </view>
+
+    <view class="field">
+      <text class="field-label">密码</text>
+      <view class="password-control">
+        <input
+          class="field-input password-input"
+          value="{{password}}"
+          password="{{!passwordVisible}}"
+          placeholder="请输入密码"
+          placeholder-class="field-placeholder"
+          maxlength="80"
+          bindinput="onPasswordInput"
+        />
+        <button class="password-toggle" bindtap="togglePassword">
+          {{passwordVisible ? "隐藏" : "显示"}}
+        </button>
+      </view>
+    </view>
+
+    <view wx:if="{{error}}" class="login-error">{{error}}</view>
+
+    <button class="primary-button login-submit" loading="{{submitting}}" disabled="{{submitting}}" bindtap="submit">
+      登录
+    </button>
+  </view>
+
+  <text class="login-note">账号由家长在网页端创建和维护</text>
+</view>
