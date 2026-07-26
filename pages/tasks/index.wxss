@@ -157,7 +157,7 @@
   display: grid;
   min-height: 172rpx;
   padding: 26rpx 22rpx;
-  grid-template-columns: 88rpx minmax(0, 1fr) auto;
+  grid-template-columns: 100rpx minmax(0, 1fr) auto;
   gap: 18rpx;
   align-items: center;
   border-bottom: 1rpx solid #e7ece9;
@@ -173,9 +173,11 @@
   gap: 12rpx;
   color: #68716d;
   font-size: 25rpx;
+  white-space: nowrap;
 }
 
 .task-dot {
+  flex: 0 0 12rpx;
   width: 12rpx;
   height: 12rpx;
   border-radius: 50%;
