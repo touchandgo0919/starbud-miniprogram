@@ -50,10 +50,10 @@
         <text class="task-description">{{item.description}}</text>
       </view>
       <view class="task-actions">
-        <button class="task-detail-link" data-id="{{item.id}}" bindtap="handleTaskDetail">查看详情</button>
+        <button class="task-control task-control--detail" data-id="{{item.id}}" bindtap="handleTaskDetail">查看详情</button>
         <button
           wx:if="{{!isParent}}"
-          class="{{item.completed ? 'task-action task-action--done' : 'task-action'}}"
+          class="{{item.completed ? 'task-control task-control--done' : 'task-control'}}"
           data-id="{{item.id}}"
           disabled="{{item.completed}}"
           bindtap="handleTaskAction"
