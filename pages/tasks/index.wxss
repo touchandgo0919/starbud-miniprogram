@@ -112,8 +112,34 @@
   font-weight: 500;
 }
 
+.filter-tabs {
+  display: grid;
+  padding: 8rpx;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8rpx;
+  border-radius: 20rpx;
+  background: #e9eeeb;
+}
+
+.filter-tab {
+  display: flex;
+  height: 64rpx;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14rpx;
+  color: #68716d;
+  font-size: 25rpx;
+}
+
+.filter-tab--active {
+  background: #0aa868;
+  color: #ffffff;
+  font-weight: 700;
+}
+
 .task-list {
   overflow: hidden;
+  margin-top: 24rpx;
   border-radius: 20rpx;
 }
 

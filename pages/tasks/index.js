@@ -18,6 +18,11 @@ Page({
     user: null,
     isParent: false,
     dateLabel: friendlyDate(),
+    filters: [
+      { value: "all", label: "全部" },
+      { value: "today", label: "今日" }
+    ],
+    activeFilter: "today",
     tasks: [],
     completedCount: 0,
     progressPercent: 0,
@@ -43,7 +48,10 @@ Page({
   async loadTasks() {
     this.setData({ loading: true, error: "" });
     try {
-      const tasks = (await api.getTodayTasks()).map(taskViewModel);
+      const sourceTasks = this.data.activeFilter === "today"
+        ? await api.getTodayTasks()
+        : await api.getTasks();
+      const tasks = sourceTasks.map(taskViewModel);
       const completedCount = tasks.filter((task) => task.completed).length;
       this.setData({
         tasks,
@@ -55,6 +63,13 @@ Page({
     } finally {
       this.setData({ loading: false });
     }
+  },
+
+  selectFilter(event) {
+    const activeFilter = event.currentTarget.dataset.value;
+    if (activeFilter === this.data.activeFilter) return;
+    this.setData({ activeFilter });
+    this.loadTasks();
   },
 
   async handleTaskAction(event) {

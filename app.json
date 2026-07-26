@@ -22,7 +22,7 @@
     "list": [
       {
         "pagePath": "pages/tasks/index",
-        "text": "今日",
+        "text": "任务",
         "iconPath": "assets/tabbar/today.png",
         "selectedIconPath": "assets/tabbar/today-selected.png"
       },

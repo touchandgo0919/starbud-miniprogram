@@ -12,6 +12,11 @@ async function getTodayTasks() {
   return body.tasks;
 }
 
+async function getTasks() {
+  const body = await request("/api/tasks");
+  return body.tasks;
+}
+
 async function claimTask(taskId) {
   const body = await request(`/api/tasks/${taskId}/claim`, { method: "POST" });
   return body.task;
@@ -53,6 +58,7 @@ module.exports = {
   createSubmission,
   finalizeSubmission,
   getSubmissions,
+  getTasks,
   getTodayTasks,
   login,
   uploadSubmissionPhoto

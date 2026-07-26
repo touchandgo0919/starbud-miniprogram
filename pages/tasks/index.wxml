@@ -23,8 +23,20 @@
   </view>
 
   <view class="section-heading">
-    <text>今日任务</text>
+    <text>任务列表</text>
     <text class="section-count">{{tasks.length}} 项</text>
+  </view>
+
+  <view class="filter-tabs">
+    <button
+      wx:for="{{filters}}"
+      wx:key="value"
+      class="filter-tab {{activeFilter === item.value ? 'filter-tab--active' : ''}}"
+      data-value="{{item.value}}"
+      bindtap="selectFilter"
+    >
+      {{item.label}}
+    </button>
   </view>
 
   <view wx:if="{{loading}}" class="loading-line">正在加载任务…</view>
@@ -36,7 +48,8 @@
   </view>
   <view wx:elif="{{!tasks.length}}" class="empty-state surface">
     <text class="empty-state__mark">✓</text>
-    <text class="empty-state__title">今天还没有任务</text>
+    <text wx:if="{{activeFilter === 'today'}}" class="empty-state__title">今天还没有任务</text>
+    <text wx:else class="empty-state__title">暂无任务记录</text>
     <text class="empty-state__copy">可以先休息一下，任务会由家长在网页端安排。</text>
   </view>
   <view wx:else class="task-list surface">
