@@ -1,13 +1,19 @@
 <view class="page-shell history-page">
-  <view class="filter-tabs">
-    <view
-      wx:for="{{filters}}"
-      wx:key="value"
-      class="filter-tab {{activeFilter === item.value ? 'filter-tab--active' : ''}}"
-      data-value="{{item.value}}"
-      bindtap="selectFilter"
-    >
-      {{item.label}}
+  <view class="history-heading">
+    <view class="history-title-group">
+      <text>提交列表</text>
+      <text class="history-count">{{submissions.length}} 项</text>
+    </view>
+    <view class="filter-tabs">
+      <view
+        wx:for="{{filters}}"
+        wx:key="value"
+        class="filter-tab {{activeFilter === item.value ? 'filter-tab--active' : ''}}"
+        data-value="{{item.value}}"
+        bindtap="selectFilter"
+      >
+        {{item.label}}
+      </view>
     </view>
   </view>
 

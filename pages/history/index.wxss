@@ -2,9 +2,29 @@
   background: #f6f8f7;
 }
 
+.history-heading {
+  display: flex;
+  padding: 20rpx 8rpx;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 34rpx;
+  font-weight: 800;
+}
+
+.history-title-group {
+  display: flex;
+  align-items: baseline;
+  gap: 14rpx;
+}
+
+.history-count {
+  color: #909793;
+  font-size: 24rpx;
+  font-weight: 500;
+}
+
 .filter-tabs {
   display: flex;
-  margin-bottom: 28rpx;
   gap: 12rpx;
   align-items: center;
   justify-content: flex-start;
