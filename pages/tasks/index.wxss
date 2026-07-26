@@ -217,7 +217,7 @@
 .task-control,
 .task-status-text {
   display: flex;
-  flex: 0 0 144rpx;
+  flex: 0 0 auto;
   width: 144rpx;
   min-width: 144rpx;
   max-width: 144rpx;
@@ -262,7 +262,6 @@
 }
 
 .task-status-text {
-  flex-basis: 72rpx;
   width: 72rpx;
   min-width: 72rpx;
   max-width: 72rpx;
