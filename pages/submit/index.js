@@ -69,14 +69,25 @@ Page({
       count: remaining,
       mediaType: ["image"],
       sourceType: ["album", "camera"],
-      sizeType: ["compressed"],
-      success: (result) => {
-        const photos = result.tempFiles.map((file) => ({
-          path: file.tempFilePath,
+      success: async (result) => {
+        const photos = await Promise.all(result.tempFiles.map(async (file) => ({
+          path: await this.compressPhoto(file.tempFilePath),
           size: file.size
-        }));
+        })));
         this.setData({ photos: [...this.data.photos, ...photos] });
       }
+    });
+  },
+
+  compressPhoto(path) {
+    return new Promise((resolve) => {
+      wx.compressImage({
+        src: path,
+        quality: 75,
+        success: (result) => resolve(result.tempFilePath),
+        // 部分格式或较小文件无需压缩，保留原文件以确保提交不中断。
+        fail: () => resolve(path)
+      });
     });
   },
 

@@ -95,7 +95,7 @@
 .photo-add {
   position: relative;
   overflow: hidden;
-  height: 208rpx;
+  aspect-ratio: 1;
   border-radius: 18rpx;
 }
 
@@ -106,8 +106,10 @@
 
 .photo-remove {
   position: absolute;
-  top: 10rpx;
-  right: 10rpx;
+  top: 8rpx;
+  right: 8rpx;
+  left: auto;
+  z-index: 1;
   display: flex;
   width: 46rpx;
   height: 46rpx;
