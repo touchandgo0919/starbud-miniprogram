@@ -11,9 +11,12 @@
 
 .filter-tab {
   display: flex;
-  min-width: 72rpx;
+  flex: 0 0 68rpx;
+  width: 68rpx;
+  min-width: 68rpx;
+  max-width: 68rpx;
   height: 48rpx;
-  padding: 0 18rpx;
+  padding: 0;
   align-items: center;
   justify-content: center;
   border-radius: 999rpx;

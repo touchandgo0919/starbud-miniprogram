@@ -120,9 +120,12 @@
 
 .filter-tab {
   display: flex;
-  min-width: 72rpx;
+  flex: 0 0 68rpx;
+  width: 68rpx;
+  min-width: 68rpx;
+  max-width: 68rpx;
   height: 48rpx;
-  padding: 0 18rpx;
+  padding: 0;
   align-items: center;
   justify-content: center;
   border-radius: 999rpx;
@@ -207,10 +210,10 @@
 .task-control,
 .task-status-text {
   display: flex;
-  flex: 0 0 72rpx;
-  width: 72rpx;
-  min-width: 72rpx;
-  max-width: 72rpx;
+  flex: 0 0 144rpx;
+  width: 144rpx;
+  min-width: 144rpx;
+  max-width: 144rpx;
   height: 56rpx;
   padding: 0;
   align-items: center;
@@ -226,10 +229,10 @@
 
 .task-actions {
   display: flex;
-  flex: 0 0 72rpx;
-  width: 72rpx;
-  min-width: 72rpx;
-  max-width: 72rpx;
+  flex: 0 0 144rpx;
+  width: 144rpx;
+  min-width: 144rpx;
+  max-width: 144rpx;
   flex-direction: column;
   align-items: flex-end;
   gap: 12rpx;
@@ -248,6 +251,10 @@
 }
 
 .task-status-text {
+  flex-basis: 72rpx;
+  width: 72rpx;
+  min-width: 72rpx;
+  max-width: 72rpx;
   border-color: #f0d38a;
   background: #fff9ea;
   color: #a07019;
