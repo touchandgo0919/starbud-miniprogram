@@ -5,7 +5,7 @@
 .filter-tabs {
   display: grid;
   padding: 8rpx;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 8rpx;
   border-radius: 20rpx;
   background: #e9eeeb;
