@@ -252,9 +252,9 @@
 }
 
 .task-control--done {
-  border-color: #b9dfca;
-  background: #eff8f3;
-  color: #3d8a65;
+  border-color: #d8dfdc;
+  background: #f3f5f4;
+  color: #8a9490;
 }
 
 .task-control--claim {
