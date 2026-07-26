@@ -26,12 +26,12 @@
           data-path="{{item.path}}"
           bindtap="previewPhoto"
         />
-        <button class="photo-remove" data-index="{{index}}" catchtap="removePhoto">×</button>
+        <view class="photo-remove" data-index="{{index}}" catchtap="removePhoto">×</view>
       </view>
-      <button wx:if="{{photos.length < 6}}" class="photo-add" bindtap="choosePhotos">
+      <view wx:if="{{photos.length < 6}}" class="photo-add" bindtap="choosePhotos">
         <text class="photo-add__icon">＋</text>
         <text>拍照 / 相册</text>
-      </button>
+      </view>
     </view>
   </view>
 
