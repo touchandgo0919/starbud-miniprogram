@@ -14,7 +14,7 @@
   <view class="history-heading">
     <view class="history-title-group">
       <text>提交列表</text>
-      <text class="history-count">{{submissions.length}} 项</text>
+      <text class="history-count">{{totalCount}} 项</text>
     </view>
     <view class="filter-tabs">
       <view
@@ -35,6 +35,8 @@
     refresher-enabled="{{true}}"
     refresher-triggered="{{refreshing}}"
     bindrefresherrefresh="onHistoryRefresh"
+    bindscrolltolower="loadMoreSubmissions"
+    lower-threshold="120"
   >
     <view wx:if="{{loading}}" class="loading-line">正在加载提交记录…</view>
     <view wx:elif="{{error}}" class="empty-state surface">
@@ -74,5 +76,7 @@
         <text wx:if="{{item.note}}" class="history-note">{{item.note}}</text>
       </view>
     </view>
+    <view wx:if="{{loadingMore}}" class="history-footer">正在加载更多提交记录…</view>
+    <view wx:elif="{{submissions.length && !hasMore}}" class="history-footer">已显示全部提交记录</view>
   </scroll-view>
 </view>

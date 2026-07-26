@@ -2,6 +2,8 @@ const api = require("../../services/api");
 const { formatSubmittedAt, localDateKey } = require("../../utils/date");
 const { getSession } = require("../../utils/storage");
 
+const PAGE_SIZE = 20;
+
 function submissionViewModel(submission) {
   return {
     ...submission,
@@ -18,11 +20,14 @@ Page({
       { value: "all", label: "全部" },
       { value: "today", label: "今日" }
     ],
-    allSubmissions: [],
     submissions: [],
+    totalCount: 0,
     keyword: "",
     loading: true,
     refreshing: false,
+    loadingMore: false,
+    page: 0,
+    hasMore: false,
     error: ""
   },
 
@@ -53,9 +58,19 @@ Page({
   async loadSubmissions() {
     this.setData({ loading: true, error: "" });
     try {
-      const allSubmissions = (await api.getSubmissions()).map(submissionViewModel);
-      this.setData({ allSubmissions });
-      this.applyFilter(this.data.activeFilter);
+      const result = await api.getSubmissionPage({
+        page: 1,
+        pageSize: PAGE_SIZE,
+        date: this.data.activeFilter === "today" ? localDateKey() : "",
+        keyword: this.data.keyword
+      });
+      this.setData({
+        submissions: result.submissions.map(submissionViewModel),
+        totalCount: result.pagination.total,
+        page: result.pagination.page,
+        hasMore: result.pagination.hasMore,
+        loadingMore: false
+      });
     } catch (error) {
       this.setData({ error: error.message || "提交记录加载失败。" });
     } finally {
@@ -64,29 +79,44 @@ Page({
   },
 
   selectFilter(event) {
-    this.applyFilter(event.currentTarget.dataset.value);
+    const activeFilter = event.currentTarget.dataset.value;
+    if (activeFilter === this.data.activeFilter) return;
+    this.setData({ activeFilter });
+    this.loadSubmissions();
   },
 
   onSearchInput(event) {
     const keyword = event.detail.value;
     this.setData({ keyword });
-    this.applyFilter(this.data.activeFilter, keyword);
+    this.loadSubmissions();
   },
 
   clearSearch() {
     this.setData({ keyword: "" });
-    this.applyFilter(this.data.activeFilter, "");
+    this.loadSubmissions();
   },
 
-  applyFilter(activeFilter, keyword = this.data.keyword) {
-    const normalizedKeyword = keyword.trim().toLowerCase();
-    const submissions = this.data.allSubmissions.filter((submission) => {
-      const matchesDate = activeFilter !== "today" || submission.isToday;
-      const matchesKeyword = !normalizedKeyword
-        || submission.taskTitle.toLowerCase().includes(normalizedKeyword);
-      return matchesDate && matchesKeyword;
-    });
-    this.setData({ activeFilter, submissions });
+  async loadMoreSubmissions() {
+    if (this.data.loading || this.data.loadingMore || !this.data.hasMore) return;
+
+    this.setData({ loadingMore: true });
+    try {
+      const result = await api.getSubmissionPage({
+        page: this.data.page + 1,
+        pageSize: PAGE_SIZE,
+        date: this.data.activeFilter === "today" ? localDateKey() : "",
+        keyword: this.data.keyword
+      });
+      this.setData({
+        submissions: [...this.data.submissions, ...result.submissions.map(submissionViewModel)],
+        page: result.pagination.page,
+        hasMore: result.pagination.hasMore
+      });
+    } catch (error) {
+      wx.showToast({ title: error.message || "加载更多记录失败", icon: "none" });
+    } finally {
+      this.setData({ loadingMore: false });
+    }
   },
 
   previewPhoto(event) {

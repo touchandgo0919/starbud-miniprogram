@@ -17,6 +17,11 @@ async function getTasks() {
   return body.tasks;
 }
 
+async function getTaskPage(page, pageSize) {
+  const body = await request(`/api/tasks?page=${page}&pageSize=${pageSize}`);
+  return body;
+}
+
 async function claimTask(taskId) {
   const body = await request(`/api/tasks/${taskId}/claim`, { method: "POST" });
   return body.task;
@@ -53,12 +58,31 @@ async function getSubmissions() {
   }));
 }
 
+async function getSubmissionPage({ page, pageSize, date, keyword }) {
+  const params = [`page=${page}`, `pageSize=${pageSize}`];
+  if (date) params.push(`date=${encodeURIComponent(date)}`);
+  if (keyword && keyword.trim()) params.push(`keyword=${encodeURIComponent(keyword.trim())}`);
+  const body = await request(`/api/submissions?${params.join("&")}`);
+  return {
+    submissions: body.submissions.map((submission) => ({
+      ...submission,
+      photos: submission.photos.map((photo) => ({
+        ...photo,
+        url: absoluteUrl(photo.url)
+      }))
+    })),
+    pagination: body.pagination
+  };
+}
+
 module.exports = {
   claimTask,
   createSubmission,
   finalizeSubmission,
   getSubmissions,
+  getSubmissionPage,
   getTasks,
+  getTaskPage,
   getTodayTasks,
   login,
   uploadSubmissionPhoto

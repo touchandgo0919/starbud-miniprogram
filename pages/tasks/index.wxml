@@ -20,7 +20,7 @@
   <view class="section-heading">
     <view class="section-title-group">
       <text>任务列表</text>
-      <text class="section-count">{{tasks.length}} 项</text>
+      <text class="section-count">{{totalCount}} 项</text>
     </view>
     <view class="filter-tabs">
       <view
@@ -41,6 +41,8 @@
     refresher-enabled="{{true}}"
     refresher-triggered="{{refreshing}}"
     bindrefresherrefresh="onTaskRefresh"
+    bindscrolltolower="loadMoreTasks"
+    lower-threshold="120"
   >
     <view wx:if="{{loading}}" class="loading-line">正在加载任务…</view>
     <view wx:elif="{{error}}" class="empty-state surface">
@@ -87,5 +89,7 @@
         </view>
       </view>
     </view>
+    <view wx:if="{{activeFilter === 'all' && loadingMore}}" class="list-footer">正在加载更多任务…</view>
+    <view wx:elif="{{activeFilter === 'all' && tasks.length && !hasMore}}" class="list-footer">已显示全部任务</view>
   </scroll-view>
 </view>
