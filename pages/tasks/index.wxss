@@ -43,11 +43,11 @@
   align-items: center;
   justify-content: center;
   border-radius: 30rpx;
-  background: #ffffff;
+  background: transparent;
   color: #0aa868;
   font-size: 40rpx;
   font-weight: 900;
-  box-shadow: 0 12rpx 30rpx rgba(7, 59, 44, 0.08);
+  box-shadow: none;
 }
 
 .progress-block {
