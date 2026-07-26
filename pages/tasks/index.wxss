@@ -99,11 +99,17 @@
 
 .section-heading {
   display: flex;
-  padding: 20rpx 8rpx 24rpx;
+  padding: 20rpx 8rpx;
   align-items: center;
   justify-content: space-between;
   font-size: 34rpx;
   font-weight: 800;
+}
+
+.section-title-group {
+  display: flex;
+  align-items: baseline;
+  gap: 14rpx;
 }
 
 .section-count {

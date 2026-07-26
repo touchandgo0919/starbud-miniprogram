@@ -23,19 +23,20 @@
   </view>
 
   <view class="section-heading">
-    <text>任务列表</text>
-    <text class="section-count">{{tasks.length}} 项</text>
-  </view>
-
-  <view class="filter-tabs">
-    <view
-      wx:for="{{filters}}"
-      wx:key="value"
-      class="filter-tab {{activeFilter === item.value ? 'filter-tab--active' : ''}}"
-      data-value="{{item.value}}"
-      bindtap="selectFilter"
-    >
-      {{item.label}}
+    <view class="section-title-group">
+      <text>任务列表</text>
+      <text class="section-count">{{tasks.length}} 项</text>
+    </view>
+    <view class="filter-tabs">
+      <view
+        wx:for="{{filters}}"
+        wx:key="value"
+        class="filter-tab {{activeFilter === item.value ? 'filter-tab--active' : ''}}"
+        data-value="{{item.value}}"
+        bindtap="selectFilter"
+      >
+        {{item.label}}
+      </view>
     </view>
   </view>
 
