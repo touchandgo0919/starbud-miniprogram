@@ -3,6 +3,7 @@ const { friendlyDate, localDateKey } = require("../../utils/date");
 const { getSession, setSelectedTask } = require("../../utils/storage");
 
 const PAGE_SIZE = 5;
+const REVIEW_NOTIFICATION_INTERVAL = 10000;
 
 function taskDateRange(filter) {
   const today = new Date();
@@ -70,6 +71,48 @@ Page({
     }
     this.setData({ user: session.user, isParent: session.user.role === "parent" });
     this.loadTasks();
+    this.startReviewNotificationPolling();
+  },
+
+  onHide() {
+    this.stopReviewNotificationPolling();
+  },
+
+  onUnload() {
+    this.stopReviewNotificationPolling();
+  },
+
+  startReviewNotificationPolling() {
+    if (this.data.isParent || this.reviewNotificationTimer) return;
+    this.checkReviewNotifications();
+    this.reviewNotificationTimer = setInterval(() => this.checkReviewNotifications(), REVIEW_NOTIFICATION_INTERVAL);
+  },
+
+  stopReviewNotificationPolling() {
+    if (!this.reviewNotificationTimer) return;
+    clearInterval(this.reviewNotificationTimer);
+    this.reviewNotificationTimer = null;
+  },
+
+  async checkReviewNotifications() {
+    if (this.checkingReviewNotifications) return;
+    this.checkingReviewNotifications = true;
+    try {
+      const notifications = await api.getNotifications();
+      const notification = notifications.find((item) => item.type === "review_completed" && !item.readAt);
+      if (!notification) return;
+      await api.markNotificationRead(notification.id);
+      wx.showModal({
+        title: notification.title,
+        content: notification.content,
+        showCancel: false,
+        confirmText: "知道了"
+      });
+    } catch (_) {
+      // 通知轮询失败不影响孩子继续查看和完成任务。
+    } finally {
+      this.checkingReviewNotifications = false;
+    }
   },
 
   async onPullDownRefresh() {
@@ -185,5 +228,48 @@ Page({
 
     setSelectedTask(task);
     wx.navigateTo({ url: `/pages/task-detail/index?taskId=${encodeURIComponent(task.id)}` });
+  },
+
+  async editTask(event) {
+    const task = this.data.tasks.find((item) => item.id === event.currentTarget.dataset.id);
+    if (!task) return;
+    const result = await new Promise((resolve) => wx.showModal({
+      title: "编辑任务名称",
+      editable: true,
+      placeholderText: task.title,
+      content: "",
+      success: resolve
+    }));
+    if (!result.confirm || !String(result.content || "").trim()) return;
+    try {
+      await api.updateTask(task.id, { ...task, title: String(result.content).trim() });
+      wx.showToast({ title: "任务已更新", icon: "success" });
+      this.loadTasks();
+    } catch (error) {
+      wx.showToast({ title: error.message || "编辑失败", icon: "none" });
+    }
+  },
+
+  async deleteTask(event) {
+    const task = this.data.tasks.find((item) => item.id === event.currentTarget.dataset.id);
+    if (!task) return;
+    const result = await new Promise((resolve) => wx.showModal({ title: "删除任务", content: `确定删除“${task.title}”吗？`, success: resolve }));
+    if (!result.confirm) return;
+    try {
+      await api.deleteTask(task.id);
+      wx.showToast({ title: "任务已删除", icon: "success" });
+      this.loadTasks();
+    } catch (error) {
+      wx.showToast({ title: error.message || "删除失败", icon: "none" });
+    }
+  },
+
+  async remindTask(event) {
+    try {
+      await api.remindTask(event.currentTarget.dataset.id);
+      wx.showToast({ title: "已发起语音提醒", icon: "success" });
+    } catch (error) {
+      wx.showToast({ title: error.message || "提醒失败", icon: "none" });
+    }
   }
 });

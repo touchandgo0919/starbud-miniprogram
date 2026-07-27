@@ -81,15 +81,43 @@ async function getSubmissionPage({ page, pageSize, date, dateFrom, dateTo, keywo
   };
 }
 
+async function getNotifications() {
+  const body = await request("/api/notifications");
+  return body.notifications;
+}
+
+async function markNotificationRead(notificationId) {
+  return request(`/api/notifications/${notificationId}/read`, { method: "POST" });
+}
+
+async function updateTask(taskId, data) {
+  const body = await request(`/api/tasks/${taskId}`, { method: "PATCH", data });
+  return body.task;
+}
+
+async function deleteTask(taskId) {
+  return request(`/api/tasks/${taskId}`, { method: "DELETE" });
+}
+
+async function remindTask(taskId) {
+  const body = await request(`/api/tasks/${taskId}/remind`, { method: "POST" });
+  return body.task;
+}
+
 module.exports = {
   claimTask,
   createSubmission,
   finalizeSubmission,
+  getNotifications,
   getSubmissions,
   getSubmissionPage,
   getTasks,
   getTaskPage,
   getTodayTasks,
+  updateTask,
+  deleteTask,
+  remindTask,
   login,
+  markNotificationRead,
   uploadSubmissionPhoto
 };

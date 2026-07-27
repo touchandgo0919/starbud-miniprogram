@@ -44,10 +44,12 @@
   justify-content: center;
   border-radius: 30rpx;
   background: transparent;
-  color: #0aa868;
-  font-size: 40rpx;
-  font-weight: 900;
   box-shadow: none;
+}
+
+.greeting-mark__logo {
+  width: 64rpx;
+  height: 64rpx;
 }
 
 .progress-block {
@@ -249,7 +251,7 @@
 }
 
 .task-control {
-  height: 40rpx;
+  height: 50rpx;
 }
 
 .task-control--done {
@@ -284,6 +286,23 @@
   background: #eff8f3;
   color: #0aa868;
 }
+
+.parent-task-actions {
+  display: flex;
+  flex: 0 0 144rpx;
+  width: 144rpx;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10rpx 14rpx;
+}
+
+.parent-task-action {
+  color: #078d59;
+  font-size: 22rpx;
+  line-height: 1.5;
+}
+
+.parent-task-action--danger { color: #d95050; }
 
 .retry-button {
   width: 220rpx;

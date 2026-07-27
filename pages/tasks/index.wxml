@@ -4,7 +4,9 @@
       <text class="greeting-title">早上好，{{user.displayName}}</text>
       <text class="greeting-date">{{dateLabel}}</text>
     </view>
-    <text class="greeting-mark">芽</text>
+    <view class="greeting-mark">
+      <image class="greeting-mark__logo" src="/assets/starbud-icon.png" mode="aspectFit" />
+    </view>
   </view>
 
   <view class="progress-block">
@@ -83,8 +85,10 @@
             {{item.actionText}}
           </view>
           <view wx:elif="{{!isParent}}" class="{{item.actionClass}}">{{item.actionText}}</view>
-          <view wx:else class="task-status-text {{item.completed ? 'task-status-text--done' : ''}}">
-            {{item.completed ? "已完成" : "待完成"}}
+          <view wx:else class="parent-task-actions">
+            <view class="parent-task-action" data-id="{{item.id}}" catchtap="editTask">编辑</view>
+            <view class="parent-task-action parent-task-action--danger" data-id="{{item.id}}" catchtap="deleteTask">删除</view>
+            <view class="parent-task-action" data-id="{{item.id}}" catchtap="remindTask">提醒</view>
           </view>
         </view>
       </view>
