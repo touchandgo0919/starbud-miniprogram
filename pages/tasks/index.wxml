@@ -90,6 +90,5 @@
       </view>
     </view>
     <view wx:if="{{activeFilter !== 'today' && loadingMore}}" class="list-footer">正在加载更多任务…</view>
-    <view wx:elif="{{activeFilter !== 'today' && tasks.length && !hasMore}}" class="list-footer">已显示全部任务</view>
   </scroll-view>
 </view>
