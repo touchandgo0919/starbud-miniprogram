@@ -78,6 +78,7 @@ function normalizeSubmissionUrls(submission) {
   return {
     ...submission,
     photos: submission.photos.map((photo) => ({ ...photo, url: absoluteUrl(photo.url) })),
+    photoUrls: submission.photos.map((photo) => absoluteUrl(photo.url)),
     reviewImageUrl: submission.reviewImageUrl ? absoluteUrl(submission.reviewImageUrl) : "",
     reviewRounds: (submission.reviewRounds || []).map((round) => ({
       ...round,

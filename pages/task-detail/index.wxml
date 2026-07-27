@@ -46,6 +46,14 @@
         <scroll-view class="round-image-scroll" scroll-x="true"><image class="round-reviewed-photo" mode="aspectFill" src="{{round.reviewImageUrl}}" data-url="{{round.reviewImageUrl}}" data-urls="{{round.reviewImageUrl}}" bindtap="previewRoundPhoto" /></scroll-view>
         <view class="round-note"><text>提交备注</text><text>{{round.note || "未填写"}}</text></view>
       </view>
+      <view wx:if="{{submission.photos.length && !submission.reviewImageUrl}}" class="review-round review-round--pending surface">
+        <text class="round-title">第 {{submission.reviewRounds.length + 1}} 次提交 · 待批改</text>
+        <text class="round-label">批改前图片</text>
+        <scroll-view class="round-image-scroll" scroll-x="true"><view class="round-original-grid"><image wx:for="{{submission.photos}}" wx:key="id" class="round-original-photo" mode="aspectFill" src="{{item.url}}" data-url="{{item.url}}" data-urls="{{submission.photoUrls}}" bindtap="previewRoundPhoto" /></view></scroll-view>
+        <text class="round-label">批改后图片</text>
+        <text class="round-pending-text">等待家长批改</text>
+        <view class="round-note"><text>提交备注</text><text>{{submission.note || "未填写"}}</text></view>
+      </view>
     </view>
 
     <button
