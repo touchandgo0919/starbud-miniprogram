@@ -58,7 +58,10 @@ Page({
       wx.reLaunch({ url: "/pages/login/index" });
       return;
     }
-    this.loadSubmissions();
+    if (!this.hasLoadedSubmissions) {
+      this.hasLoadedSubmissions = true;
+      this.loadSubmissions();
+    }
   },
 
   async onPullDownRefresh() {

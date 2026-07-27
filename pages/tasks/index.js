@@ -74,7 +74,10 @@ Page({
       return;
     }
     this.setData({ user: session.user, isParent: session.user.role === "parent" });
-    this.loadTasks();
+    if (!this.hasLoadedTasks) {
+      this.hasLoadedTasks = true;
+      this.loadTasks();
+    }
     this.startReviewNotificationPolling();
   },
 
