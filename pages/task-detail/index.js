@@ -27,6 +27,7 @@ function taskViewModel(task) {
 Page({
   data: {
     task: null,
+    submission: null,
     isChild: false,
     loading: true
   },
@@ -42,6 +43,7 @@ Page({
     this.setData({ isChild: session.user.role === "child" });
     const selectedTask = getSelectedTask();
     if (selectedTask && String(selectedTask.id) === taskId) {
+      await this.loadSubmission(taskViewModel(selectedTask));
       this.setData({ task: taskViewModel(selectedTask), loading: false });
       return;
     }
@@ -51,6 +53,7 @@ Page({
       if (!task) throw new Error("任务不存在或今天无需执行。");
       const taskView = taskViewModel(task);
       setSelectedTask(taskView);
+      await this.loadSubmission(taskView);
       this.setData({ task: taskView });
     } catch (error) {
       wx.showModal({
@@ -62,6 +65,27 @@ Page({
     } finally {
       this.setData({ loading: false });
     }
+  },
+
+  async loadSubmission(task) {
+    const date = task.occurrenceDate || new Date().toLocaleDateString("en-CA");
+    try {
+      const submission = await api.getTaskSubmission(task.id, date);
+      this.setData({ submission });
+    } catch (error) {
+      if (!String(error.message || "").includes("404")) throw error;
+      this.setData({ submission: null });
+    }
+  },
+
+  previewReviewedPhoto() {
+    const url = this.data.submission && this.data.submission.reviewImageUrl;
+    if (url) wx.previewImage({ current: url, urls: [url] });
+  },
+
+  previewOriginalPhotos() {
+    const photos = this.data.submission && this.data.submission.photos;
+    if (photos && photos.length) wx.previewImage({ current: photos[0].url, urls: photos.map((photo) => photo.url) });
   },
 
   async handlePrimaryAction() {

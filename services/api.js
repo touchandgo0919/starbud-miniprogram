@@ -62,6 +62,15 @@ async function getSubmissions() {
   }));
 }
 
+async function getTaskSubmission(taskId, date) {
+  const body = await request(`/api/tasks/${taskId}/submission?date=${encodeURIComponent(date)}`);
+  return {
+    ...body.submission,
+    photos: body.submission.photos.map((photo) => ({ ...photo, url: absoluteUrl(photo.url) })),
+    reviewImageUrl: body.submission.reviewImageUrl ? absoluteUrl(body.submission.reviewImageUrl) : ""
+  };
+}
+
 async function getSubmissionPage({ page, pageSize, date, dateFrom, dateTo, keyword }) {
   const params = [`page=${page}`, `pageSize=${pageSize}`];
   if (date) params.push(`date=${encodeURIComponent(date)}`);
@@ -110,6 +119,7 @@ module.exports = {
   finalizeSubmission,
   getNotifications,
   getSubmissions,
+  getTaskSubmission,
   getSubmissionPage,
   getTasks,
   getTaskPage,

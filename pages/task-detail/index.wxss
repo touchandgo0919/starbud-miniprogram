@@ -104,3 +104,11 @@
 .detail-primary {
   margin-top: 34rpx;
 }
+
+.photo-section { margin-top: 28rpx; padding: 28rpx 30rpx; }
+.photo-title, .photo-tip { display: block; }
+.photo-title { color: #26312d; font-size: 28rpx; font-weight: 750; }
+.photo-tip { margin-top: 8rpx; color: #7a817e; font-size: 23rpx; }
+.review-photo { display: block; width: 100%; margin-top: 20rpx; border-radius: 14rpx; background: #f4f7f5; }
+.original-photo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12rpx; margin-top: 20rpx; }
+.original-photo { width: 100%; height: 180rpx; border-radius: 10rpx; background: #f4f7f5; }
