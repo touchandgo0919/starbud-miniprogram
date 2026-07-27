@@ -1,8 +1,25 @@
 const api = require("../../services/api");
-const { friendlyDate } = require("../../utils/date");
+const { friendlyDate, localDateKey } = require("../../utils/date");
 const { getSession, setSelectedTask } = require("../../utils/storage");
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 5;
+
+function taskDateRange(filter) {
+  const today = new Date();
+  const dateTo = localDateKey(today);
+
+  if (filter === "week") {
+    const start = new Date(today);
+    start.setDate(today.getDate() - ((today.getDay() + 6) % 7));
+    return { dateFrom: localDateKey(start), dateTo };
+  }
+
+  if (filter === "month") {
+    return { dateFrom: localDateKey(new Date(today.getFullYear(), today.getMonth(), 1)), dateTo };
+  }
+
+  return {};
+}
 
 function taskViewModel(task) {
   const completed = task.status === "completed" || task.submissionStatus === "submitted";
@@ -28,6 +45,8 @@ Page({
     dateLabel: friendlyDate(),
     filters: [
       { value: "all", label: "全部" },
+      { value: "month", label: "本月" },
+      { value: "week", label: "本周" },
       { value: "today", label: "今日" }
     ],
     activeFilter: "today",
@@ -71,19 +90,23 @@ Page({
   async loadTasks() {
     this.setData({ loading: true, error: "" });
     try {
-      const isAll = this.data.activeFilter === "all";
-      const result = isAll ? await api.getTaskPage(1, PAGE_SIZE) : null;
-      const sourceTasks = isAll ? result.tasks : await api.getTodayTasks();
+      const isToday = this.data.activeFilter === "today";
+      const result = isToday ? null : await api.getTaskPage({
+        page: 1,
+        pageSize: PAGE_SIZE,
+        ...taskDateRange(this.data.activeFilter)
+      });
+      const sourceTasks = isToday ? await api.getTodayTasks() : result.tasks;
       const tasks = sourceTasks.map(taskViewModel);
       const completedCount = tasks.filter((task) => task.completed).length;
-      const totalCount = isAll ? result.pagination.total : tasks.length;
+      const totalCount = isToday ? tasks.length : result.pagination.total;
       this.setData({
         tasks,
         totalCount,
         completedCount,
         progressPercent: tasks.length ? Math.round((completedCount / tasks.length) * 100) : 0,
-        page: isAll ? result.pagination.page : 1,
-        hasMore: isAll && result.pagination.hasMore,
+        page: isToday ? 1 : result.pagination.page,
+        hasMore: !isToday && result.pagination.hasMore,
         loadingMore: false
       });
     } catch (error) {
@@ -101,13 +124,17 @@ Page({
   },
 
   async loadMoreTasks() {
-    if (this.data.activeFilter !== "all" || this.data.loading || this.data.loadingMore || !this.data.hasMore) {
+    if (this.data.activeFilter === "today" || this.data.loading || this.data.loadingMore || !this.data.hasMore) {
       return;
     }
 
     this.setData({ loadingMore: true });
     try {
-      const result = await api.getTaskPage(this.data.page + 1, PAGE_SIZE);
+      const result = await api.getTaskPage({
+        page: this.data.page + 1,
+        pageSize: PAGE_SIZE,
+        ...taskDateRange(this.data.activeFilter)
+      });
       const additionalTasks = result.tasks.map(taskViewModel);
       const tasks = [...this.data.tasks, ...additionalTasks];
       const completedCount = tasks.filter((task) => task.completed).length;
