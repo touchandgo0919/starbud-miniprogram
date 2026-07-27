@@ -1,6 +1,6 @@
 const api = require("../../services/api");
 const { formatSubmittedAt, localDateKey } = require("../../utils/date");
-const { getSession, setSelectedTask } = require("../../utils/storage");
+const { getSession } = require("../../utils/storage");
 
 const PAGE_SIZE = 20;
 
@@ -30,6 +30,7 @@ function submissionViewModel(submission) {
     subjectMark: submission.taskTitle.slice(0, 1),
     reviewed: Boolean(submission.reviewedAt),
     statusLabel: submission.finalizedAt ? "已完成" : submission.reviewedAt ? "已批改" : "已提交",
+    canEditNote: !submission.finalizedAt,
     isToday: submission.taskDate === localDateKey()
   };
 }
@@ -172,6 +173,10 @@ Page({
     const submissionId = event.currentTarget.dataset.id;
     const submission = this.data.submissions.find((item) => item.id === submissionId);
     if (!submission) return;
+    if (!submission.canEditNote) {
+      wx.showToast({ title: "任务已完成，备注不可编辑", icon: "none" });
+      return;
+    }
     this.setData({ editingSubmissionId: submissionId, editingNote: submission.note || "" });
   },
 
@@ -186,6 +191,12 @@ Page({
   async saveNote() {
     const submissionId = this.data.editingSubmissionId;
     if (!submissionId) return;
+    const submission = this.data.submissions.find((item) => item.id === submissionId);
+    if (!submission || !submission.canEditNote) {
+      this.cancelEditNote();
+      wx.showToast({ title: "任务已完成，备注不可编辑", icon: "none" });
+      return;
+    }
     try {
       const updated = await api.updateSubmissionNote(submissionId, this.data.editingNote);
       this.setData({
@@ -197,33 +208,5 @@ Page({
     } catch (error) {
       wx.showToast({ title: error.message || "备注保存失败", icon: "none" });
     }
-  },
-
-  resubmit(event) {
-    const submissionId = event.currentTarget.dataset.id;
-    const submission = this.data.submissions.find((item) => item.id === submissionId);
-    if (!submission) return;
-    wx.showModal({
-      title: "重新提交作业？",
-      content: "旧照片和旧批改结果将被替换，请上传修改后的照片和备注。",
-      confirmText: "继续",
-      confirmColor: "#0AA868",
-      success: async (result) => {
-        if (!result.confirm) return;
-        try {
-          await api.reopenSubmissionForResubmit(submissionId);
-          setSelectedTask({
-            id: submission.taskId,
-            title: submission.taskTitle,
-            scheduleTime: submission.scheduleTime,
-            voiceContent: "",
-            subjectMark: submission.subjectMark
-          });
-          wx.navigateTo({ url: `/pages/submit/index?taskId=${encodeURIComponent(submission.taskId)}&submissionId=${encodeURIComponent(submissionId)}` });
-        } catch (error) {
-          wx.showToast({ title: error.message || "无法重新提交", icon: "none" });
-        }
-      }
-    });
   }
 });

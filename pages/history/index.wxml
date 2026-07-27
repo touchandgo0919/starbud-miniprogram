@@ -72,9 +72,8 @@
         </view>
         <view wx:else class="history-note-wrap">
           <text class="history-note">{{item.note || "未填写备注"}}</text>
-          <view wx:if="{{!isParent}}" class="history-note-actions">
+          <view wx:if="{{!isParent && item.canEditNote}}" class="history-note-actions">
             <text class="history-note-edit" data-id="{{item.id}}" bindtap="startEditNote">编辑备注</text>
-            <text wx:if="{{item.reviewed}}" class="history-note-edit history-note-resubmit" data-id="{{item.id}}" bindtap="resubmit">重新提交</text>
           </view>
         </view>
       </view>
