@@ -94,6 +94,7 @@ Page({
       const result = isToday ? null : await api.getTaskPage({
         page: 1,
         pageSize: PAGE_SIZE,
+        scope: this.data.activeFilter === "all" ? "definitions" : "",
         ...taskDateRange(this.data.activeFilter)
       });
       const sourceTasks = isToday ? await api.getTodayTasks() : result.tasks;
@@ -133,6 +134,7 @@ Page({
       const result = await api.getTaskPage({
         page: this.data.page + 1,
         pageSize: PAGE_SIZE,
+        scope: this.data.activeFilter === "all" ? "definitions" : "",
         ...taskDateRange(this.data.activeFilter)
       });
       const additionalTasks = result.tasks.map(taskViewModel);

@@ -17,10 +17,11 @@ async function getTasks() {
   return body.tasks;
 }
 
-async function getTaskPage({ page, pageSize, dateFrom, dateTo }) {
+async function getTaskPage({ page, pageSize, dateFrom, dateTo, scope }) {
   const params = [`page=${page}`, `pageSize=${pageSize}`];
   if (dateFrom) params.push(`dateFrom=${encodeURIComponent(dateFrom)}`);
   if (dateTo) params.push(`dateTo=${encodeURIComponent(dateTo)}`);
+  if (scope) params.push(`scope=${encodeURIComponent(scope)}`);
   const body = await request(`/api/tasks?${params.join("&")}`);
   return body;
 }
