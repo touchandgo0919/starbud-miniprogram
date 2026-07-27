@@ -23,16 +23,28 @@
       <text class="voice-content">{{task.voiceEnabled ? task.voiceContent : "未开启语音提醒"}}</text>
     </view>
 
-    <view wx:if="{{submission && submission.reviewImageUrl}}" class="photo-section surface">
+    <view wx:if="{{submission && !submission.reviewRounds.length && submission.reviewImageUrl}}" class="photo-section surface">
       <text class="photo-title">批改后照片</text>
       <text class="photo-tip">默认展示批改结果</text>
       <image class="review-photo" mode="widthFix" src="{{submission.reviewImageUrl}}" bindtap="previewReviewedPhoto" />
     </view>
 
-    <view wx:if="{{submission && submission.photos.length}}" class="photo-section surface">
+    <view wx:if="{{submission && !submission.reviewRounds.length && submission.photos.length}}" class="photo-section surface">
       <text class="photo-title">批改前照片</text>
       <view class="original-photo-grid" bindtap="previewOriginalPhotos">
         <image wx:for="{{submission.photos}}" wx:key="id" class="original-photo" mode="aspectFill" src="{{item.url}}" />
+      </view>
+    </view>
+
+    <view wx:if="{{submission && submission.reviewRounds.length}}" class="review-rounds-section">
+      <text class="rounds-title">批改记录</text>
+      <view wx:for="{{submission.reviewRounds}}" wx:key="id" wx:for-item="round" class="review-round surface">
+        <text class="round-title">第 {{round.sequence}} 次批改</text>
+        <text class="round-label">批改前图片</text>
+        <scroll-view class="round-image-scroll" scroll-x="true"><view class="round-original-grid"><image wx:for="{{round.photos}}" wx:key="id" wx:for-item="photo" class="round-original-photo" mode="aspectFill" src="{{photo.url}}" data-url="{{photo.url}}" data-urls="{{round.photoUrls}}" bindtap="previewRoundPhoto" /></view></scroll-view>
+        <text class="round-label">批改后图片</text>
+        <scroll-view class="round-image-scroll" scroll-x="true"><image class="round-reviewed-photo" mode="aspectFill" src="{{round.reviewImageUrl}}" data-url="{{round.reviewImageUrl}}" data-urls="{{round.reviewImageUrl}}" bindtap="previewRoundPhoto" /></scroll-view>
+        <view class="round-note"><text>提交备注</text><text>{{round.note || "未填写"}}</text></view>
       </view>
     </view>
 
@@ -41,7 +53,7 @@
       class="primary-button detail-primary"
       bindtap="handlePrimaryAction"
     >
-      {{task.claimedAt ? "去完成任务" : "领取任务"}}
+      {{task.needsRevision ? "重新提交" : task.claimedAt ? "去完成任务" : "领取任务"}}
     </button>
   </block>
 </view>

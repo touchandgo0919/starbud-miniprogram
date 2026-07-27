@@ -112,3 +112,15 @@
 .review-photo { display: block; width: 100%; margin-top: 20rpx; border-radius: 14rpx; background: #f4f7f5; }
 .original-photo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12rpx; margin-top: 20rpx; }
 .original-photo { width: 100%; height: 180rpx; border-radius: 10rpx; background: #f4f7f5; }
+.review-rounds-section { margin-top: 28rpx; }
+.rounds-title, .round-title, .round-label { display: block; }
+.rounds-title { margin: 0 0 16rpx; color: #26312d; font-size: 30rpx; font-weight: 800; }
+.review-round { margin-top: 18rpx; padding: 28rpx 30rpx; }
+.round-title { color: #26312d; font-size: 28rpx; font-weight: 800; }
+.round-label { margin-top: 22rpx; color: #69736f; font-size: 24rpx; font-weight: 700; }
+.round-image-scroll { width: 100%; margin-top: 14rpx; white-space: nowrap; }
+.round-original-grid { display: inline-flex; gap: 12rpx; }
+.round-original-photo, .round-reviewed-photo { display: inline-block; width: 200rpx; height: 180rpx; border-radius: 10rpx; background: #f4f7f5; }
+.round-note { margin-top: 22rpx; padding-top: 20rpx; border-top: 1rpx solid #e7ece9; }
+.round-note text { display: block; color: #69736f; font-size: 24rpx; font-weight: 700; }
+.round-note text + text { margin-top: 8rpx; color: #25302c; font-weight: 400; line-height: 1.55; white-space: pre-wrap; }

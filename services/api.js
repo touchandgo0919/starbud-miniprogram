@@ -71,22 +71,26 @@ async function reopenSubmissionForResubmit(submissionId) {
 
 async function getSubmissions() {
   const body = await request("/api/submissions");
-  return body.submissions.map((submission) => ({
+  return body.submissions.map(normalizeSubmissionUrls);
+}
+
+function normalizeSubmissionUrls(submission) {
+  return {
     ...submission,
-    photos: submission.photos.map((photo) => ({
-      ...photo,
-      url: absoluteUrl(photo.url)
+    photos: submission.photos.map((photo) => ({ ...photo, url: absoluteUrl(photo.url) })),
+    reviewImageUrl: submission.reviewImageUrl ? absoluteUrl(submission.reviewImageUrl) : "",
+    reviewRounds: (submission.reviewRounds || []).map((round) => ({
+      ...round,
+      reviewImageUrl: absoluteUrl(round.reviewImageUrl),
+      photos: round.photos.map((photo) => ({ ...photo, url: absoluteUrl(photo.url) })),
+      photoUrls: round.photos.map((photo) => absoluteUrl(photo.url))
     }))
-  }));
+  };
 }
 
 async function getTaskSubmission(taskId, date) {
   const body = await request(`/api/tasks/${taskId}/submission?date=${encodeURIComponent(date)}`);
-  return {
-    ...body.submission,
-    photos: body.submission.photos.map((photo) => ({ ...photo, url: absoluteUrl(photo.url) })),
-    reviewImageUrl: body.submission.reviewImageUrl ? absoluteUrl(body.submission.reviewImageUrl) : ""
-  };
+  return normalizeSubmissionUrls(body.submission);
 }
 
 async function getSubmissionPage({ page, pageSize, date, dateFrom, dateTo, keyword }) {
@@ -97,13 +101,7 @@ async function getSubmissionPage({ page, pageSize, date, dateFrom, dateTo, keywo
   if (keyword && keyword.trim()) params.push(`keyword=${encodeURIComponent(keyword.trim())}`);
   const body = await request(`/api/submissions?${params.join("&")}`);
   return {
-    submissions: body.submissions.map((submission) => ({
-      ...submission,
-      photos: submission.photos.map((photo) => ({
-        ...photo,
-        url: absoluteUrl(photo.url)
-      }))
-    })),
+    submissions: body.submissions.map(normalizeSubmissionUrls),
     pagination: body.pagination
   };
 }

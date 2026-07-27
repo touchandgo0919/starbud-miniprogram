@@ -9,13 +9,15 @@ const repeatLabels = {
 };
 
 function taskViewModel(task) {
-  const completed = task.status === "completed" || task.submissionStatus === "submitted";
+  const needsRevision = Boolean(task.needsRevision);
+  const completed = !needsRevision && (task.status === "completed" || task.submissionStatus === "submitted");
   const reviewed = Boolean(task.reviewedAt);
   return {
     ...task,
     completed,
     repeatLabel: repeatLabels[task.repeatType] || "未知",
-    statusLabel: reviewed ? "已批改" : completed ? "已完成" : "待完成",
+    statusLabel: needsRevision ? "待修改" : reviewed ? "已批改" : completed ? "已完成" : "待完成",
+    needsRevision,
     claimLabel: task.claimedAt ? "已领取" : "未领取",
     submissionLabel: task.submissionStatus === "submitted"
       ? `已提交（${task.submissionPhotoCount || 0} 张照片）`
@@ -95,9 +97,29 @@ Page({
     if (photos && photos.length) wx.previewImage({ current: photos[0].url, urls: photos.map((photo) => photo.url) });
   },
 
+  previewRoundPhoto(event) {
+    const value = event.currentTarget.dataset.urls;
+    const urls = Array.isArray(value) ? value : String(value || "").split("|").filter(Boolean);
+    const current = event.currentTarget.dataset.url;
+    if (current && urls.length) wx.previewImage({ current, urls });
+  },
+
   async handlePrimaryAction() {
     const task = this.data.task;
-    if (!this.data.isChild || !task || task.completed) return;
+    if (!this.data.isChild || !task) return;
+
+    if (task.needsRevision && this.data.submission && this.data.submission.id) {
+      try {
+        const draft = await api.reopenSubmissionForResubmit(this.data.submission.id);
+        setSelectedTask({ ...task, submissionId: draft.id, submissionStatus: "draft", needsRevision: false });
+        wx.navigateTo({ url: `/pages/submit/index?taskId=${encodeURIComponent(task.id)}&submissionId=${encodeURIComponent(draft.id)}` });
+      } catch (error) {
+        wx.showToast({ title: error.message || "重新提交失败", icon: "none" });
+      }
+      return;
+    }
+
+    if (task.completed) return;
 
     if (!task.claimedAt) {
       try {
