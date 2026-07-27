@@ -74,7 +74,8 @@ Page({
       const submission = await api.getTaskSubmission(task.id, date);
       this.setData({ submission });
     } catch (error) {
-      if (!String(error.message || "").includes("404")) throw error;
+      const message = String(error.message || "");
+      if (!message.includes("404") && !/not found/i.test(message)) throw error;
       this.setData({ submission: null });
     }
   },
