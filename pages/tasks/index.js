@@ -33,13 +33,13 @@ function taskViewModel(task) {
     reviewed,
     waitingReview,
     actionText,
-    actionClass: reviewed || waitingReview || completed
-      ? "task-control task-control--reviewed"
-      : completed
-        ? "task-control task-control--done"
-      : task.claimedAt
-        ? "task-control task-control--complete"
-        : "task-control task-control--claim",
+    actionClass: completed
+      ? "task-control task-control--done"
+      : reviewed || waitingReview || task.needsRevision
+        ? "task-control task-control--reviewed"
+        : task.claimedAt
+          ? "task-control task-control--complete"
+          : "task-control task-control--claim",
     subjectMark: task.title.slice(0, 1),
     description: task.voiceContent || "按时完成任务并拍照提交"
   };
