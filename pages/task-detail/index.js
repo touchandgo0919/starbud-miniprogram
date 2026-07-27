@@ -50,8 +50,8 @@ Page({
     }
 
     try {
-      const task = (await api.getTodayTasks()).find((item) => String(item.id) === taskId);
-      if (!task) throw new Error("任务不存在或今天无需执行。");
+      const task = await api.getTask(taskId);
+      if (!task) throw new Error("任务不存在或无权查看。");
       const taskView = taskViewModel(task);
       setSelectedTask(taskView);
       await this.loadSubmission(taskView);
