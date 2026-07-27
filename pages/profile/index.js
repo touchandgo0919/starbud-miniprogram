@@ -2,7 +2,15 @@ const { clearSession, getSession } = require("../../utils/storage");
 
 Page({
   data: {
-    user: null
+    user: null,
+    statusBarHeight: 24,
+    navBarHeight: 68
+  },
+
+  onLoad() {
+    const system = wx.getSystemInfoSync();
+    const statusBarHeight = system.statusBarHeight || 24;
+    this.setData({ statusBarHeight, navBarHeight: statusBarHeight + 44 });
   },
 
   onShow() {

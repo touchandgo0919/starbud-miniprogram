@@ -3,14 +3,22 @@
   height: 100vh;
   min-height: 0;
   padding-bottom: 24rpx;
+  padding-top: 0;
   flex-direction: column;
   overflow: hidden;
   background: #f6f8f7;
 }
 
+.top-hero { margin: 0 -28rpx; padding: 0 28rpx; background: linear-gradient(105deg, #08372b 0%, #121418 55%, #0d4331 100%); }
+.module-nav { display: flex; padding-right: 190rpx; align-items: center; }
+.module-brand { display: flex; height: 76rpx; align-items: center; gap: 14rpx; color: #ffffff; font-size: 30rpx; font-weight: 800; }
+.module-brand__logo { width: 48rpx; height: 48rpx; }
+
 .history-search {
   display: flex;
   height: 76rpx;
+  margin-top: 28rpx;
+  margin-bottom: 18rpx;
   padding: 0 22rpx;
   align-items: center;
   border-radius: 18rpx;
@@ -52,6 +60,8 @@
   font-size: 34rpx;
   font-weight: 800;
 }
+.top-hero .history-heading { color: #f4f5f7; }
+.top-hero .history-count { color: #969ca7; }
 
 .history-title-group {
   display: flex;
@@ -185,16 +195,27 @@
   background: #edf0ee;
 }
 
-.history-note {
-  display: block;
+.history-note-wrap,
+.history-note-editor {
   margin-top: 18rpx;
   padding: 18rpx 20rpx;
   border-radius: 14rpx;
   background: #f5f8f6;
+}
+
+.history-note {
+  display: block;
   color: #64706b;
   font-size: 24rpx;
   line-height: 1.55;
 }
+
+.history-note-actions { display: flex; gap: 24rpx; margin-top: 12rpx; }
+.history-note-edit { color: #078d59; font-size: 23rpx; font-weight: 700; }
+.history-note-resubmit { color: #d7373d; }
+.history-note-editor textarea { width: 100%; min-height: 72rpx; color: #26312d; font-size: 25rpx; line-height: 1.5; }
+.history-note-editor__actions { display: flex; justify-content: flex-end; gap: 28rpx; margin-top: 14rpx; color: #7a817e; font-size: 24rpx; }
+.history-note-editor__save { color: #078d59; font-weight: 700; }
 
 .retry-button {
   width: 220rpx;

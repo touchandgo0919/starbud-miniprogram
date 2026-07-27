@@ -56,6 +56,19 @@ async function finalizeSubmission(submissionId) {
   return body.submission;
 }
 
+async function updateSubmissionNote(submissionId, note) {
+  const body = await request(`/api/submissions/${submissionId}`, {
+    method: "PATCH",
+    data: { note }
+  });
+  return body.submission;
+}
+
+async function reopenSubmissionForResubmit(submissionId) {
+  const body = await request(`/api/submissions/${submissionId}/resubmit`, { method: "POST" });
+  return body.submission;
+}
+
 async function getSubmissions() {
   const body = await request("/api/submissions");
   return body.submissions.map((submission) => ({
@@ -135,5 +148,7 @@ module.exports = {
   remindTask,
   login,
   markNotificationRead,
-  uploadSubmissionPhoto
+  uploadSubmissionPhoto,
+  updateSubmissionNote,
+  reopenSubmissionForResubmit
 };

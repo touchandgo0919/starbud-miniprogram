@@ -43,10 +43,17 @@ function taskViewModel(task) {
   };
 }
 
+function filterTasks(tasks, keyword) {
+  const normalized = String(keyword || "").trim().toLowerCase();
+  return normalized ? tasks.filter((task) => task.title.toLowerCase().includes(normalized)) : tasks;
+}
+
 Page({
   data: {
     user: null,
     isParent: false,
+    statusBarHeight: 24,
+    navBarHeight: 68,
     dateLabel: friendlyDate(),
     filters: [
       { value: "all", label: "全部" },
@@ -55,6 +62,8 @@ Page({
       { value: "today", label: "今日" }
     ],
     activeFilter: "today",
+    keyword: "",
+    allTasks: [],
     tasks: [],
     totalCount: 0,
     completedCount: 0,
@@ -65,6 +74,12 @@ Page({
     page: 0,
     hasMore: false,
     error: ""
+  },
+
+  onLoad() {
+    const system = wx.getSystemInfoSync();
+    const statusBarHeight = system.statusBarHeight || 24;
+    this.setData({ statusBarHeight, navBarHeight: statusBarHeight + 44 });
   },
 
   onShow() {
@@ -148,11 +163,13 @@ Page({
         ...taskDateRange(this.data.activeFilter)
       });
       const sourceTasks = isToday ? await api.getTodayTasks() : result.tasks;
-      const tasks = sourceTasks.map(taskViewModel);
+      const allTasks = sourceTasks.map(taskViewModel);
+      const tasks = filterTasks(allTasks, this.data.keyword);
       const completedCount = tasks.filter((task) => task.completed).length;
       const totalCount = isToday ? tasks.length : result.pagination.total;
       this.setData({
         tasks,
+        allTasks,
         totalCount,
         completedCount,
         progressPercent: tasks.length ? Math.round((completedCount / tasks.length) * 100) : 0,
@@ -165,6 +182,15 @@ Page({
     } finally {
       this.setData({ loading: false });
     }
+  },
+
+  onSearchInput(event) {
+    const keyword = event.detail.value;
+    this.setData({ keyword, tasks: filterTasks(this.data.allTasks, keyword) });
+  },
+
+  clearSearch() {
+    this.setData({ keyword: "", tasks: this.data.allTasks });
   },
 
   selectFilter(event) {
@@ -188,10 +214,12 @@ Page({
         ...taskDateRange(this.data.activeFilter)
       });
       const additionalTasks = result.tasks.map(taskViewModel);
-      const tasks = [...this.data.tasks, ...additionalTasks];
+      const allTasks = [...this.data.allTasks, ...additionalTasks];
+      const tasks = filterTasks(allTasks, this.data.keyword);
       const completedCount = tasks.filter((task) => task.completed).length;
       this.setData({
         tasks,
+        allTasks,
         completedCount,
         progressPercent: tasks.length
           ? Math.round((completedCount / tasks.length) * 100)

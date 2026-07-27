@@ -54,7 +54,7 @@
   <view class="submit-bar">
     <text wx:if="{{uploadProgress}}" class="upload-progress">{{uploadProgress}}</text>
     <button class="primary-button" loading="{{submitting}}" disabled="{{submitting}}" bindtap="submit">
-      提交作业
+      {{resubmitSubmissionId ? "重新提交作业" : "提交作业"}}
     </button>
   </view>
 </view>

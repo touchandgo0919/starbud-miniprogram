@@ -11,6 +11,7 @@ Page({
     task: null,
     photos: [],
     note: "",
+    resubmitSubmissionId: "",
     submitting: false,
     uploadProgress: ""
   },
@@ -28,13 +29,15 @@ Page({
     }
 
     const taskId = String(options.taskId || "");
+    const resubmitSubmissionId = String(options.submissionId || "");
     const selectedTask = getSelectedTask();
     if (selectedTask && String(selectedTask.id) === taskId) {
       this.setData({
         task: {
           ...selectedTask,
           subjectMark: selectedTask.subjectMark || selectedTask.title.slice(0, 1)
-        }
+        },
+        resubmitSubmissionId
       });
       return;
     }
@@ -131,8 +134,13 @@ Page({
   async performSubmit() {
     this.setData({ submitting: true, uploadProgress: "正在创建提交单…" });
     try {
-      const submission = await api.createSubmission(this.data.task.id, this.data.note);
+      const submission = this.data.resubmitSubmissionId
+        ? { id: this.data.resubmitSubmissionId, status: "draft" }
+        : await api.createSubmission(this.data.task.id, this.data.note);
       if (submission.status !== "submitted") {
+        if (this.data.resubmitSubmissionId) {
+          await api.updateSubmissionNote(submission.id, this.data.note);
+        }
         for (let index = 0; index < this.data.photos.length; index += 1) {
           this.setData({
             uploadProgress: `正在上传第 ${index + 1} / ${this.data.photos.length} 张照片…`

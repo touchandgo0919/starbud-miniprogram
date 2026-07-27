@@ -1,30 +1,23 @@
 <view class="page-shell history-page">
-  <view class="history-search surface">
-    <text class="history-search__icon">⌕</text>
-    <input
-      class="history-search__input"
-      value="{{keyword}}"
-      placeholder="搜索任务名称"
-      confirm-type="search"
-      bindinput="onSearchInput"
-    />
-    <view wx:if="{{keyword}}" class="history-search__clear" bindtap="clearSearch">×</view>
-  </view>
-
-  <view class="history-heading">
-    <view class="history-title-group">
-      <text>提交列表</text>
-      <text class="history-count">{{totalCount}} 项</text>
+  <view class="top-hero">
+    <view class="module-nav" style="height: {{navBarHeight}}px; padding-top: {{statusBarHeight}}px;">
+      <view class="module-brand">
+        <image class="module-brand__logo" src="/assets/starbud-icon.png" mode="aspectFit" />
+        <text>星星芽AI助手</text>
+      </view>
     </view>
-    <view class="filter-tabs">
-      <view
-        wx:for="{{filters}}"
-        wx:key="value"
-        class="filter-tab {{activeFilter === item.value ? 'filter-tab--active' : ''}}"
-        data-value="{{item.value}}"
-        bindtap="selectFilter"
-      >
-        {{item.label}}
+    <view class="history-search surface">
+      <text class="history-search__icon">⌕</text>
+      <input class="history-search__input" value="{{keyword}}" placeholder="搜索提交" confirm-type="search" bindinput="onSearchInput" />
+      <view wx:if="{{keyword}}" class="history-search__clear" bindtap="clearSearch">×</view>
+    </view>
+    <view class="history-heading">
+      <view class="history-title-group">
+        <text>提交列表</text>
+        <text class="history-count">{{totalCount}} 项</text>
+      </view>
+      <view class="filter-tabs">
+        <view wx:for="{{filters}}" wx:key="value" class="filter-tab {{activeFilter === item.value ? 'filter-tab--active' : ''}}" data-value="{{item.value}}" bindtap="selectFilter">{{item.label}}</view>
       </view>
     </view>
   </view>
@@ -73,7 +66,17 @@
             bindtap="previewPhoto"
           />
         </scroll-view>
-        <text wx:if="{{item.note}}" class="history-note">{{item.note}}</text>
+        <view wx:if="{{!isParent && editingSubmissionId === item.id}}" class="history-note-editor">
+          <textarea value="{{editingNote}}" maxlength="500" placeholder="填写提交备注" auto-height bindinput="onNoteInput" />
+          <view class="history-note-editor__actions"><text bindtap="cancelEditNote">取消</text><text class="history-note-editor__save" bindtap="saveNote">保存</text></view>
+        </view>
+        <view wx:else class="history-note-wrap">
+          <text class="history-note">{{item.note || "未填写备注"}}</text>
+          <view wx:if="{{!isParent}}" class="history-note-actions">
+            <text class="history-note-edit" data-id="{{item.id}}" bindtap="startEditNote">编辑备注</text>
+            <text wx:if="{{item.reviewed}}" class="history-note-edit history-note-resubmit" data-id="{{item.id}}" bindtap="resubmit">重新提交</text>
+          </view>
+        </view>
       </view>
     </view>
     <view wx:if="{{loadingMore}}" class="history-footer">正在加载更多提交记录…</view>

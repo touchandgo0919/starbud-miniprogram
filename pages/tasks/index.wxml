@@ -1,38 +1,31 @@
 <view class="page-shell tasks-page">
-  <view class="greeting surface">
-    <view>
-      <text class="greeting-title">早上好，{{user.displayName}}</text>
-      <text class="greeting-date">{{dateLabel}}</text>
+  <view class="top-hero">
+    <view class="module-nav" style="height: {{navBarHeight}}px; padding-top: {{statusBarHeight}}px;">
+      <view class="module-brand">
+        <image class="module-brand__logo" src="/assets/starbud-icon.png" mode="aspectFit" />
+        <text>星星芽AI助手</text>
+      </view>
     </view>
-    <view class="greeting-mark">
-      <image class="greeting-mark__logo" src="/assets/starbud-icon.png" mode="aspectFit" />
+    <view class="module-search surface">
+      <text class="module-search__icon">⌕</text>
+      <input class="module-search__input" value="{{keyword}}" placeholder="搜索任务" confirm-type="search" bindinput="onSearchInput" />
+      <view wx:if="{{keyword}}" class="module-search__clear" bindtap="clearSearch">×</view>
     </view>
-  </view>
-
-  <view class="progress-block">
-    <view class="progress-copy">
-      <text class="progress-value">{{completedCount}} / {{tasks.length}}</text>
-      <text class="progress-label">已完成</text>
-    </view>
-    <view class="progress-track">
-      <view class="progress-fill" style="width: {{progressPercent}}%"></view>
-    </view>
-  </view>
-
-  <view class="section-heading">
-    <view class="section-title-group">
-      <text>任务列表</text>
-      <text class="section-count">{{totalCount}} 项</text>
-    </view>
-    <view class="filter-tabs">
-      <view
-        wx:for="{{filters}}"
-        wx:key="value"
-        class="filter-tab {{activeFilter === item.value ? 'filter-tab--active' : ''}}"
-        data-value="{{item.value}}"
-        bindtap="selectFilter"
-      >
-        {{item.label}}
+    <view class="section-heading">
+      <view class="section-title-group">
+        <text>任务列表</text>
+        <text class="section-count">{{totalCount}} 项</text>
+      </view>
+      <view class="filter-tabs">
+        <view
+          wx:for="{{filters}}"
+          wx:key="value"
+          class="filter-tab {{activeFilter === item.value ? 'filter-tab--active' : ''}}"
+          data-value="{{item.value}}"
+          bindtap="selectFilter"
+        >
+          {{item.label}}
+        </view>
       </view>
     </view>
   </view>

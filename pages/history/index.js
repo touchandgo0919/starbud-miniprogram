@@ -1,6 +1,6 @@
 const api = require("../../services/api");
 const { formatSubmittedAt, localDateKey } = require("../../utils/date");
-const { getSession } = require("../../utils/storage");
+const { getSession, setSelectedTask } = require("../../utils/storage");
 
 const PAGE_SIZE = 20;
 
@@ -28,12 +28,15 @@ function submissionViewModel(submission) {
     ...submission,
     submittedLabel: formatSubmittedAt(submission.submittedAt),
     subjectMark: submission.taskTitle.slice(0, 1),
+    reviewed: Boolean(submission.reviewedAt),
     isToday: submission.taskDate === localDateKey()
   };
 }
 
 Page({
   data: {
+    statusBarHeight: 24,
+    navBarHeight: 68,
     activeFilter: "today",
     filters: [
       { value: "all", label: "全部" },
@@ -42,6 +45,9 @@ Page({
       { value: "today", label: "今日" }
     ],
     submissions: [],
+    isParent: false,
+    editingSubmissionId: "",
+    editingNote: "",
     totalCount: 0,
     keyword: "",
     loading: true,
@@ -52,12 +58,19 @@ Page({
     error: ""
   },
 
+  onLoad() {
+    const system = wx.getSystemInfoSync();
+    const statusBarHeight = system.statusBarHeight || 24;
+    this.setData({ statusBarHeight, navBarHeight: statusBarHeight + 44 });
+  },
+
   onShow() {
     const session = getSession();
     if (!session || !session.user || !["child", "parent"].includes(session.user.role)) {
       wx.reLaunch({ url: "/pages/login/index" });
       return;
     }
+    this.setData({ isParent: session.user.role === "parent" });
     if (!this.hasLoadedSubmissions) {
       this.hasLoadedSubmissions = true;
       this.loadSubmissions();
@@ -151,6 +164,65 @@ Page({
     wx.previewImage({
       current,
       urls: submission.photos.map((photo) => photo.url)
+    });
+  },
+
+  startEditNote(event) {
+    const submissionId = event.currentTarget.dataset.id;
+    const submission = this.data.submissions.find((item) => item.id === submissionId);
+    if (!submission) return;
+    this.setData({ editingSubmissionId: submissionId, editingNote: submission.note || "" });
+  },
+
+  onNoteInput(event) {
+    this.setData({ editingNote: event.detail.value });
+  },
+
+  cancelEditNote() {
+    this.setData({ editingSubmissionId: "", editingNote: "" });
+  },
+
+  async saveNote() {
+    const submissionId = this.data.editingSubmissionId;
+    if (!submissionId) return;
+    try {
+      const updated = await api.updateSubmissionNote(submissionId, this.data.editingNote);
+      this.setData({
+        submissions: this.data.submissions.map((item) => item.id === submissionId ? { ...item, note: updated.note } : item),
+        editingSubmissionId: "",
+        editingNote: ""
+      });
+      wx.showToast({ title: "备注已保存", icon: "success" });
+    } catch (error) {
+      wx.showToast({ title: error.message || "备注保存失败", icon: "none" });
+    }
+  },
+
+  resubmit(event) {
+    const submissionId = event.currentTarget.dataset.id;
+    const submission = this.data.submissions.find((item) => item.id === submissionId);
+    if (!submission) return;
+    wx.showModal({
+      title: "重新提交作业？",
+      content: "旧照片和旧批改结果将被替换，请上传修改后的照片和备注。",
+      confirmText: "继续",
+      confirmColor: "#0AA868",
+      success: async (result) => {
+        if (!result.confirm) return;
+        try {
+          await api.reopenSubmissionForResubmit(submissionId);
+          setSelectedTask({
+            id: submission.taskId,
+            title: submission.taskTitle,
+            scheduleTime: submission.scheduleTime,
+            voiceContent: "",
+            subjectMark: submission.subjectMark
+          });
+          wx.navigateTo({ url: `/pages/submit/index?taskId=${encodeURIComponent(submission.taskId)}&submissionId=${encodeURIComponent(submissionId)}` });
+        } catch (error) {
+          wx.showToast({ title: error.message || "无法重新提交", icon: "none" });
+        }
+      }
     });
   }
 });

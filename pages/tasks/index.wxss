@@ -3,89 +3,20 @@
   height: 100vh;
   min-height: 0;
   padding-bottom: 24rpx;
+  padding-top: 0;
   flex-direction: column;
   overflow: hidden;
   background: #ffffff;
 }
 
-.greeting {
-  display: flex;
-  min-height: 194rpx;
-  margin-top: 12rpx;
-  padding: 36rpx 34rpx;
-  align-items: center;
-  justify-content: space-between;
-  border-color: #d9f0e4;
-  background: #eaf8f1;
-}
-
-.greeting-title,
-.greeting-date {
-  display: block;
-}
-
-.greeting-title {
-  color: #073b2c;
-  font-size: 42rpx;
-  font-weight: 800;
-}
-
-.greeting-date {
-  margin-top: 18rpx;
-  color: #4f6c61;
-  font-size: 26rpx;
-}
-
-.greeting-mark {
-  display: flex;
-  width: 92rpx;
-  height: 92rpx;
-  align-items: center;
-  justify-content: center;
-  border-radius: 30rpx;
-  background: transparent;
-  box-shadow: none;
-}
-
-.greeting-mark__logo {
-  width: 64rpx;
-  height: 64rpx;
-}
-
-.progress-block {
-  padding: 38rpx 8rpx 30rpx;
-}
-
-.progress-copy {
-  display: flex;
-  align-items: baseline;
-  gap: 14rpx;
-}
-
-.progress-value {
-  font-size: 38rpx;
-  font-weight: 800;
-}
-
-.progress-label {
-  color: #7a817e;
-  font-size: 25rpx;
-}
-
-.progress-track {
-  overflow: hidden;
-  height: 14rpx;
-  margin-top: 20rpx;
-  border-radius: 999rpx;
-  background: #edf0ee;
-}
-
-.progress-fill {
-  height: 100%;
-  border-radius: inherit;
-  background: #0aa868;
-  transition: width 240ms ease;
-}
+.top-hero { margin: 0 -28rpx; padding: 0 28rpx; background: linear-gradient(105deg, #08372b 0%, #121418 55%, #0d4331 100%); }
+.module-nav { display: flex; padding-right: 190rpx; align-items: center; }
+.module-brand { display: flex; height: 76rpx; align-items: center; gap: 14rpx; color: #ffffff; font-size: 30rpx; font-weight: 800; }
+.module-brand__logo { width: 48rpx; height: 48rpx; }
+.module-search { display: flex; height: 76rpx; margin-top: 28rpx; margin-bottom: 18rpx; padding: 0 22rpx; align-items: center; border-radius: 18rpx; background: #ffffff; }
+.module-search__icon { margin-right: 14rpx; color: #7b8781; font-size: 36rpx; line-height: 1; }
+.module-search__input { min-width: 0; flex: 1; color: #26312d; font-size: 26rpx; }
+.module-search__clear { display: flex; width: 36rpx; height: 36rpx; align-items: center; justify-content: center; border-radius: 50%; background: #e8edeb; color: #708078; font-size: 28rpx; line-height: 1; }
 
 .section-heading {
   display: flex;
@@ -95,6 +26,8 @@
   font-size: 34rpx;
   font-weight: 800;
 }
+.top-hero .section-heading { color: #f4f5f7; }
+.top-hero .section-count { color: #969ca7; }
 
 .section-title-group {
   display: flex;
