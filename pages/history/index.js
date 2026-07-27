@@ -4,6 +4,25 @@ const { getSession } = require("../../utils/storage");
 
 const PAGE_SIZE = 20;
 
+function submissionDateRange(filter) {
+  const today = new Date();
+  const dateTo = localDateKey(today);
+
+  if (filter === "today") return { date: dateTo };
+
+  if (filter === "week") {
+    const start = new Date(today);
+    start.setDate(today.getDate() - ((today.getDay() + 6) % 7));
+    return { dateFrom: localDateKey(start), dateTo };
+  }
+
+  if (filter === "month") {
+    return { dateFrom: localDateKey(new Date(today.getFullYear(), today.getMonth(), 1)), dateTo };
+  }
+
+  return {};
+}
+
 function submissionViewModel(submission) {
   return {
     ...submission,
@@ -18,6 +37,8 @@ Page({
     activeFilter: "today",
     filters: [
       { value: "all", label: "全部" },
+      { value: "month", label: "本月" },
+      { value: "week", label: "本周" },
       { value: "today", label: "今日" }
     ],
     submissions: [],
@@ -61,7 +82,7 @@ Page({
       const result = await api.getSubmissionPage({
         page: 1,
         pageSize: PAGE_SIZE,
-        date: this.data.activeFilter === "today" ? localDateKey() : "",
+        ...submissionDateRange(this.data.activeFilter),
         keyword: this.data.keyword
       });
       this.setData({
@@ -104,7 +125,7 @@ Page({
       const result = await api.getSubmissionPage({
         page: this.data.page + 1,
         pageSize: PAGE_SIZE,
-        date: this.data.activeFilter === "today" ? localDateKey() : "",
+        ...submissionDateRange(this.data.activeFilter),
         keyword: this.data.keyword
       });
       this.setData({

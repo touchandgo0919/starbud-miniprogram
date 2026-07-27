@@ -62,9 +62,11 @@ async function getSubmissions() {
   }));
 }
 
-async function getSubmissionPage({ page, pageSize, date, keyword }) {
+async function getSubmissionPage({ page, pageSize, date, dateFrom, dateTo, keyword }) {
   const params = [`page=${page}`, `pageSize=${pageSize}`];
   if (date) params.push(`date=${encodeURIComponent(date)}`);
+  if (dateFrom) params.push(`dateFrom=${encodeURIComponent(dateFrom)}`);
+  if (dateTo) params.push(`dateTo=${encodeURIComponent(dateTo)}`);
   if (keyword && keyword.trim()) params.push(`keyword=${encodeURIComponent(keyword.trim())}`);
   const body = await request(`/api/submissions?${params.join("&")}`);
   return {
