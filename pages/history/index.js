@@ -29,6 +29,7 @@ function submissionViewModel(submission) {
     submittedLabel: formatSubmittedAt(submission.submittedAt),
     subjectMark: submission.taskTitle.slice(0, 1),
     reviewed: Boolean(submission.reviewedAt),
+    statusLabel: submission.finalizedAt ? "已完成" : submission.reviewedAt ? "已批改" : "已提交",
     isToday: submission.taskDate === localDateKey()
   };
 }

@@ -57,7 +57,7 @@
     </view>
 
     <button
-      wx:if="{{isChild && !task.completed}}"
+      wx:if="{{isChild && !task.completed && (!task.waitingReview || task.needsRevision)}}"
       class="primary-button detail-primary"
       bindtap="handlePrimaryAction"
     >

@@ -10,14 +10,16 @@ const repeatLabels = {
 
 function taskViewModel(task) {
   const needsRevision = Boolean(task.needsRevision);
-  const completed = !needsRevision && (task.status === "completed" || task.submissionStatus === "submitted");
+  const waitingReview = task.submissionStatus === "submitted" && !task.finalizedAt && !needsRevision;
+  const completed = task.status === "completed";
   const reviewed = Boolean(task.reviewedAt);
   return {
     ...task,
     completed,
     repeatLabel: repeatLabels[task.repeatType] || "未知",
-    statusLabel: needsRevision ? "待修改" : reviewed ? "已批改" : completed ? "已完成" : "待完成",
+    statusLabel: needsRevision ? "待修改" : waitingReview ? "待批改" : completed ? "已完成" : reviewed ? "已批改" : "待完成",
     needsRevision,
+    waitingReview,
     claimLabel: task.claimedAt ? "已领取" : "未领取",
     submissionLabel: task.submissionStatus === "submitted"
       ? `已提交（${task.submissionPhotoCount || 0} 张照片）`
@@ -119,7 +121,7 @@ Page({
       return;
     }
 
-    if (task.completed) return;
+    if (task.completed || task.waitingReview) return;
 
     if (!task.claimedAt) {
       try {

@@ -23,15 +23,17 @@ function taskDateRange(filter) {
 }
 
 function taskViewModel(task) {
-  const completed = task.status === "completed" || task.submissionStatus === "submitted";
+  const completed = task.status === "completed";
   const reviewed = Boolean(task.reviewedAt);
-  const actionText = reviewed ? "已批改" : completed ? "已提交" : task.claimedAt ? "去完成" : "领取";
+  const waitingReview = task.submissionStatus === "submitted" && !task.finalizedAt && !task.needsRevision;
+  const actionText = task.needsRevision ? "待修改" : waitingReview ? "待批改" : completed ? "已完成" : reviewed ? "已批改" : task.claimedAt ? "去完成" : "领取";
   return {
     ...task,
     completed,
     reviewed,
+    waitingReview,
     actionText,
-    actionClass: reviewed
+    actionClass: reviewed || waitingReview || completed
       ? "task-control task-control--reviewed"
       : completed
         ? "task-control task-control--done"
@@ -239,7 +241,7 @@ Page({
 
     const taskId = event.currentTarget.dataset.id;
     const task = this.data.tasks.find((item) => item.id === taskId);
-    if (!task || task.completed) return;
+    if (!task || task.completed || task.waitingReview) return;
 
     if (!task.claimedAt) {
       try {

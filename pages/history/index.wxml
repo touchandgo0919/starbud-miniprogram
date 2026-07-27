@@ -51,7 +51,7 @@
             <text class="history-title">{{item.taskTitle}}</text>
             <text class="history-time">提交时间：{{item.submittedLabel}}</text>
           </view>
-          <text class="history-status">已提交</text>
+          <text class="history-status">{{item.statusLabel}}</text>
         </view>
         <scroll-view class="photo-strip" scroll-x enhanced show-scrollbar="{{false}}">
           <image
