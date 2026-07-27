@@ -25,11 +25,11 @@ async function getTaskPage({ page, pageSize, dateFrom, dateTo, scope }) {
   const body = await request(`/api/tasks?${params.join("&")}`);
   return body;
 }
+
 async function getTask(taskId) {
   const body = await request(`/api/tasks/${taskId}`);
   return body.task;
 }
-
 
 async function claimTask(taskId) {
   const body = await request(`/api/tasks/${taskId}/claim`, { method: "POST" });
