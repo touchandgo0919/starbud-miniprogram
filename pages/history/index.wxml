@@ -77,6 +77,5 @@
       </view>
     </view>
     <view wx:if="{{loadingMore}}" class="history-footer">正在加载更多提交记录…</view>
-    <view wx:elif="{{submissions.length && !hasMore}}" class="history-footer">已显示全部提交记录</view>
   </scroll-view>
 </view>
