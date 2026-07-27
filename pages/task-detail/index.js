@@ -10,11 +10,12 @@ const repeatLabels = {
 
 function taskViewModel(task) {
   const completed = task.status === "completed" || task.submissionStatus === "submitted";
+  const reviewed = Boolean(task.reviewedAt);
   return {
     ...task,
     completed,
     repeatLabel: repeatLabels[task.repeatType] || "未知",
-    statusLabel: completed ? "已完成" : "待完成",
+    statusLabel: reviewed ? "已批改" : completed ? "已完成" : "待完成",
     claimLabel: task.claimedAt ? "已领取" : "未领取",
     submissionLabel: task.submissionStatus === "submitted"
       ? `已提交（${task.submissionPhotoCount || 0} 张照片）`

@@ -24,13 +24,17 @@ function taskDateRange(filter) {
 
 function taskViewModel(task) {
   const completed = task.status === "completed" || task.submissionStatus === "submitted";
-  const actionText = completed ? "已提交" : task.claimedAt ? "去完成" : "领取";
+  const reviewed = Boolean(task.reviewedAt);
+  const actionText = reviewed ? "已批改" : completed ? "已提交" : task.claimedAt ? "去完成" : "领取";
   return {
     ...task,
     completed,
+    reviewed,
     actionText,
-    actionClass: completed
-      ? "task-control task-control--done"
+    actionClass: reviewed
+      ? "task-control task-control--reviewed"
+      : completed
+        ? "task-control task-control--done"
       : task.claimedAt
         ? "task-control task-control--complete"
         : "task-control task-control--claim",

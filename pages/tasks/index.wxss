@@ -260,6 +260,12 @@
   color: #8a9490;
 }
 
+.task-control--reviewed {
+  border-color: #e5484d;
+  background: #fff3f3;
+  color: #d7373d;
+}
+
 .task-control--claim {
   border-color: #e2ad32;
   background: #fff9e8;
