@@ -69,6 +69,11 @@ Page({
   },
 
   async loadSubmission(task) {
+    if (!task.submissionId && !task.submissionStatus) {
+      this.setData({ submission: null });
+      return;
+    }
+
     const date = task.occurrenceDate || new Date().toLocaleDateString("en-CA");
     try {
       const submission = await api.getTaskSubmission(task.id, date);
