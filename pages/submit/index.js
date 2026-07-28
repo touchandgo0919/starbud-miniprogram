@@ -5,13 +5,16 @@ const {
   getSession,
   setSelectedTask
 } = require("../../utils/storage");
+const { localDateKey } = require("../../utils/date");
 
 Page({
   data: {
     task: null,
     photos: [],
+    existingPhotos: [],
     note: "",
     resubmitSubmissionId: "",
+    recoveredDraft: false,
     submitting: false,
     uploadProgress: ""
   },
@@ -21,9 +24,9 @@ Page({
     if (!session || !session.user || session.user.role !== "child") {
       wx.showModal({
         title: "无法提交作业",
-        content: "只有儿童账号可以拍照提交作业。",
-        showCancel: false,
-        success: () => wx.navigateBack()
+      content: "只有儿童账号可以拍照提交作业。",
+      showCancel: false,
+      success: () => wx.navigateBack()
       });
       return;
     }
@@ -39,6 +42,7 @@ Page({
         },
         resubmitSubmissionId
       });
+      await this.restoreExistingDraft(selectedTask, resubmitSubmissionId);
       return;
     }
 
@@ -51,6 +55,7 @@ Page({
       };
       setSelectedTask(taskView);
       this.setData({ task: taskView });
+      await this.restoreExistingDraft(taskView, resubmitSubmissionId);
     } catch (error) {
       wx.showModal({
         title: "无法打开任务",
@@ -61,8 +66,28 @@ Page({
     }
   },
 
+  async restoreExistingDraft(task, resubmitSubmissionId) {
+    if (resubmitSubmissionId) return;
+    try {
+      const submission = await api.getTaskSubmission(
+        task.id,
+        task.occurrenceDate || localDateKey(new Date())
+      );
+      if (submission.status !== "draft" || !submission.photos.length) return;
+      this.setData({
+        resubmitSubmissionId: submission.id,
+        existingPhotos: submission.photos,
+        note: submission.note || "",
+        recoveredDraft: true
+      });
+    } catch (error) {
+      // 首次提交没有草稿时接口会返回 404，保持空白提交页即可。
+      if (!String(error && error.message || "").includes("404")) console.warn("恢复提交草稿失败", error);
+    }
+  },
+
   choosePhotos() {
-    const remaining = 8 - this.data.photos.length;
+    const remaining = 8 - this.data.existingPhotos.length - this.data.photos.length;
     if (remaining <= 0) {
       wx.showToast({ title: "最多上传 8 张照片", icon: "none" });
       return;
@@ -102,6 +127,14 @@ Page({
     });
   },
 
+  previewExistingPhoto(event) {
+    const current = event.currentTarget.dataset.url;
+    wx.previewImage({
+      current,
+      urls: this.data.existingPhotos.map((photo) => photo.url)
+    });
+  },
+
   removePhoto(event) {
     const index = Number(event.currentTarget.dataset.index);
     this.setData({
@@ -115,14 +148,17 @@ Page({
 
   submit() {
     if (!this.data.task || this.data.submitting) return;
-    if (!this.data.photos.length) {
+    const photoCount = this.data.existingPhotos.length + this.data.photos.length;
+    if (!photoCount) {
       wx.showToast({ title: "请至少上传一张作业照片", icon: "none" });
       return;
     }
 
     wx.showModal({
       title: "确认提交作业？",
-      content: `将上传 ${this.data.photos.length} 张照片，提交后不能继续添加。`,
+      content: this.data.existingPhotos.length
+        ? `已恢复 ${this.data.existingPhotos.length} 张照片${this.data.photos.length ? `，将补传 ${this.data.photos.length} 张` : ""}，确认提交吗？`
+        : `将上传 ${this.data.photos.length} 张照片，提交后不能继续添加。`,
       confirmText: "确认提交",
       confirmColor: "#0AA868",
       success: (result) => {

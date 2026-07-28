@@ -16,8 +16,19 @@
       <text class="form-title">作业照片</text>
       <text class="form-hint">至少 1 张，最多 8 张</text>
     </view>
+    <view wx:if="recoveredDraft" class="draft-recovery-note">已恢复 {{existingPhotos.length}} 张已上传照片，可继续提交或补传新照片。</view>
 
     <view class="photo-grid">
+      <view wx:for="{{existingPhotos}}" wx:key="id" class="photo-cell">
+        <image
+          class="photo-image"
+          src="{{item.url}}"
+          mode="aspectFill"
+          data-url="{{item.url}}"
+          bindtap="previewExistingPhoto"
+        />
+        <view class="photo-uploaded">已上传</view>
+      </view>
       <view wx:for="{{photos}}" wx:key="path" class="photo-cell">
         <image
           class="photo-image"
@@ -28,7 +39,7 @@
         />
         <view class="photo-remove" data-index="{{index}}" catchtap="removePhoto">×</view>
       </view>
-      <view wx:if="{{photos.length < 8}}" class="photo-add" bindtap="choosePhotos">
+      <view wx:if="{{existingPhotos.length + photos.length < 8}}" class="photo-add" bindtap="choosePhotos">
         <text class="photo-add__icon">＋</text>
         <text>拍照 / 相册</text>
       </view>
@@ -54,7 +65,7 @@
   <view class="submit-bar">
     <text wx:if="{{uploadProgress}}" class="upload-progress">{{uploadProgress}}</text>
     <button class="primary-button" loading="{{submitting}}" disabled="{{submitting}}" bindtap="submit">
-      {{resubmitSubmissionId ? "重新提交作业" : "提交作业"}}
+      {{recoveredDraft ? "继续提交作业" : resubmitSubmissionId ? "重新提交作业" : "提交作业"}}
     </button>
   </view>
 </view>

@@ -84,6 +84,16 @@
   font-size: 23rpx;
 }
 
+.draft-recovery-note {
+  margin-top: 16rpx;
+  padding: 16rpx 18rpx;
+  border-radius: 14rpx;
+  background: #eaf8f1;
+  color: #078d59;
+  font-size: 23rpx;
+  line-height: 1.5;
+}
+
 .photo-grid {
   display: flex;
   flex-wrap: wrap;
@@ -127,6 +137,19 @@
   color: #718079;
   font-size: 30rpx;
   line-height: 1;
+}
+
+.photo-uploaded {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: 8rpx 0;
+  background: rgba(7, 141, 89, 0.88);
+  color: #ffffff;
+  font-size: 20rpx;
+  line-height: 1;
+  text-align: center;
 }
 
 .photo-add {
