@@ -62,9 +62,9 @@ Page({
   },
 
   choosePhotos() {
-    const remaining = 6 - this.data.photos.length;
+    const remaining = 8 - this.data.photos.length;
     if (remaining <= 0) {
-      wx.showToast({ title: "最多上传 6 张照片", icon: "none" });
+      wx.showToast({ title: "最多上传 8 张照片", icon: "none" });
       return;
     }
 
