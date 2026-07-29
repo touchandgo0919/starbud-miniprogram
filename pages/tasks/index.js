@@ -188,6 +188,7 @@ Page({
       const notification = notifications.find((item) => item.type === "review_completed" && !item.readAt);
       if (!notification) return;
       await api.markNotificationRead(notification.id);
+      await this.refreshTaskPage();
       wx.showModal({ title: notification.title, content: notification.content, showCancel: false, confirmText: "知道了" });
     } catch (_) {
       // 通知轮询失败不影响孩子继续查看和完成任务。
@@ -364,8 +365,15 @@ Page({
   async handleTaskAction(event) {
     if (this.data.isParent) return;
     const taskId = event.currentTarget.dataset.id;
-    const task = this.data.tasks.find((item) => item.id === taskId);
-    if (!task || task.completed || task.waitingReview) return;
+    let task = this.data.tasks.find((item) => item.id === taskId);
+    if (!task) return;
+    try {
+      task = taskViewModel(await api.getTask(task.id, task.occurrenceDate), false);
+    } catch (error) {
+      wx.showToast({ title: error.message || "任务状态加载失败", icon: "none" });
+      return;
+    }
+    if (task.completed || task.waitingReview) return;
     if (task.needsRevision) {
       if (!task.submissionId) {
         wx.showToast({ title: "未找到待重新提交的作业", icon: "none" });

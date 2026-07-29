@@ -48,14 +48,10 @@ Page({
     const taskId = String(options.taskId || "");
     this.setData({ isChild: session.user.role === "child" });
     const selectedTask = getSelectedTask();
-    if (selectedTask && String(selectedTask.id) === taskId) {
-      await this.loadSubmission(taskViewModel(selectedTask));
-      this.setData({ task: taskViewModel(selectedTask), loading: false });
-      return;
-    }
+    const taskDate = String(options.taskDate || (selectedTask && String(selectedTask.id) === taskId ? selectedTask.occurrenceDate || "" : ""));
 
     try {
-      const task = await api.getTask(taskId, options.taskDate);
+      const task = await api.getTask(taskId, taskDate);
       if (!task) throw new Error("任务不存在或无权查看。");
       const taskView = taskViewModel(task);
       setSelectedTask(taskView);
