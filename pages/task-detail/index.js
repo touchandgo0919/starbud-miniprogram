@@ -108,13 +108,8 @@ Page({
     if (!this.data.isChild || !task) return;
 
     if (task.needsRevision && this.data.submission && this.data.submission.id) {
-      try {
-        const draft = await api.reopenSubmissionForResubmit(this.data.submission.id);
-        setSelectedTask({ ...task, submissionId: draft.id, submissionStatus: "draft", needsRevision: false });
-        wx.navigateTo({ url: `/pages/submit/index?taskId=${encodeURIComponent(task.id)}&submissionId=${encodeURIComponent(draft.id)}` });
-      } catch (error) {
-        wx.showToast({ title: error.message || "重新提交失败", icon: "none" });
-      }
+      setSelectedTask(task);
+      wx.navigateTo({ url: `/pages/submit/index?taskId=${encodeURIComponent(task.id)}&taskDate=${encodeURIComponent(task.occurrenceDate || "")}&submissionId=${encodeURIComponent(this.data.submission.id)}&resubmit=1` });
       return;
     }
 

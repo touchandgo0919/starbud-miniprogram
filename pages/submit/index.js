@@ -14,6 +14,7 @@ Page({
     existingPhotos: [],
     note: "",
     resubmitSubmissionId: "",
+    reopenOnSubmit: false,
     recoveredDraft: false,
     submitting: false,
     uploadProgress: ""
@@ -33,6 +34,7 @@ Page({
 
     const taskId = String(options.taskId || "");
     const resubmitSubmissionId = String(options.submissionId || "");
+    const reopenOnSubmit = options.resubmit === "1";
     const selectedTask = getSelectedTask();
     if (selectedTask && String(selectedTask.id) === taskId) {
       this.setData({
@@ -40,7 +42,8 @@ Page({
           ...selectedTask,
           subjectMark: selectedTask.subjectMark || selectedTask.title.slice(0, 1)
         },
-        resubmitSubmissionId
+        resubmitSubmissionId,
+        reopenOnSubmit
       });
       await this.restoreExistingDraft(selectedTask, resubmitSubmissionId);
       return;
@@ -54,7 +57,7 @@ Page({
         subjectMark: task.title.slice(0, 1)
       };
       setSelectedTask(taskView);
-      this.setData({ task: taskView });
+      this.setData({ task: taskView, resubmitSubmissionId, reopenOnSubmit });
       await this.restoreExistingDraft(taskView, resubmitSubmissionId);
     } catch (error) {
       wx.showModal({
@@ -170,9 +173,11 @@ Page({
   async performSubmit() {
     this.setData({ submitting: true, uploadProgress: "正在创建提交单…" });
     try {
-      const submission = this.data.resubmitSubmissionId
-        ? { id: this.data.resubmitSubmissionId, status: "draft" }
-        : await api.createSubmission(this.data.task.id, this.data.note, this.data.task.occurrenceDate);
+      const submission = this.data.reopenOnSubmit
+        ? await api.reopenSubmissionForResubmit(this.data.resubmitSubmissionId)
+        : this.data.resubmitSubmissionId
+          ? { id: this.data.resubmitSubmissionId, status: "draft" }
+          : await api.createSubmission(this.data.task.id, this.data.note, this.data.task.occurrenceDate);
       if (submission.status !== "submitted") {
         if (this.data.resubmitSubmissionId) {
           await api.updateSubmissionNote(submission.id, this.data.note);

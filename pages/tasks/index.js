@@ -379,13 +379,8 @@ Page({
         wx.showToast({ title: "未找到待重新提交的作业", icon: "none" });
         return;
       }
-      try {
-        const draft = await api.reopenSubmissionForResubmit(task.submissionId);
-        setSelectedTask({ ...task, submissionId: draft.id, submissionStatus: "draft", needsRevision: false });
-        wx.navigateTo({ url: `/pages/submit/index?taskId=${encodeURIComponent(task.id)}&submissionId=${encodeURIComponent(draft.id)}` });
-      } catch (error) {
-        wx.showToast({ title: error.message || "重新提交失败", icon: "none" });
-      }
+      setSelectedTask(task);
+      wx.navigateTo({ url: `/pages/submit/index?taskId=${encodeURIComponent(task.id)}&taskDate=${encodeURIComponent(task.occurrenceDate || "")}&submissionId=${encodeURIComponent(task.submissionId)}&resubmit=1` });
       return;
     }
     if (!task.claimedAt) {
