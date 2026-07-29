@@ -366,6 +366,20 @@ Page({
     const taskId = event.currentTarget.dataset.id;
     const task = this.data.tasks.find((item) => item.id === taskId);
     if (!task || task.completed || task.waitingReview) return;
+    if (task.needsRevision) {
+      if (!task.submissionId) {
+        wx.showToast({ title: "未找到待重新提交的作业", icon: "none" });
+        return;
+      }
+      try {
+        const draft = await api.reopenSubmissionForResubmit(task.submissionId);
+        setSelectedTask({ ...task, submissionId: draft.id, submissionStatus: "draft", needsRevision: false });
+        wx.navigateTo({ url: `/pages/submit/index?taskId=${encodeURIComponent(task.id)}&submissionId=${encodeURIComponent(draft.id)}` });
+      } catch (error) {
+        wx.showToast({ title: error.message || "重新提交失败", icon: "none" });
+      }
+      return;
+    }
     if (!task.claimedAt) {
       try {
         await api.claimTask(task.id);
