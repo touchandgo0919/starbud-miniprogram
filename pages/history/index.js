@@ -67,6 +67,18 @@ Page({
     const system = wx.getSystemInfoSync();
     const statusBarHeight = system.statusBarHeight || 24;
     this.setData({ statusBarHeight, navBarHeight: statusBarHeight + 44 });
+    wx.showShareMenu({ menus: ["shareAppMessage", "shareTimeline"] });
+  },
+
+  onShareAppMessage() {
+    return {
+      title: "星星芽AI助手 · 我的提交",
+      path: "/pages/history/index"
+    };
+  },
+
+  onShareTimeline() {
+    return { title: "星星芽AI助手 · 我的提交" };
   },
 
   onShow() {

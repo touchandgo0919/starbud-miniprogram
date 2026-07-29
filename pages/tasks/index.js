@@ -104,7 +104,19 @@ Page({
     const system = wx.getSystemInfoSync();
     const statusBarHeight = system.statusBarHeight || 24;
     this.setData({ statusBarHeight, navBarHeight: statusBarHeight + 44 });
+    wx.showShareMenu({ menus: ["shareAppMessage", "shareTimeline"] });
     this.refreshCalendarView();
+  },
+
+  onShareAppMessage() {
+    return {
+      title: "星星芽AI助手 · 我的任务",
+      path: "/pages/tasks/index"
+    };
+  },
+
+  onShareTimeline() {
+    return { title: "星星芽AI助手 · 我的任务" };
   },
 
   onShow() {
