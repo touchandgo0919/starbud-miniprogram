@@ -7,6 +7,8 @@
         <text class="module-brand__count">{{totalCount}} 项</text>
       </view>
     </view>
+  </view>
+
     <view class="history-toolbar">
       <view class="history-search surface">
         <text class="history-search__icon">⌕</text>
@@ -17,7 +19,6 @@
         <view wx:for="{{filters}}" wx:key="value" class="filter-tab {{activeFilter === item.value ? 'filter-tab--active' : ''}}" data-value="{{item.value}}" bindtap="selectFilter">{{item.label}}</view>
       </view>
     </view>
-  </view>
 
   <scroll-view
     class="history-scroll"
