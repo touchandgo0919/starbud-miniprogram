@@ -2,32 +2,59 @@
   display: flex;
   height: 100vh;
   min-height: 0;
-  padding-bottom: 24rpx;
-  padding-top: 0;
+  padding: 0 16rpx 24rpx;
   flex-direction: column;
   overflow: hidden;
-  background: #ffffff;
+  background: #f5f6fa;
 }
 
-.top-hero { margin: 0 -28rpx; padding: 0 28rpx; background: linear-gradient(105deg, #08372b 0%, #121418 55%, #0d4331 100%); }
-.module-nav { display: flex; padding-right: 190rpx; align-items: center; }
-.module-brand { display: flex; height: 76rpx; align-items: center; gap: 14rpx; color: #ffffff; font-size: 30rpx; font-weight: 800; }
-.module-brand__logo { width: 48rpx; height: 48rpx; }
-.module-search { display: flex; height: 76rpx; margin-top: 28rpx; margin-bottom: 18rpx; padding: 0 22rpx; align-items: center; border-radius: 18rpx; background: #ffffff; }
-.module-search__icon { margin-right: 14rpx; color: #7b8781; font-size: 36rpx; line-height: 1; }
-.module-search__input { min-width: 0; flex: 1; color: #26312d; font-size: 26rpx; }
-.module-search__clear { display: flex; width: 36rpx; height: 36rpx; align-items: center; justify-content: center; border-radius: 50%; background: #e8edeb; color: #708078; font-size: 28rpx; line-height: 1; }
+.calendar-panel {
+  margin: 0 -16rpx;
+  padding: 20rpx 28rpx 22rpx;
+  border-radius: 0 0 24rpx 24rpx;
+  background: #ffffff;
+  box-shadow: 0 8rpx 24rpx rgba(40, 52, 47, 0.05);
+}
+
+.calendar-header,
+.calendar-actions,
+.calendar-title,
+.calendar-weekdays,
+.calendar-legend {
+  display: flex;
+  align-items: center;
+}
+
+.calendar-header { height: 54rpx; justify-content: space-between; }
+.calendar-title { gap: 10rpx; color: #202936; font-size: 32rpx; font-weight: 800; }
+.calendar-title__chevron { color: #66717d; font-size: 34rpx; line-height: 1; }
+.calendar-actions { gap: 12rpx; }
+.calendar-action { padding: 8rpx 14rpx; border-radius: 999rpx; background: #eef8f2; color: #078d59; font-size: 22rpx; font-weight: 700; }
+.calendar-toggle { display: flex; width: 44rpx; height: 44rpx; align-items: center; justify-content: center; color: #7b8692; font-size: 32rpx; line-height: 1; }
+
+.calendar-weekdays { margin-top: 20rpx; justify-content: space-around; color: #929dab; font-size: 23rpx; font-weight: 700; }
+.calendar-weekdays text { width: 14.285%; text-align: center; }
+
+.calendar-days { display: grid; margin-top: 14rpx; grid-template-columns: repeat(7, minmax(0, 1fr)); row-gap: 10rpx; }
+.calendar-days--expanded { row-gap: 8rpx; }
+.calendar-day { position: relative; display: flex; height: 48rpx; align-items: center; justify-content: center; color: #202936; font-size: 28rpx; font-weight: 700; }
+.calendar-day__number { position: relative; z-index: 1; display: flex; width: 44rpx; height: 44rpx; align-items: center; justify-content: center; border-radius: 50%; }
+.calendar-day--outside { color: #bec6d1; }
+.calendar-day--selected .calendar-day__number { background: #09a85e; color: #ffffff; }
+.calendar-day__dot { position: absolute; bottom: 0; width: 7rpx; height: 7rpx; border-radius: 50%; background: #08a35d; }
+.calendar-day--selected .calendar-day__dot { bottom: -2rpx; background: #08a35d; }
+.calendar-legend { margin-top: 12rpx; justify-content: flex-end; gap: 8rpx; color: #7a858f; font-size: 20rpx; }
+.calendar-legend text:first-child { width: 7rpx; height: 7rpx; border-radius: 50%; background: #08a35d; }
 
 .section-heading {
   display: flex;
-  padding: 20rpx 8rpx;
+  padding: 30rpx 10rpx 18rpx;
   align-items: center;
   justify-content: space-between;
+  color: #25302c;
   font-size: 34rpx;
   font-weight: 800;
 }
-.top-hero .section-heading { color: #f4f5f7; }
-.top-hero .section-count { color: #969ca7; }
 
 .section-title-group {
   display: flex;
@@ -41,38 +68,9 @@
   font-weight: 500;
 }
 
-.filter-tabs {
-  display: flex;
-  gap: 12rpx;
-  align-items: center;
-  justify-content: flex-start;
-}
-
-.filter-tab {
-  display: flex;
-  flex: 0 0 68rpx;
-  width: 68rpx;
-  min-width: 68rpx;
-  max-width: 68rpx;
-  height: 48rpx;
-  padding: 0;
-  align-items: center;
-  justify-content: center;
-  border-radius: 999rpx;
-  background: #f0f3f2;
-  color: #61706a;
-  font-size: 22rpx;
-}
-
-.filter-tab--active {
-  background: #0aa868;
-  color: #ffffff;
-  font-weight: 700;
-}
-
 .task-scroll {
   min-height: 0;
-  margin-top: 24rpx;
+  margin-top: 0;
   flex: 1;
 }
 

@@ -1,25 +1,47 @@
 const api = require("../../services/api");
-const { friendlyDate, localDateKey } = require("../../utils/date");
+const { localDateKey } = require("../../utils/date");
 const { getSession, setSelectedTask } = require("../../utils/storage");
 
-const PAGE_SIZE = 5;
+const PAGE_SIZE = 20;
 const REVIEW_NOTIFICATION_INTERVAL = 10000;
+const weekdayLabels = ["日", "一", "二", "三", "四", "五", "六"];
 
-function taskDateRange(filter) {
-  const today = new Date();
-  const dateTo = localDateKey(today);
+function dateFromKey(key) {
+  const [year, month, day] = key.split("-").map(Number);
+  return new Date(year, month - 1, day);
+}
 
-  if (filter === "week") {
-    const start = new Date(today);
-    start.setDate(today.getDate() - ((today.getDay() + 6) % 7));
-    return { dateFrom: localDateKey(start), dateTo };
-  }
+function addDays(date, count) {
+  const result = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  result.setDate(result.getDate() + count);
+  return result;
+}
 
-  if (filter === "month") {
-    return { dateFrom: localDateKey(new Date(today.getFullYear(), today.getMonth(), 1)), dateTo };
-  }
+function sundayStart(date) {
+  return addDays(date, -date.getDay());
+}
 
-  return {};
+function buildCalendarDays(selectedDate, expanded) {
+  const selected = dateFromKey(selectedDate);
+  const month = selected.getMonth();
+  const start = expanded
+    ? sundayStart(new Date(selected.getFullYear(), month, 1))
+    : sundayStart(selected);
+  const length = expanded ? 42 : 7;
+  const today = localDateKey();
+
+  return Array.from({ length }, (_, index) => {
+    const date = addDays(start, index);
+    const key = localDateKey(date);
+    return {
+      key,
+      label: String(date.getDate()),
+      isCurrentMonth: date.getMonth() === month,
+      isSelected: key === selectedDate,
+      isToday: key === today,
+      hasTask: false
+    };
+  });
 }
 
 function taskViewModel(task) {
@@ -45,27 +67,18 @@ function taskViewModel(task) {
   };
 }
 
-function filterTasks(tasks, keyword) {
-  const normalized = String(keyword || "").trim().toLowerCase();
-  return normalized ? tasks.filter((task) => task.title.toLowerCase().includes(normalized)) : tasks;
-}
-
 Page({
   data: {
     user: null,
     isParent: false,
     statusBarHeight: 24,
     navBarHeight: 68,
-    dateLabel: friendlyDate(),
-    filters: [
-      { value: "all", label: "全部" },
-      { value: "month", label: "本月" },
-      { value: "week", label: "本周" },
-      { value: "today", label: "今日" }
-    ],
-    activeFilter: "today",
-    keyword: "",
-    allTasks: [],
+    weekdayLabels,
+    selectedDate: localDateKey(),
+    calendarTitle: "",
+    calendarDays: [],
+    calendarExpanded: false,
+    calendarTaskDates: {},
     tasks: [],
     totalCount: 0,
     completedCount: 0,
@@ -82,6 +95,7 @@ Page({
     const system = wx.getSystemInfoSync();
     const statusBarHeight = system.statusBarHeight || 24;
     this.setData({ statusBarHeight, navBarHeight: statusBarHeight + 44 });
+    this.refreshCalendarView();
   },
 
   onShow() {
@@ -93,7 +107,7 @@ Page({
     this.setData({ user: session.user, isParent: session.user.role === "parent" });
     if (!this.hasLoadedTasks) {
       this.hasLoadedTasks = true;
-      this.loadTasks();
+      this.refreshTaskPage();
     }
     this.startReviewNotificationPolling();
   },
@@ -104,6 +118,20 @@ Page({
 
   onUnload() {
     this.stopReviewNotificationPolling();
+  },
+
+  refreshCalendarView(taskDates = this.data.calendarTaskDates) {
+    const selected = dateFromKey(this.data.selectedDate);
+    const calendarDays = buildCalendarDays(this.data.selectedDate, this.data.calendarExpanded)
+      .map((day) => ({ ...day, hasTask: Boolean(taskDates[day.key]) }));
+    this.setData({
+      calendarTitle: `${selected.getFullYear()}年${selected.getMonth() + 1}月`,
+      calendarDays
+    });
+  },
+
+  async refreshTaskPage() {
+    await Promise.all([this.loadTasks(), this.loadCalendarTasks()]);
   },
 
   startReviewNotificationPolling() {
@@ -126,12 +154,7 @@ Page({
       const notification = notifications.find((item) => item.type === "review_completed" && !item.readAt);
       if (!notification) return;
       await api.markNotificationRead(notification.id);
-      wx.showModal({
-        title: notification.title,
-        content: notification.content,
-        showCancel: false,
-        confirmText: "知道了"
-      });
+      wx.showModal({ title: notification.title, content: notification.content, showCancel: false, confirmText: "知道了" });
     } catch (_) {
       // 通知轮询失败不影响孩子继续查看和完成任务。
     } finally {
@@ -140,7 +163,7 @@ Page({
   },
 
   async onPullDownRefresh() {
-    await this.loadTasks();
+    await this.refreshTaskPage();
     wx.stopPullDownRefresh();
   },
 
@@ -148,7 +171,7 @@ Page({
     if (this.data.refreshing) return;
     this.setData({ refreshing: true });
     try {
-      await this.loadTasks();
+      await this.refreshTaskPage();
     } finally {
       this.setData({ refreshing: false });
     }
@@ -157,26 +180,16 @@ Page({
   async loadTasks() {
     this.setData({ loading: true, error: "" });
     try {
-      const isToday = this.data.activeFilter === "today";
-      const result = isToday ? null : await api.getTaskPage({
-        page: 1,
-        pageSize: PAGE_SIZE,
-        scope: this.data.activeFilter === "all" ? "definitions" : "",
-        ...taskDateRange(this.data.activeFilter)
-      });
-      const sourceTasks = isToday ? await api.getTodayTasks() : result.tasks;
-      const allTasks = sourceTasks.map(taskViewModel);
-      const tasks = filterTasks(allTasks, this.data.keyword);
+      const result = await api.getTaskPage({ page: 1, pageSize: PAGE_SIZE, date: this.data.selectedDate });
+      const tasks = result.tasks.map(taskViewModel);
       const completedCount = tasks.filter((task) => task.completed).length;
-      const totalCount = isToday ? tasks.length : result.pagination.total;
       this.setData({
         tasks,
-        allTasks,
-        totalCount,
+        totalCount: result.pagination.total,
         completedCount,
         progressPercent: tasks.length ? Math.round((completedCount / tasks.length) * 100) : 0,
-        page: isToday ? 1 : result.pagination.page,
-        hasMore: !isToday && result.pagination.hasMore,
+        page: result.pagination.page,
+        hasMore: result.pagination.hasMore,
         loadingMore: false
       });
     } catch (error) {
@@ -186,46 +199,67 @@ Page({
     }
   },
 
-  onSearchInput(event) {
-    const keyword = event.detail.value;
-    this.setData({ keyword, tasks: filterTasks(this.data.allTasks, keyword) });
+  async loadCalendarTasks() {
+    const days = buildCalendarDays(this.data.selectedDate, this.data.calendarExpanded);
+    try {
+      const result = await api.getTaskPage({
+        page: 1,
+        pageSize: 50,
+        dateFrom: days[0].key,
+        dateTo: days[days.length - 1].key
+      });
+      const calendarTaskDates = result.tasks.reduce((dates, task) => {
+        if (task.occurrenceDate) dates[task.occurrenceDate] = (dates[task.occurrenceDate] || 0) + 1;
+        return dates;
+      }, {});
+      this.setData({ calendarTaskDates });
+      this.refreshCalendarView(calendarTaskDates);
+    } catch (_) {
+      this.refreshCalendarView({});
+    }
   },
 
-  clearSearch() {
-    this.setData({ keyword: "", tasks: this.data.allTasks });
+  selectCalendarDate(event) {
+    const selectedDate = event.currentTarget.dataset.date;
+    if (!selectedDate || selectedDate === this.data.selectedDate) return;
+    this.setData({ selectedDate, page: 0, hasMore: false }, () => this.refreshTaskPage());
   },
 
-  selectFilter(event) {
-    const activeFilter = event.currentTarget.dataset.value;
-    if (activeFilter === this.data.activeFilter) return;
-    this.setData({ activeFilter });
-    this.loadTasks();
+  toggleCalendar() {
+    this.setData({ calendarExpanded: !this.data.calendarExpanded }, () => {
+      this.refreshCalendarView();
+      this.loadCalendarTasks();
+    });
+  },
+
+  selectToday() {
+    const selectedDate = localDateKey();
+    this.setData({ selectedDate, page: 0, hasMore: false }, () => this.refreshTaskPage());
+  },
+
+  showCurrentMonth() {
+    this.setData({ calendarExpanded: true }, () => {
+      this.refreshCalendarView();
+      this.loadCalendarTasks();
+    });
   },
 
   async loadMoreTasks() {
-    if (this.data.activeFilter === "today" || this.data.loading || this.data.loadingMore || !this.data.hasMore) {
-      return;
-    }
-
+    if (this.data.loading || this.data.loadingMore || !this.data.hasMore) return;
     this.setData({ loadingMore: true });
     try {
       const result = await api.getTaskPage({
         page: this.data.page + 1,
         pageSize: PAGE_SIZE,
-        scope: this.data.activeFilter === "all" ? "definitions" : "",
-        ...taskDateRange(this.data.activeFilter)
+        date: this.data.selectedDate
       });
       const additionalTasks = result.tasks.map(taskViewModel);
-      const allTasks = [...this.data.allTasks, ...additionalTasks];
-      const tasks = filterTasks(allTasks, this.data.keyword);
+      const tasks = [...this.data.tasks, ...additionalTasks];
       const completedCount = tasks.filter((task) => task.completed).length;
       this.setData({
         tasks,
-        allTasks,
         completedCount,
-        progressPercent: tasks.length
-          ? Math.round((completedCount / tasks.length) * 100)
-          : 0,
+        progressPercent: tasks.length ? Math.round((completedCount / tasks.length) * 100) : 0,
         page: result.pagination.page,
         hasMore: result.pagination.hasMore
       });
@@ -238,22 +272,19 @@ Page({
 
   async handleTaskAction(event) {
     if (this.data.isParent) return;
-
     const taskId = event.currentTarget.dataset.id;
     const task = this.data.tasks.find((item) => item.id === taskId);
     if (!task || task.completed || task.waitingReview) return;
-
     if (!task.claimedAt) {
       try {
         await api.claimTask(task.id);
         wx.showToast({ title: "任务已领取", icon: "success" });
-        await this.loadTasks();
+        await this.refreshTaskPage();
       } catch (error) {
         wx.showToast({ title: error.message || "领取失败", icon: "none" });
       }
       return;
     }
-
     setSelectedTask(task);
     wx.navigateTo({ url: `/pages/submit/index?taskId=${encodeURIComponent(task.id)}` });
   },
@@ -262,7 +293,6 @@ Page({
     const taskId = String(event.currentTarget.dataset.id || "");
     const task = this.data.tasks.find((item) => String(item.id) === taskId);
     if (!task) return;
-
     setSelectedTask(task);
     wx.navigateTo({ url: `/pages/task-detail/index?taskId=${encodeURIComponent(task.id)}` });
   },
@@ -270,18 +300,12 @@ Page({
   async editTask(event) {
     const task = this.data.tasks.find((item) => item.id === event.currentTarget.dataset.id);
     if (!task) return;
-    const result = await new Promise((resolve) => wx.showModal({
-      title: "编辑任务名称",
-      editable: true,
-      placeholderText: task.title,
-      content: "",
-      success: resolve
-    }));
+    const result = await new Promise((resolve) => wx.showModal({ title: "编辑任务名称", editable: true, placeholderText: task.title, content: "", success: resolve }));
     if (!result.confirm || !String(result.content || "").trim()) return;
     try {
       await api.updateTask(task.id, { ...task, title: String(result.content).trim() });
       wx.showToast({ title: "任务已更新", icon: "success" });
-      this.loadTasks();
+      this.refreshTaskPage();
     } catch (error) {
       wx.showToast({ title: error.message || "编辑失败", icon: "none" });
     }
@@ -295,7 +319,7 @@ Page({
     try {
       await api.deleteTask(task.id);
       wx.showToast({ title: "任务已删除", icon: "success" });
-      this.loadTasks();
+      this.refreshTaskPage();
     } catch (error) {
       wx.showToast({ title: error.message || "删除失败", icon: "none" });
     }

@@ -1,32 +1,39 @@
 <view class="page-shell tasks-page">
-  <view class="top-hero">
-    <view class="module-nav" style="height: {{navBarHeight}}px; padding-top: {{statusBarHeight}}px;">
-      <view class="module-brand">
-        <image class="module-brand__logo" src="/assets/starbud-icon.png" mode="aspectFit" />
-        <text>星星芽AI助手</text>
+  <view class="calendar-panel" style="padding-top: {{statusBarHeight}}px;">
+    <view class="calendar-header">
+      <view class="calendar-title" bindtap="toggleCalendar">
+        <text>{{calendarTitle}}</text>
+        <text class="calendar-title__chevron">⌄</text>
+      </view>
+      <view class="calendar-actions">
+        <view wx:if="{{calendarExpanded}}" class="calendar-action" bindtap="showCurrentMonth">本月</view>
+        <view wx:if="{{calendarExpanded}}" class="calendar-action" bindtap="selectToday">今天</view>
+        <view class="calendar-toggle" bindtap="toggleCalendar">{{calendarExpanded ? '⌃' : '⌄'}}</view>
       </view>
     </view>
-    <view class="module-search surface">
-      <text class="module-search__icon">⌕</text>
-      <input class="module-search__input" value="{{keyword}}" placeholder="搜索任务" confirm-type="search" bindinput="onSearchInput" />
-      <view wx:if="{{keyword}}" class="module-search__clear" bindtap="clearSearch">×</view>
+
+    <view class="calendar-weekdays">
+      <text wx:for="{{weekdayLabels}}" wx:key="*this">{{item}}</text>
     </view>
-    <view class="section-heading">
-      <view class="section-title-group">
-        <text>任务列表</text>
-        <text class="section-count">{{totalCount}} 项</text>
+    <view class="calendar-days {{calendarExpanded ? 'calendar-days--expanded' : ''}}">
+      <view
+        wx:for="{{calendarDays}}"
+        wx:key="key"
+        class="calendar-day {{item.isCurrentMonth ? '' : 'calendar-day--outside'}} {{item.isSelected ? 'calendar-day--selected' : ''}}"
+        data-date="{{item.key}}"
+        bindtap="selectCalendarDate"
+      >
+        <text class="calendar-day__number">{{item.label}}</text>
+        <text wx:if="{{item.hasTask}}" class="calendar-day__dot"></text>
       </view>
-      <view class="filter-tabs">
-        <view
-          wx:for="{{filters}}"
-          wx:key="value"
-          class="filter-tab {{activeFilter === item.value ? 'filter-tab--active' : ''}}"
-          data-value="{{item.value}}"
-          bindtap="selectFilter"
-        >
-          {{item.label}}
-        </view>
-      </view>
+    </view>
+    <view wx:if="{{calendarExpanded}}" class="calendar-legend"><text></text><text>我的日程</text></view>
+  </view>
+
+  <view class="section-heading">
+    <view class="section-title-group">
+      <text>任务列表</text>
+      <text class="section-count">{{totalCount}} 项</text>
     </view>
   </view>
 
@@ -44,22 +51,15 @@
       <text class="empty-state__mark">!</text>
       <text class="empty-state__title">任务加载失败</text>
       <text class="empty-state__copy">{{error}}</text>
-      <button class="secondary-button retry-button" bindtap="loadTasks">重新加载</button>
+      <button class="secondary-button retry-button" bindtap="refreshTaskPage">重新加载</button>
     </view>
     <view wx:elif="{{!tasks.length}}" class="empty-state surface">
       <text class="empty-state__mark">✓</text>
-      <text wx:if="{{activeFilter === 'today'}}" class="empty-state__title">今天还没有任务</text>
-      <text wx:else class="empty-state__title">暂无任务记录</text>
+      <text class="empty-state__title">该日期还没有任务</text>
       <text class="empty-state__copy">可以先休息一下，任务会由家长在网页端安排。</text>
     </view>
     <view wx:else class="task-list surface">
-      <view
-        wx:for="{{tasks}}"
-        wx:key="id"
-        class="task-row"
-        data-id="{{item.id}}"
-        bindtap="handleTaskDetail"
-      >
+      <view wx:for="{{tasks}}" wx:key="id" class="task-row" data-id="{{item.id}}" bindtap="handleTaskDetail">
         <view class="task-time">
           <text>{{item.scheduleTime}}</text>
           <view class="task-dot {{item.completed ? 'task-dot--done' : ''}}"></view>
@@ -69,14 +69,7 @@
           <text class="task-description">{{item.description}}</text>
         </view>
         <view class="task-actions">
-          <view
-            wx:if="{{!isParent && !item.completed}}"
-            class="{{item.actionClass}}"
-            data-id="{{item.id}}"
-            catchtap="handleTaskAction"
-          >
-            {{item.actionText}}
-          </view>
+          <view wx:if="{{!isParent && !item.completed}}" class="{{item.actionClass}}" data-id="{{item.id}}" catchtap="handleTaskAction">{{item.actionText}}</view>
           <view wx:elif="{{!isParent}}" class="{{item.actionClass}}">{{item.actionText}}</view>
           <view wx:else class="parent-task-actions">
             <view class="parent-task-action" data-id="{{item.id}}" catchtap="editTask">编辑</view>
@@ -86,6 +79,6 @@
         </view>
       </view>
     </view>
-    <view wx:if="{{activeFilter !== 'today' && loadingMore}}" class="list-footer">正在加载更多任务…</view>
+    <view wx:if="{{loadingMore}}" class="list-footer">正在加载更多任务…</view>
   </scroll-view>
 </view>
