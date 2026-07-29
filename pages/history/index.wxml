@@ -3,18 +3,15 @@
     <view class="module-nav" style="height: {{navBarHeight}}px; padding-top: {{statusBarHeight}}px;">
       <view class="module-brand">
         <image class="module-brand__logo" src="/assets/starbud-icon.png" mode="aspectFit" />
-        <text>星星芽AI助手</text>
+        <text>我的提交</text>
+        <text class="module-brand__count">{{totalCount}} 项</text>
       </view>
     </view>
-    <view class="history-search surface">
-      <text class="history-search__icon">⌕</text>
-      <input class="history-search__input" value="{{keyword}}" placeholder="搜索提交" confirm-type="search" bindinput="onSearchInput" />
-      <view wx:if="{{keyword}}" class="history-search__clear" bindtap="clearSearch">×</view>
-    </view>
-    <view class="history-heading">
-      <view class="history-title-group">
-        <text>提交列表</text>
-        <text class="history-count">{{totalCount}} 项</text>
+    <view class="history-toolbar">
+      <view class="history-search surface">
+        <text class="history-search__icon">⌕</text>
+        <input class="history-search__input" value="{{keyword}}" placeholder="搜索提交" confirm-type="search" bindinput="onSearchInput" />
+        <view wx:if="{{keyword}}" class="history-search__clear" bindtap="clearSearch">×</view>
       </view>
       <view class="filter-tabs">
         <view wx:for="{{filters}}" wx:key="value" class="filter-tab {{activeFilter === item.value ? 'filter-tab--active' : ''}}" data-value="{{item.value}}" bindtap="selectFilter">{{item.label}}</view>

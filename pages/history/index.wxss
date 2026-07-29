@@ -13,16 +13,19 @@
 .module-nav { display: flex; padding-right: 190rpx; align-items: center; }
 .module-brand { display: flex; height: 76rpx; align-items: center; gap: 14rpx; color: #ffffff; font-size: 30rpx; font-weight: 800; }
 .module-brand__logo { width: 48rpx; height: 48rpx; }
+.module-brand__count { color: rgba(255, 255, 255, 0.65); font-size: 24rpx; font-weight: 500; }
+
+.history-toolbar { display: flex; margin-top: 28rpx; margin-bottom: 20rpx; align-items: center; gap: 12rpx; }
 
 .history-search {
   display: flex;
   height: 76rpx;
-  margin-top: 28rpx;
-  margin-bottom: 18rpx;
+  min-width: 0;
   padding: 0 22rpx;
   align-items: center;
   border-radius: 18rpx;
   background: #ffffff;
+  flex: 1;
 }
 
 .history-search__icon {
@@ -77,17 +80,17 @@
 
 .filter-tabs {
   display: flex;
-  gap: 12rpx;
+  gap: 8rpx;
   align-items: center;
   justify-content: flex-start;
 }
 
 .filter-tab {
   display: flex;
-  flex: 0 0 68rpx;
-  width: 68rpx;
-  min-width: 68rpx;
-  max-width: 68rpx;
+  flex: 0 0 58rpx;
+  width: 58rpx;
+  min-width: 58rpx;
+  max-width: 58rpx;
   height: 48rpx;
   padding: 0;
   align-items: center;
