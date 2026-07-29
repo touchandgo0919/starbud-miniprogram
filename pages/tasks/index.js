@@ -59,7 +59,9 @@ function taskViewModel(task, showChildName) {
     actionText,
     actionClass: completed
       ? "task-control task-control--done"
-      : reviewed || waitingReview || task.needsRevision
+      : waitingReview
+        ? "task-control task-control--waiting-review"
+        : reviewed || task.needsRevision
         ? "task-control task-control--reviewed"
         : task.claimedAt
           ? "task-control task-control--complete"

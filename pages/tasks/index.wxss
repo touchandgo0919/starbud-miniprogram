@@ -208,6 +208,12 @@
   color: #d7373d;
 }
 
+.task-control--waiting-review {
+  border-color: #3b82f6;
+  background: #eff6ff;
+  color: #2563eb;
+}
+
 .task-control--claim {
   border-color: #e2ad32;
   background: #fff9e8;
