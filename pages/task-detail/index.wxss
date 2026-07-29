@@ -13,8 +13,8 @@
 .detail-loading__mark { width: 180rpx; height: 180rpx; animation: detail-mark-twinkle 1.25s ease-in-out infinite alternate; }
 
 @keyframes detail-mark-twinkle {
-  from { transform: scale(0.9); opacity: 0.7; }
-  to { transform: scale(1.08); opacity: 1; }
+  from { transform: scale(0.9); opacity: 0.74; filter: drop-shadow(0 0 8rpx rgba(255, 194, 38, 0.36)); }
+  to { transform: scale(1.08); opacity: 1; filter: drop-shadow(0 0 24rpx rgba(255, 196, 32, 0.92)); }
 }
 
 .detail-hero {
