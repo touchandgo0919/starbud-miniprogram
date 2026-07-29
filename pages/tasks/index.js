@@ -263,8 +263,7 @@ Page({
     }, () => this.refreshTaskPage());
   },
 
-  changeCalendarMonth(event) {
-    const offset = Number(event.currentTarget.dataset.offset || 0);
+  shiftCalendarMonth(offset) {
     if (!offset) return;
     const next = new Date(this.data.calendarYear, this.data.calendarMonth - 1 + offset, 1);
     this.setData({
@@ -275,6 +274,23 @@ Page({
       this.refreshCalendarView();
       this.loadCalendarTasks();
     });
+  },
+
+  onCalendarTouchStart(event) {
+    const touch = event.touches && event.touches[0];
+    if (!touch) return;
+    this.calendarTouchStart = { x: touch.clientX, y: touch.clientY };
+  },
+
+  onCalendarTouchEnd(event) {
+    const start = this.calendarTouchStart;
+    const touch = event.changedTouches && event.changedTouches[0];
+    this.calendarTouchStart = null;
+    if (!start || !touch) return;
+    const offsetX = touch.clientX - start.x;
+    const offsetY = touch.clientY - start.y;
+    if (Math.abs(offsetX) < 56 || Math.abs(offsetX) <= Math.abs(offsetY)) return;
+    this.shiftCalendarMonth(offsetX < 0 ? 1 : -1);
   },
 
   showCurrentMonth() {

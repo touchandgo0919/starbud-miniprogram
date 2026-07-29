@@ -6,15 +6,11 @@
     </view>
   </view>
 
-  <view class="calendar-panel">
+  <view class="calendar-panel" bindtouchstart="onCalendarTouchStart" bindtouchend="onCalendarTouchEnd">
     <view class="calendar-header">
-      <view class="calendar-month-switch">
-        <view class="calendar-month-arrow" data-offset="-1" bindtap="changeCalendarMonth">‹</view>
-        <view class="calendar-title" bindtap="toggleCalendar">
+      <view class="calendar-title" bindtap="toggleCalendar">
         <text>{{calendarTitle}}</text>
         <text class="calendar-title__chevron">⌄</text>
-        </view>
-        <view class="calendar-month-arrow" data-offset="1" bindtap="changeCalendarMonth">›</view>
       </view>
       <view class="calendar-actions">
         <view wx:if="{{calendarExpanded}}" class="calendar-action" bindtap="showCurrentMonth">本月</view>
@@ -30,15 +26,14 @@
       <view
         wx:for="{{calendarDays}}"
         wx:key="key"
-        class="calendar-day {{item.isCurrentMonth ? '' : 'calendar-day--outside'}} {{item.isSelected ? 'calendar-day--selected' : ''}}"
+        class="calendar-day {{item.isCurrentMonth ? '' : 'calendar-day--outside'}} {{item.isToday ? 'calendar-day--today' : ''}} {{item.isSelected ? 'calendar-day--selected' : ''}}"
         data-date="{{item.key}}"
         bindtap="selectCalendarDate"
       >
         <text class="calendar-day__number">{{item.label}}</text>
-        <text wx:if="{{item.hasTask}}" class="calendar-day__dot"></text>
+        <view class="calendar-day__dot-row"><text wx:if="{{item.hasTask}}" class="calendar-day__dot"></text></view>
       </view>
     </view>
-    <view wx:if="{{calendarExpanded}}" class="calendar-legend"><text></text><text>我的日程</text></view>
   </view>
 
   <scroll-view
