@@ -1,5 +1,5 @@
 <view class="page-shell tasks-page">
-  <view class="section-heading" style="padding-top: {{statusBarHeight}}px;">
+  <view class="section-heading" style="height: {{navBarHeight}}px; padding-top: {{statusBarHeight}}px;">
     <view class="section-title-group">
       <text>我的任务</text>
       <text class="section-count">{{totalCount}} 项</text>
@@ -8,9 +8,13 @@
 
   <view class="calendar-panel">
     <view class="calendar-header">
-      <view class="calendar-title" bindtap="toggleCalendar">
+      <view class="calendar-month-switch">
+        <view class="calendar-month-arrow" data-offset="-1" bindtap="changeCalendarMonth">‹</view>
+        <view class="calendar-title" bindtap="toggleCalendar">
         <text>{{calendarTitle}}</text>
         <text class="calendar-title__chevron">⌄</text>
+        </view>
+        <view class="calendar-month-arrow" data-offset="1" bindtap="changeCalendarMonth">›</view>
       </view>
       <view class="calendar-actions">
         <view wx:if="{{calendarExpanded}}" class="calendar-action" bindtap="showCurrentMonth">本月</view>

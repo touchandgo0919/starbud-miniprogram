@@ -19,6 +19,7 @@
 .calendar-header,
 .calendar-actions,
 .calendar-title,
+.calendar-month-switch,
 .calendar-weekdays,
 .calendar-legend {
   display: flex;
@@ -26,6 +27,8 @@
 }
 
 .calendar-header { height: 54rpx; justify-content: space-between; }
+.calendar-month-switch { gap: 10rpx; }
+.calendar-month-arrow { display: flex; width: 38rpx; height: 44rpx; align-items: center; justify-content: center; color: #7b8692; font-size: 42rpx; font-weight: 400; line-height: 1; }
 .calendar-title { gap: 10rpx; color: #202936; font-size: 32rpx; font-weight: 800; }
 .calendar-title__chevron { color: #66717d; font-size: 34rpx; line-height: 1; }
 .calendar-actions { gap: 12rpx; }
@@ -48,7 +51,8 @@
 
 .section-heading {
   display: flex;
-  padding: 30rpx 10rpx 18rpx;
+  box-sizing: border-box;
+  padding: 0 10rpx;
   align-items: center;
   justify-content: space-between;
   color: #25302c;

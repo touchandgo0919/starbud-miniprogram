@@ -21,12 +21,14 @@ function sundayStart(date) {
   return addDays(date, -date.getDay());
 }
 
-function buildCalendarDays(selectedDate, expanded) {
+function buildCalendarDays(selectedDate, expanded, year, month) {
   const selected = dateFromKey(selectedDate);
-  const month = selected.getMonth();
+  const displayMonth = month - 1;
+  const selectedInMonth = selected.getFullYear() === year && selected.getMonth() === displayMonth;
+  const baseDate = selectedInMonth ? selected : new Date(year, displayMonth, 1);
   const start = expanded
-    ? sundayStart(new Date(selected.getFullYear(), month, 1))
-    : sundayStart(selected);
+    ? sundayStart(new Date(year, displayMonth, 1))
+    : sundayStart(baseDate);
   const length = expanded ? 42 : 7;
   const today = localDateKey();
 
@@ -36,7 +38,7 @@ function buildCalendarDays(selectedDate, expanded) {
     return {
       key,
       label: String(date.getDate()),
-      isCurrentMonth: date.getMonth() === month,
+      isCurrentMonth: date.getFullYear() === year && date.getMonth() === displayMonth,
       isSelected: key === selectedDate,
       isToday: key === today,
       hasTask: false
@@ -75,6 +77,8 @@ Page({
     navBarHeight: 68,
     weekdayLabels,
     selectedDate: localDateKey(),
+    calendarYear: new Date().getFullYear(),
+    calendarMonth: new Date().getMonth() + 1,
     calendarTitle: "",
     calendarDays: [],
     calendarExpanded: false,
@@ -121,11 +125,15 @@ Page({
   },
 
   refreshCalendarView(taskDates = this.data.calendarTaskDates) {
-    const selected = dateFromKey(this.data.selectedDate);
-    const calendarDays = buildCalendarDays(this.data.selectedDate, this.data.calendarExpanded)
+    const calendarDays = buildCalendarDays(
+      this.data.selectedDate,
+      this.data.calendarExpanded,
+      this.data.calendarYear,
+      this.data.calendarMonth
+    )
       .map((day) => ({ ...day, hasTask: Boolean(taskDates[day.key]) }));
     this.setData({
-      calendarTitle: `${selected.getFullYear()}年${selected.getMonth() + 1}月`,
+      calendarTitle: `${this.data.calendarYear}年${this.data.calendarMonth}月`,
       calendarDays
     });
   },
@@ -200,7 +208,12 @@ Page({
   },
 
   async loadCalendarTasks() {
-    const days = buildCalendarDays(this.data.selectedDate, this.data.calendarExpanded);
+    const days = buildCalendarDays(
+      this.data.selectedDate,
+      this.data.calendarExpanded,
+      this.data.calendarYear,
+      this.data.calendarMonth
+    );
     try {
       const result = await api.getTaskPage({
         page: 1,
@@ -222,7 +235,14 @@ Page({
   selectCalendarDate(event) {
     const selectedDate = event.currentTarget.dataset.date;
     if (!selectedDate || selectedDate === this.data.selectedDate) return;
-    this.setData({ selectedDate, page: 0, hasMore: false }, () => this.refreshTaskPage());
+    const selected = dateFromKey(selectedDate);
+    this.setData({
+      selectedDate,
+      calendarYear: selected.getFullYear(),
+      calendarMonth: selected.getMonth() + 1,
+      page: 0,
+      hasMore: false
+    }, () => this.refreshTaskPage());
   },
 
   toggleCalendar() {
@@ -233,12 +253,37 @@ Page({
   },
 
   selectToday() {
-    const selectedDate = localDateKey();
-    this.setData({ selectedDate, page: 0, hasMore: false }, () => this.refreshTaskPage());
+    const today = new Date();
+    this.setData({
+      selectedDate: localDateKey(today),
+      calendarYear: today.getFullYear(),
+      calendarMonth: today.getMonth() + 1,
+      page: 0,
+      hasMore: false
+    }, () => this.refreshTaskPage());
+  },
+
+  changeCalendarMonth(event) {
+    const offset = Number(event.currentTarget.dataset.offset || 0);
+    if (!offset) return;
+    const next = new Date(this.data.calendarYear, this.data.calendarMonth - 1 + offset, 1);
+    this.setData({
+      calendarYear: next.getFullYear(),
+      calendarMonth: next.getMonth() + 1,
+      calendarExpanded: true
+    }, () => {
+      this.refreshCalendarView();
+      this.loadCalendarTasks();
+    });
   },
 
   showCurrentMonth() {
-    this.setData({ calendarExpanded: true }, () => {
+    const today = new Date();
+    this.setData({
+      calendarYear: today.getFullYear(),
+      calendarMonth: today.getMonth() + 1,
+      calendarExpanded: true
+    }, () => {
       this.refreshCalendarView();
       this.loadCalendarTasks();
     });
