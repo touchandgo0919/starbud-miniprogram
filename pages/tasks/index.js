@@ -50,13 +50,13 @@ function taskViewModel(task, showChildName) {
   const completed = task.status === "completed";
   const reviewed = Boolean(task.reviewedAt);
   const waitingReview = task.submissionStatus === "submitted" && !task.finalizedAt && !task.needsRevision;
-  const actionText = task.needsRevision ? "待修改" : waitingReview ? "待批改" : completed ? "已完成" : reviewed ? "已批改" : task.claimedAt ? (task.requiresPhotoUpload ? "去完成" : "已领取") : "去领取";
+  const actionText = task.needsRevision ? "待修改" : waitingReview ? "待批改" : completed ? "已完成" : reviewed ? "已批改" : task.claimedAt ? "去完成" : "去领取";
   return {
     ...task,
     completed,
     reviewed,
     waitingReview,
-    canChildAct: !completed && (task.needsRevision || !task.claimedAt || Boolean(task.requiresPhotoUpload)),
+    canChildAct: !completed && !waitingReview && (!reviewed || task.needsRevision),
     actionText,
     actionClass: completed
       ? "task-control task-control--done"
@@ -356,7 +356,7 @@ Page({
     if (this.data.isParent) return;
     const taskId = event.currentTarget.dataset.id;
     const task = this.data.tasks.find((item) => item.id === taskId);
-    if (!task || task.completed || task.waitingReview || (!task.requiresPhotoUpload && task.claimedAt)) return;
+    if (!task || task.completed || task.waitingReview) return;
     if (!task.claimedAt) {
       try {
         await api.claimTask(task.id);
@@ -364,6 +364,16 @@ Page({
         await this.refreshTaskPage();
       } catch (error) {
         wx.showToast({ title: error.message || "领取失败", icon: "none" });
+      }
+      return;
+    }
+    if (!task.requiresPhotoUpload) {
+      try {
+        await api.completeTask(task.id);
+        wx.showToast({ title: "任务已完成", icon: "success" });
+        await this.refreshTaskPage();
+      } catch (error) {
+        wx.showToast({ title: error.message || "完成失败", icon: "none" });
       }
       return;
     }

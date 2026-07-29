@@ -64,7 +64,7 @@
       class="primary-button detail-primary"
       bindtap="handlePrimaryAction"
     >
-      {{task.needsRevision ? "重新提交" : task.claimedAt ? "去完成任务" : "去领取"}}
+      {{task.needsRevision ? "重新提交" : task.claimedAt ? "去完成" : "去领取"}}
     </button>
   </block>
 </view>

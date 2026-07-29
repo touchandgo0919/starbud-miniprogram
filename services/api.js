@@ -37,6 +37,11 @@ async function claimTask(taskId) {
   return body.task;
 }
 
+async function completeTask(taskId) {
+  const body = await request(`/api/tasks/${taskId}/complete`, { method: "POST" });
+  return body.task;
+}
+
 async function createSubmission(taskId, note) {
   const body = await request(`/api/tasks/${taskId}/submissions`, {
     method: "POST",
@@ -133,6 +138,7 @@ async function remindTask(taskId) {
 
 module.exports = {
   claimTask,
+  completeTask,
   createSubmission,
   finalizeSubmission,
   getNotifications,
