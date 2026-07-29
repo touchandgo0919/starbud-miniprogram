@@ -385,8 +385,8 @@ Page({
     }
     if (!task.claimedAt) {
       try {
-        await api.claimTask(task.id, task.occurrenceDate);
-        wx.showToast({ title: "任务已领取", icon: "success" });
+        const claimedTask = await api.claimTask(task.id, task.occurrenceDate);
+        wx.showToast({ title: claimedTask.status === "completed" ? "任务已完成" : "任务已领取", icon: "success" });
         await this.refreshTaskPage();
       } catch (error) {
         wx.showToast({ title: error.message || "领取失败", icon: "none" });

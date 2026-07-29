@@ -121,7 +121,7 @@ Page({
         const taskView = taskViewModel(claimedTask);
         setSelectedTask(taskView);
         this.setData({ task: taskView });
-        wx.showToast({ title: "任务已领取", icon: "success" });
+        wx.showToast({ title: taskView.completed ? "任务已完成" : "任务已领取", icon: "success" });
       } catch (error) {
         wx.showToast({ title: error.message || "领取失败", icon: "none" });
       }
