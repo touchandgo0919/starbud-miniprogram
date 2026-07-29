@@ -42,7 +42,7 @@ Page({
   data: {
     statusBarHeight: 24,
     navBarHeight: 68,
-    activeFilter: "all",
+    activeFilter: "today",
     filters: [
       { value: "all", label: "全部" },
       { value: "month", label: "本月" },
