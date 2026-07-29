@@ -47,7 +47,7 @@ Page({
     }
 
     try {
-      const task = (await api.getTodayTasks()).find((item) => String(item.id) === taskId);
+      const task = await api.getTask(taskId, String(options.taskDate || ""));
       if (!task) throw new Error("任务不存在或今天无需执行。");
       const taskView = {
         ...task,
@@ -172,7 +172,7 @@ Page({
     try {
       const submission = this.data.resubmitSubmissionId
         ? { id: this.data.resubmitSubmissionId, status: "draft" }
-        : await api.createSubmission(this.data.task.id, this.data.note);
+        : await api.createSubmission(this.data.task.id, this.data.note, this.data.task.occurrenceDate);
       if (submission.status !== "submitted") {
         if (this.data.resubmitSubmissionId) {
           await api.updateSubmissionNote(submission.id, this.data.note);

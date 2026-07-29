@@ -382,7 +382,7 @@ Page({
     }
     if (!task.claimedAt) {
       try {
-        await api.claimTask(task.id);
+        await api.claimTask(task.id, task.occurrenceDate);
         wx.showToast({ title: "任务已领取", icon: "success" });
         await this.refreshTaskPage();
       } catch (error) {
@@ -392,7 +392,7 @@ Page({
     }
     if (!task.requiresPhotoUpload) {
       try {
-        await api.completeTask(task.id);
+        await api.completeTask(task.id, task.occurrenceDate);
         wx.showToast({ title: "任务已完成", icon: "success" });
         await this.refreshTaskPage();
       } catch (error) {
@@ -401,7 +401,7 @@ Page({
       return;
     }
     setSelectedTask(task);
-    wx.navigateTo({ url: `/pages/submit/index?taskId=${encodeURIComponent(task.id)}` });
+    wx.navigateTo({ url: `/pages/submit/index?taskId=${encodeURIComponent(task.id)}&taskDate=${encodeURIComponent(task.occurrenceDate || "")}` });
   },
 
   handleTaskDetail(event) {
@@ -409,7 +409,7 @@ Page({
     const task = this.data.tasks.find((item) => String(item.id) === taskId);
     if (!task) return;
     setSelectedTask(task);
-    wx.navigateTo({ url: `/pages/task-detail/index?taskId=${encodeURIComponent(task.id)}` });
+    wx.navigateTo({ url: `/pages/task-detail/index?taskId=${encodeURIComponent(task.id)}&taskDate=${encodeURIComponent(task.occurrenceDate || "")}` });
   },
 
   async editTask(event) {

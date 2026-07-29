@@ -55,7 +55,7 @@ Page({
     }
 
     try {
-      const task = await api.getTask(taskId);
+      const task = await api.getTask(taskId, options.taskDate);
       if (!task) throw new Error("任务不存在或无权查看。");
       const taskView = taskViewModel(task);
       setSelectedTask(taskView);
@@ -126,7 +126,7 @@ Page({
 
     if (!task.claimedAt) {
       try {
-        const claimedTask = await api.claimTask(task.id);
+        const claimedTask = await api.claimTask(task.id, task.occurrenceDate);
         const taskView = taskViewModel(claimedTask);
         setSelectedTask(taskView);
         this.setData({ task: taskView });
@@ -139,7 +139,7 @@ Page({
 
     if (!task.requiresPhotoUpload) {
       try {
-        const completedTask = await api.completeTask(task.id);
+        const completedTask = await api.completeTask(task.id, task.occurrenceDate);
         const taskView = taskViewModel(completedTask);
         setSelectedTask(taskView);
         this.setData({ task: taskView });
@@ -151,6 +151,6 @@ Page({
     }
 
     setSelectedTask(task);
-    wx.navigateTo({ url: `/pages/submit/index?taskId=${encodeURIComponent(task.id)}` });
+    wx.navigateTo({ url: `/pages/submit/index?taskId=${encodeURIComponent(task.id)}&taskDate=${encodeURIComponent(task.occurrenceDate || "")}` });
   }
 });

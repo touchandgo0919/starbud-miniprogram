@@ -27,25 +27,26 @@ async function getTaskPage({ page, pageSize, date, dateFrom, dateTo, scope }) {
   return body;
 }
 
-async function getTask(taskId) {
-  const body = await request(`/api/tasks/${taskId}`);
+async function getTask(taskId, taskDate) {
+  const suffix = taskDate ? `?date=${encodeURIComponent(taskDate)}` : "";
+  const body = await request(`/api/tasks/${taskId}${suffix}`);
   return body.task;
 }
 
-async function claimTask(taskId) {
-  const body = await request(`/api/tasks/${taskId}/claim`, { method: "POST" });
+async function claimTask(taskId, taskDate) {
+  const body = await request(`/api/tasks/${taskId}/claim`, { method: "POST", data: { taskDate } });
   return body.task;
 }
 
-async function completeTask(taskId) {
-  const body = await request(`/api/tasks/${taskId}/complete`, { method: "POST" });
+async function completeTask(taskId, taskDate) {
+  const body = await request(`/api/tasks/${taskId}/complete`, { method: "POST", data: { taskDate } });
   return body.task;
 }
 
-async function createSubmission(taskId, note) {
+async function createSubmission(taskId, note, taskDate) {
   const body = await request(`/api/tasks/${taskId}/submissions`, {
     method: "POST",
-    data: { note }
+    data: { note, taskDate }
   });
   return body.submission;
 }
