@@ -23,10 +23,12 @@ function submissionDateRange(filter) {
   return {};
 }
 
-function submissionViewModel(submission) {
+function submissionViewModel(submission, showChildName) {
   return {
     ...submission,
-    submittedLabel: formatSubmittedAt(submission.submittedAt),
+    submittedLabel: [showChildName && submission.childName, formatSubmittedAt(submission.submittedAt)]
+      .filter(Boolean)
+      .join(" · "),
     subjectMark: submission.taskTitle.slice(0, 1),
     reviewed: Boolean(submission.reviewedAt),
     statusLabel: submission.finalizedAt ? "已完成" : submission.reviewedAt ? "已批改" : "已提交",
@@ -105,7 +107,7 @@ Page({
         keyword: this.data.keyword
       });
       this.setData({
-        submissions: result.submissions.map(submissionViewModel),
+        submissions: result.submissions.map((submission) => submissionViewModel(submission, this.data.isParent)),
         totalCount: result.pagination.total,
         page: result.pagination.page,
         hasMore: result.pagination.hasMore,
@@ -148,7 +150,7 @@ Page({
         keyword: this.data.keyword
       });
       this.setData({
-        submissions: [...this.data.submissions, ...result.submissions.map(submissionViewModel)],
+        submissions: [...this.data.submissions, ...result.submissions.map((submission) => submissionViewModel(submission, this.data.isParent))],
         page: result.pagination.page,
         hasMore: result.pagination.hasMore
       });

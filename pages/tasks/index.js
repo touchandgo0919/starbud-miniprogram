@@ -46,7 +46,7 @@ function buildCalendarDays(selectedDate, expanded, year, month) {
   });
 }
 
-function taskViewModel(task) {
+function taskViewModel(task, showChildName) {
   const completed = task.status === "completed";
   const reviewed = Boolean(task.reviewedAt);
   const waitingReview = task.submissionStatus === "submitted" && !task.finalizedAt && !task.needsRevision;
@@ -65,7 +65,9 @@ function taskViewModel(task) {
           ? "task-control task-control--complete"
           : "task-control task-control--claim",
     subjectMark: task.title.slice(0, 1),
-    description: task.voiceContent || "按时完成任务并拍照提交"
+    description: [showChildName && task.childName, task.voiceContent || "按时完成任务并拍照提交"]
+      .filter(Boolean)
+      .join(" · ")
   };
 }
 
@@ -189,7 +191,7 @@ Page({
     this.setData({ loading: true, error: "" });
     try {
       const result = await api.getTaskPage({ page: 1, pageSize: PAGE_SIZE, date: this.data.selectedDate });
-      const tasks = result.tasks.map(taskViewModel);
+      const tasks = result.tasks.map((task) => taskViewModel(task, this.data.isParent));
       const completedCount = tasks.filter((task) => task.completed).length;
       this.setData({
         tasks,
@@ -318,7 +320,7 @@ Page({
         pageSize: PAGE_SIZE,
         date: this.data.selectedDate
       });
-      const additionalTasks = result.tasks.map(taskViewModel);
+      const additionalTasks = result.tasks.map((task) => taskViewModel(task, this.data.isParent));
       const tasks = [...this.data.tasks, ...additionalTasks];
       const completedCount = tasks.filter((task) => task.completed).length;
       this.setData({
