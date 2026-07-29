@@ -10,11 +10,11 @@
   flex-direction: column;
 }
 
-.detail-loading__brand { width: 180rpx; height: 180rpx; border-radius: 42rpx; box-shadow: 0 0 26rpx rgba(132, 218, 87, 0.42); animation: detail-brand-twinkle 1.25s ease-in-out infinite alternate; }
+.detail-loading__mark { width: 180rpx; height: 180rpx; animation: detail-mark-twinkle 1.25s ease-in-out infinite alternate; }
 
-@keyframes detail-brand-twinkle {
-  from { transform: scale(0.9); opacity: 0.7; box-shadow: 0 0 10rpx rgba(132, 218, 87, 0.2); }
-  to { transform: scale(1.08); opacity: 1; box-shadow: 0 0 34rpx rgba(255, 210, 52, 0.72); }
+@keyframes detail-mark-twinkle {
+  from { transform: scale(0.9); opacity: 0.7; }
+  to { transform: scale(1.08); opacity: 1; }
 }
 
 .detail-hero {
