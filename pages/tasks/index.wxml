@@ -1,8 +1,11 @@
 <view class="page-shell tasks-page">
-  <view class="section-heading" style="height: {{navBarHeight}}px; padding-top: {{statusBarHeight}}px;">
-    <view class="section-title-group">
-      <text>我的任务</text>
-      <text class="section-count">{{totalCount}} 项</text>
+  <view class="tasks-hero">
+    <view class="section-heading" style="height: {{navBarHeight}}px; padding-top: {{statusBarHeight}}px;">
+      <view class="section-title-group">
+        <image class="section-title-logo" src="/assets/starbud-icon.png" mode="aspectFit" />
+        <text>我的任务</text>
+        <text class="section-count">{{totalCount}} 项</text>
+      </view>
     </view>
   </view>
 

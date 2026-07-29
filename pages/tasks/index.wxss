@@ -8,6 +8,12 @@
   background: #f5f6fa;
 }
 
+.tasks-hero {
+  margin: 0 -16rpx;
+  padding: 0 26rpx;
+  background: linear-gradient(105deg, #08372b 0%, #121418 55%, #0d4331 100%);
+}
+
 .calendar-panel {
   margin: 20rpx 0 12rpx;
   padding: 20rpx 28rpx 22rpx;
@@ -54,19 +60,21 @@
   padding: 0 10rpx;
   align-items: center;
   justify-content: space-between;
-  color: #25302c;
+  color: #ffffff;
   font-size: 34rpx;
   font-weight: 800;
 }
 
 .section-title-group {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 14rpx;
 }
 
+.section-title-logo { width: 44rpx; height: 44rpx; }
+
 .section-count {
-  color: #909793;
+  color: rgba(255, 255, 255, 0.65);
   font-size: 24rpx;
   font-weight: 500;
 }
