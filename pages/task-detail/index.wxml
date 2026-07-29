@@ -1,8 +1,8 @@
 <view class="page-shell detail-page">
   <view wx:if="{{loading}}" class="detail-loading">
     <view class="detail-loading__stars" aria-label="正在加载任务详情">
-      <text class="detail-loading__star detail-loading__star--first">✦</text>
-      <text class="detail-loading__star detail-loading__star--second">✦</text>
+      <view class="detail-loading__orbit detail-loading__orbit--first"><text class="detail-loading__star detail-loading__star--first">✦</text></view>
+      <view class="detail-loading__orbit detail-loading__orbit--second"><text class="detail-loading__star detail-loading__star--second">✦</text></view>
     </view>
   </view>
   <block wx:elif="{{task}}">
