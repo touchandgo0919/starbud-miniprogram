@@ -8,8 +8,14 @@
 
   <view class="calendar-panel" bindtouchstart="onCalendarTouchStart" bindtouchend="onCalendarTouchEnd">
     <view class="calendar-header">
-      <view class="calendar-title" bindtap="toggleCalendar">
+      <view class="calendar-title">
+        <view class="calendar-month-switch" data-offset="-1" catchtap="changeCalendarMonth">
+          <view class="calendar-month-switch__icon calendar-month-switch__icon--previous"></view>
+        </view>
         <text>{{calendarTitle}}</text>
+        <view class="calendar-month-switch" data-offset="1" catchtap="changeCalendarMonth">
+          <view class="calendar-month-switch__icon calendar-month-switch__icon--next"></view>
+        </view>
       </view>
       <view class="calendar-actions">
         <view wx:if="{{calendarExpanded}}" class="calendar-action" bindtap="showCurrentMonth">本月</view>

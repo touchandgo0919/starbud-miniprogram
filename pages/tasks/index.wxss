@@ -25,7 +25,11 @@
 }
 
 .calendar-header { height: 54rpx; margin-bottom: 22rpx; justify-content: space-between; }
-.calendar-title { gap: 12rpx; color: #111827; font-size: 34rpx; font-weight: 800; line-height: 48rpx; }
+.calendar-title { gap: 8rpx; color: #111827; font-size: 34rpx; font-weight: 800; line-height: 48rpx; }
+.calendar-month-switch { display: flex; width: 34rpx; height: 48rpx; align-items: center; justify-content: center; }
+.calendar-month-switch__icon { width: 13rpx; height: 13rpx; border-right: 3rpx solid #88909b; border-bottom: 3rpx solid #88909b; }
+.calendar-month-switch__icon--previous { transform: rotate(135deg); }
+.calendar-month-switch__icon--next { transform: rotate(-45deg); }
 .calendar-actions { gap: 8rpx; }
 .calendar-action { min-width: 78rpx; height: 44rpx; padding: 0 16rpx; box-sizing: border-box; border-radius: 999rpx; background: #eaf7ef; color: #00913a; font-size: 24rpx; font-weight: 700; line-height: 44rpx; text-align: center; }
 .calendar-toggle { display: flex; width: 44rpx; height: 44rpx; align-items: center; justify-content: center; }

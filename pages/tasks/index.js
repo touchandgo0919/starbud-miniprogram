@@ -276,6 +276,10 @@ Page({
     });
   },
 
+  changeCalendarMonth(event) {
+    this.shiftCalendarMonth(Number(event.currentTarget.dataset.offset));
+  },
+
   onCalendarTouchStart(event) {
     const touch = event.touches && event.touches[0];
     if (!touch) return;
