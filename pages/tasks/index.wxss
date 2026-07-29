@@ -9,9 +9,9 @@
 }
 
 .calendar-panel {
-  margin: 0 -16rpx;
+  margin: 20rpx 0 28rpx;
   padding: 20rpx 28rpx 22rpx;
-  border-radius: 0 0 24rpx 24rpx;
+  border-radius: 24rpx;
   background: #ffffff;
   box-shadow: 0 8rpx 24rpx rgba(40, 52, 47, 0.05);
 }
