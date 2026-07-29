@@ -4,7 +4,6 @@
       <text class="detail-loading__star detail-loading__star--first">✦</text>
       <text class="detail-loading__star detail-loading__star--second">✦</text>
     </view>
-    <text class="detail-loading__text">正在加载任务详情</text>
   </view>
   <block wx:elif="{{task}}">
     <view class="detail-hero surface">
