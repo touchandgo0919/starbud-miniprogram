@@ -41,7 +41,7 @@
         bindtap="selectCalendarDate"
       >
         <text class="calendar-day__number">{{item.label}}</text>
-        <view class="calendar-day__dot-row"><text wx:if="{{item.hasTask}}" class="calendar-day__dot"></text></view>
+        <view class="calendar-day__dot-row"><text wx:if="{{item.hasTask}}" class="calendar-day__dot {{item.dotClass}}"></text></view>
       </view>
     </view>
   </view>

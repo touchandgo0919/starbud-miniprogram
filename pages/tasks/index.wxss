@@ -53,6 +53,11 @@
 .calendar-day--selected .calendar-day__number { border: 0; background: #00913a; color: #ffffff; }
 .calendar-day__dot-row { display: flex; height: 14rpx; margin-top: 6rpx; align-items: center; justify-content: center; }
 .calendar-day__dot { width: 7rpx; height: 7rpx; border-radius: 50%; background: #00913a; }
+.calendar-day__dot--revision { background: #e5484d; }
+.calendar-day__dot--review { background: #3b82f6; }
+.calendar-day__dot--active { background: #00913a; }
+.calendar-day__dot--pending { background: #f2b63d; }
+.calendar-day__dot--completed { background: #8a9490; }
 
 .section-heading {
   display: flex;

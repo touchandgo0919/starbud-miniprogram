@@ -5,6 +5,7 @@ const { getSession, setSelectedTask } = require("../../utils/storage");
 const PAGE_SIZE = 20;
 const REVIEW_NOTIFICATION_INTERVAL = 10000;
 const weekdayLabels = ["日", "一", "二", "三", "四", "五", "六"];
+const calendarDotPriority = { revision: 5, review: 4, active: 3, pending: 2, completed: 1 };
 
 function dateFromKey(key) {
   const [year, month, day] = key.split("-").map(Number);
@@ -41,9 +42,18 @@ function buildCalendarDays(selectedDate, expanded, year, month) {
       isCurrentMonth: date.getFullYear() === year && date.getMonth() === displayMonth,
       isSelected: key === selectedDate,
       isToday: key === today,
-      hasTask: false
+      hasTask: false,
+      dotClass: ""
     };
   });
+}
+
+function calendarDotStatus(task) {
+  if (task.reviewStatus === "needs_revision") return "revision";
+  if (task.reviewStatus === "pending_review") return "review";
+  if (task.status === "completed" || task.reviewStatus === "completed") return "completed";
+  if (task.claimedAt || task.reviewStatus === "submitting") return "active";
+  return "pending";
 }
 
 function taskViewModel(task, showChildName) {
@@ -157,7 +167,11 @@ Page({
       this.data.calendarYear,
       this.data.calendarMonth
     )
-      .map((day) => ({ ...day, hasTask: Boolean(taskDates[day.key]) }));
+      .map((day) => ({
+        ...day,
+        hasTask: Boolean(taskDates[day.key]),
+        dotClass: taskDates[day.key] ? `calendar-day__dot--${taskDates[day.key]}` : ""
+      }));
     this.setData({
       calendarTitle: `${this.data.calendarYear}年${this.data.calendarMonth}月`,
       calendarDays
@@ -249,7 +263,12 @@ Page({
         dateTo: days[days.length - 1].key
       });
       const calendarTaskDates = result.tasks.reduce((dates, task) => {
-        if (task.occurrenceDate) dates[task.occurrenceDate] = (dates[task.occurrenceDate] || 0) + 1;
+        if (!task.occurrenceDate) return dates;
+        const status = calendarDotStatus(task);
+        const current = dates[task.occurrenceDate];
+        if (!current || calendarDotPriority[status] > calendarDotPriority[current]) {
+          dates[task.occurrenceDate] = status;
+        }
         return dates;
       }, {});
       this.setData({ calendarTaskDates });
