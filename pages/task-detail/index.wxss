@@ -2,6 +2,32 @@
   padding-top: 28rpx;
 }
 
+.detail-loading {
+  display: flex;
+  min-height: calc(100vh - 56rpx);
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.detail-loading__stars { position: relative; width: 112rpx; height: 88rpx; }
+.detail-loading__star { position: absolute; color: #e2ad32; font-size: 56rpx; line-height: 1; text-shadow: 0 4rpx 12rpx rgba(226, 173, 50, 0.24); }
+.detail-loading__star--first { top: 0; left: 0; animation: detail-star-spin 1.2s linear infinite; }
+.detail-loading__star--second { right: 0; bottom: 0; color: #f3c557; font-size: 40rpx; animation: detail-star-spin-reverse 1s linear infinite; }
+.detail-loading__text { margin-top: 22rpx; color: #8a918e; font-size: 25rpx; }
+
+@keyframes detail-star-spin {
+  from { transform: rotate(0deg) scale(0.88); opacity: 0.68; }
+  50% { transform: rotate(180deg) scale(1.1); opacity: 1; }
+  to { transform: rotate(360deg) scale(0.88); opacity: 0.68; }
+}
+
+@keyframes detail-star-spin-reverse {
+  from { transform: rotate(360deg) scale(1.08); opacity: 1; }
+  50% { transform: rotate(180deg) scale(0.82); opacity: 0.62; }
+  to { transform: rotate(0deg) scale(1.08); opacity: 1; }
+}
+
 .detail-hero {
   display: flex;
   padding: 32rpx;

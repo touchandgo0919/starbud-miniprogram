@@ -1,5 +1,11 @@
 <view class="page-shell detail-page">
-  <view wx:if="{{loading}}" class="loading-line">正在加载任务详情…</view>
+  <view wx:if="{{loading}}" class="detail-loading">
+    <view class="detail-loading__stars" aria-label="正在加载任务详情">
+      <text class="detail-loading__star detail-loading__star--first">✦</text>
+      <text class="detail-loading__star detail-loading__star--second">✦</text>
+    </view>
+    <text class="detail-loading__text">正在加载任务详情</text>
+  </view>
   <block wx:elif="{{task}}">
     <view class="detail-hero surface">
       <view class="subject-mark">{{task.subjectMark}}</view>
