@@ -26,10 +26,11 @@
 
 .calendar-header { height: 54rpx; margin-bottom: 22rpx; justify-content: space-between; }
 .calendar-title { gap: 12rpx; color: #111827; font-size: 34rpx; font-weight: 800; line-height: 48rpx; }
-.calendar-title__chevron { color: #66717d; font-size: 34rpx; line-height: 1; }
 .calendar-actions { gap: 8rpx; }
 .calendar-action { min-width: 78rpx; height: 44rpx; padding: 0 16rpx; box-sizing: border-box; border-radius: 999rpx; background: #eaf7ef; color: #00913a; font-size: 24rpx; font-weight: 700; line-height: 44rpx; text-align: center; }
-.calendar-toggle { display: flex; width: 44rpx; height: 44rpx; align-items: center; justify-content: center; color: #7b8692; font-size: 32rpx; line-height: 1; }
+.calendar-toggle { display: flex; width: 44rpx; height: 44rpx; align-items: center; justify-content: center; }
+.calendar-toggle__icon { width: 16rpx; height: 16rpx; border-right: 3rpx solid #88909b; border-bottom: 3rpx solid #88909b; transform: translateY(-3rpx) rotate(45deg); }
+.calendar-toggle__icon--up { transform: translateY(3rpx) rotate(225deg); }
 
 .calendar-weekdays { justify-content: space-around; color: #9aa1ad; font-size: 25rpx; font-weight: 700; }
 .calendar-weekdays text { width: 14.285%; height: 46rpx; line-height: 46rpx; text-align: center; }

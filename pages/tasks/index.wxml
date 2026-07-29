@@ -10,12 +10,13 @@
     <view class="calendar-header">
       <view class="calendar-title" bindtap="toggleCalendar">
         <text>{{calendarTitle}}</text>
-        <text class="calendar-title__chevron">⌄</text>
       </view>
       <view class="calendar-actions">
         <view wx:if="{{calendarExpanded}}" class="calendar-action" bindtap="showCurrentMonth">本月</view>
         <view class="calendar-action" bindtap="selectToday">今天</view>
-        <view class="calendar-toggle" bindtap="toggleCalendar">{{calendarExpanded ? '⌃' : '⌄'}}</view>
+        <view class="calendar-toggle" bindtap="toggleCalendar">
+          <view class="calendar-toggle__icon {{calendarExpanded ? 'calendar-toggle__icon--up' : ''}}"></view>
+        </view>
       </view>
     </view>
 
