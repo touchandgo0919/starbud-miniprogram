@@ -8,8 +8,8 @@
     "pages/profile/index"
   ],
   "window": {
-    "backgroundColor": "#F6F8F7",
-    "backgroundTextStyle": "dark",
+    "backgroundColor": "#08372B",
+    "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#FFFFFF",
     "navigationBarTextStyle": "black",
     "navigationBarTitleText": "星星芽AI助手"

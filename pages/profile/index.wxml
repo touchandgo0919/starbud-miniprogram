@@ -1,4 +1,4 @@
-<view class="page-shell profile-page" wx:if="{{user}}">
+<view class="page-shell profile-page">
   <view class="top-hero">
     <view class="module-nav" style="height: {{navBarHeight}}px; padding-top: {{statusBarHeight}}px;">
       <view class="module-brand">
@@ -8,6 +8,7 @@
     </view>
   </view>
 
+  <block wx:if="{{user}}">
   <view class="profile-card surface">
     <image class="profile-logo" src="/assets/starbud-icon.png" mode="aspectFill" />
     <view class="profile-copy">
@@ -57,4 +58,5 @@
   </view>
 
   <button class="logout-button" bindtap="logout">退出登录</button>
+  </block>
 </view>
