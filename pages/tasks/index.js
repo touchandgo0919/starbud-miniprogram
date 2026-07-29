@@ -411,6 +411,15 @@ Page({
     const taskId = String(event.currentTarget.dataset.id || "");
     const task = this.data.tasks.find((item) => String(item.id) === taskId);
     if (!task) return;
+    if (!this.data.isParent && task.needsRevision) {
+      if (!task.submissionId) {
+        wx.showToast({ title: "未找到待重新提交的作业", icon: "none" });
+        return;
+      }
+      setSelectedTask(task);
+      wx.navigateTo({ url: `/pages/submit/index?taskId=${encodeURIComponent(task.id)}&taskDate=${encodeURIComponent(task.occurrenceDate || "")}&submissionId=${encodeURIComponent(task.submissionId)}&resubmit=1` });
+      return;
+    }
     setSelectedTask(task);
     wx.navigateTo({ url: `/pages/task-detail/index?taskId=${encodeURIComponent(task.id)}&taskDate=${encodeURIComponent(task.occurrenceDate || "")}` });
   },
