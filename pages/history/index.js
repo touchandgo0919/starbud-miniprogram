@@ -43,6 +43,7 @@ Page({
     activeFilter: "all",
     filters: [
       { value: "all", label: "全部" },
+      { value: "month", label: "本月" },
       { value: "week", label: "本周" },
       { value: "today", label: "今日" }
     ],
