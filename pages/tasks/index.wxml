@@ -78,7 +78,7 @@
           <text class="task-description">{{item.description}}</text>
         </view>
         <view class="task-actions">
-          <view wx:if="{{!isParent && !item.completed}}" class="{{item.actionClass}}" data-id="{{item.id}}" catchtap="handleTaskAction">{{item.actionText}}</view>
+          <view wx:if="{{!isParent && item.canChildAct}}" class="{{item.actionClass}}" data-id="{{item.id}}" catchtap="handleTaskAction">{{item.actionText}}</view>
           <view wx:elif="{{!isParent}}" class="{{item.actionClass}}">{{item.actionText}}</view>
           <view wx:else class="parent-task-actions">
             <view class="parent-task-action" data-id="{{item.id}}" catchtap="editTask">编辑</view>

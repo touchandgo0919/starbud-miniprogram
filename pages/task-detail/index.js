@@ -20,6 +20,7 @@ function taskViewModel(task) {
     statusLabel: needsRevision ? "待修改" : waitingReview ? "待批改" : completed ? "已完成" : reviewed ? "已批改" : "待完成",
     needsRevision,
     waitingReview,
+    canChildAct: !completed && (needsRevision || !task.claimedAt || Boolean(task.requiresPhotoUpload)),
     claimLabel: task.claimedAt ? "已领取" : "未领取",
     submissionLabel: task.submissionStatus === "submitted"
       ? `已提交（${task.submissionPhotoCount || 0} 张照片）`
@@ -121,7 +122,7 @@ Page({
       return;
     }
 
-    if (task.completed || task.waitingReview) return;
+    if (task.completed || task.waitingReview || (!task.requiresPhotoUpload && task.claimedAt)) return;
 
     if (!task.claimedAt) {
       try {
@@ -130,6 +131,7 @@ Page({
         setSelectedTask(taskView);
         this.setData({ task: taskView });
         wx.showToast({ title: "任务已领取", icon: "success" });
+        if (!taskView.requiresPhotoUpload) return;
       } catch (error) {
         wx.showToast({ title: error.message || "领取失败", icon: "none" });
       }
