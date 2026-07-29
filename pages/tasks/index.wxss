@@ -71,7 +71,7 @@
   gap: 14rpx;
 }
 
-.section-title-logo { width: 44rpx; height: 44rpx; }
+.section-title-logo { width: 48rpx; height: 48rpx; }
 
 .section-count {
   color: rgba(255, 255, 255, 0.65);
