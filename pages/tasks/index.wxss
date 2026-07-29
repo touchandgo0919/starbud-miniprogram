@@ -129,8 +129,12 @@
   background: #ffc947;
 }
 
+.task-dot--claim { background: #ffc947; }
+.task-dot--complete { background: #0aa868; }
+.task-dot--waiting-review { background: #3b82f6; }
+.task-dot--reviewed { background: #e5484d; }
 .task-dot--done {
-  background: #0aa868;
+  background: #8a9490;
 }
 
 .task-copy {

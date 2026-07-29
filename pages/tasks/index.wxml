@@ -71,7 +71,7 @@
       <view wx:for="{{tasks}}" wx:key="id" class="task-row" data-id="{{item.id}}" bindtap="handleTaskDetail">
         <view class="task-time">
           <text>{{item.scheduleTime}}</text>
-          <view class="task-dot {{item.completed ? 'task-dot--done' : ''}}"></view>
+          <view class="task-dot {{item.dotClass}}"></view>
         </view>
         <view class="task-copy">
           <text class="task-title">{{item.title}}</text>

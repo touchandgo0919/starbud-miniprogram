@@ -70,7 +70,16 @@ function taskViewModel(task, showChildName) {
     subjectMark: task.title.slice(0, 1),
     description: [showChildName && task.childName, task.voiceContent || "按时完成任务并拍照提交"]
       .filter(Boolean)
-      .join(" · ")
+      .join(" · "),
+    dotClass: completed
+      ? "task-dot--done"
+      : waitingReview
+        ? "task-dot--waiting-review"
+        : reviewed || task.needsRevision
+          ? "task-dot--reviewed"
+          : task.claimedAt
+            ? "task-dot--complete"
+            : "task-dot--claim"
   };
 }
 
