@@ -7,6 +7,19 @@ const REVIEW_NOTIFICATION_INTERVAL = 10000;
 const weekdayLabels = ["日", "一", "二", "三", "四", "五", "六"];
 const calendarDotPriority = { revision: 5, review: 4, active: 3, pending: 2, completed: 1 };
 
+function confirmClaim(taskTitle) {
+  return new Promise((resolve) => {
+    wx.showModal({
+      title: "确认领取",
+      content: `确认领取“${taskTitle}”吗？`,
+      confirmText: "确认领取",
+      cancelText: "取消",
+      success: (result) => resolve(result.confirm),
+      fail: () => resolve(false)
+    });
+  });
+}
+
 function dateFromKey(key) {
   const [year, month, day] = key.split("-").map(Number);
   return new Date(year, month - 1, day);
@@ -399,6 +412,7 @@ Page({
       return;
     }
     if (!task.claimedAt) {
+      if (!await confirmClaim(task.title)) return;
       try {
         const claimedTask = await api.claimTask(task.id, task.occurrenceDate);
         wx.showToast({ title: claimedTask.status === "completed" ? "任务已完成" : "任务已领取", icon: "success" });

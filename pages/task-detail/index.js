@@ -8,6 +8,19 @@ const repeatLabels = {
   weekly: "每周"
 };
 
+function confirmClaim(taskTitle) {
+  return new Promise((resolve) => {
+    wx.showModal({
+      title: "确认领取",
+      content: `确认领取“${taskTitle}”吗？`,
+      confirmText: "确认领取",
+      cancelText: "取消",
+      success: (result) => resolve(result.confirm),
+      fail: () => resolve(false)
+    });
+  });
+}
+
 function taskViewModel(task) {
   const needsRevision = Boolean(task.needsRevision);
   const waitingReview = task.submissionStatus === "submitted" && !task.finalizedAt && !needsRevision;
@@ -116,6 +129,7 @@ Page({
     if (task.completed || task.waitingReview) return;
 
     if (!task.claimedAt) {
+      if (!await confirmClaim(task.title)) return;
       try {
         const claimedTask = await api.claimTask(task.id, task.occurrenceDate);
         const taskView = taskViewModel(claimedTask);
