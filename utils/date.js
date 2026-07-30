@@ -14,8 +14,8 @@ function friendlyDate(date = new Date()) {
 
 function formatSubmittedAt(value) {
   if (!value) return "";
-  const date = new Date(value);
-  return `${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
+  const match = /^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}:\d{2})/.exec(String(value));
+  return match ? `${match[2]}-${match[3]} ${match[4]}` : String(value);
 }
 
 module.exports = {
