@@ -152,7 +152,6 @@ Page({
   },
 
   onShow() {
-    void api.trackPageView("/pages/tasks/index");
     const session = getSession();
     if (!session || !session.user || !["child", "parent"].includes(session.user.role)) {
       wx.reLaunch({ url: "/pages/login/index" });
@@ -401,7 +400,7 @@ Page({
     let task = this.data.tasks.find((item) => item.id === taskId);
     if (!task) return;
     try {
-      task = taskViewModel(await api.getTask(task.id, task.occurrenceDate), false);
+      task = taskViewModel(await api.getTask(task.id, task.occurrenceDate, "action"), false);
     } catch (error) {
       wx.showToast({ title: error.message || "任务状态加载失败", icon: "none" });
       return;

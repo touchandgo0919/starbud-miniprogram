@@ -7,16 +7,8 @@ async function login(username, password) {
   });
 }
 
-async function trackAccessEvent(eventName, options = {}) {
-  try {
-    await request("/api/access-events", { method: "POST", data: { eventName, ...options } });
-  } catch {
-    // Tracking must not interrupt the child's workflow.
-  }
-}
-
-function trackPageView(route) {
-  return trackAccessEvent("page_view", { route });
+async function logout() {
+  return request("/api/auth/logout", { method: "POST" });
 }
 
 async function getTodayTasks() {
@@ -39,8 +31,11 @@ async function getTaskPage({ page, pageSize, date, dateFrom, dateTo, scope }) {
   return body;
 }
 
-async function getTask(taskId, taskDate) {
-  const suffix = taskDate ? `?date=${encodeURIComponent(taskDate)}` : "";
+async function getTask(taskId, taskDate, purpose) {
+  const params = [];
+  if (taskDate) params.push(`date=${encodeURIComponent(taskDate)}`);
+  if (purpose) params.push(`purpose=${encodeURIComponent(purpose)}`);
+  const suffix = params.length ? `?${params.join("&")}` : "";
   const body = await request(`/api/tasks/${taskId}${suffix}`);
   return body.task;
 }
@@ -173,9 +168,8 @@ module.exports = {
   updateTask,
   deleteTask,
   remindTask,
-  trackAccessEvent,
-  trackPageView,
   login,
+  logout,
   markNotificationRead,
   uploadSubmissionPhoto,
   updateSubmissionNote,

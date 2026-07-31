@@ -81,7 +81,6 @@ Page({
   },
 
   onShow() {
-    void api.trackPageView("/pages/history/index");
     const session = getSession();
     if (!session || !session.user || !["child", "parent"].includes(session.user.role)) {
       wx.reLaunch({ url: "/pages/login/index" });
@@ -92,6 +91,10 @@ Page({
       this.hasLoadedSubmissions = true;
       this.loadSubmissions();
     }
+  },
+
+  onUnload() {
+    if (this.searchTimer) clearTimeout(this.searchTimer);
   },
 
   async onPullDownRefresh() {
@@ -142,10 +145,16 @@ Page({
   onSearchInput(event) {
     const keyword = event.detail.value;
     this.setData({ keyword });
-    this.loadSubmissions();
+    if (this.searchTimer) clearTimeout(this.searchTimer);
+    this.searchTimer = setTimeout(() => {
+      this.searchTimer = null;
+      this.loadSubmissions();
+    }, 350);
   },
 
   clearSearch() {
+    if (this.searchTimer) clearTimeout(this.searchTimer);
+    this.searchTimer = null;
     this.setData({ keyword: "" });
     this.loadSubmissions();
   },

@@ -15,7 +15,6 @@ Page({
   },
 
   onShow() {
-    void api.trackPageView("/pages/profile/index");
     const session = getSession();
     if (!session || !session.user || !["child", "parent"].includes(session.user.role)) {
       wx.reLaunch({ url: "/pages/login/index" });
@@ -30,8 +29,13 @@ Page({
       content: "退出后需要重新输入儿童账号和密码。",
       confirmText: "退出",
       confirmColor: "#C74C57",
-      success(result) {
+      async success(result) {
         if (!result.confirm) return;
+        try {
+          await api.logout();
+        } catch (_) {
+          // 即使断网，也允许用户在本机退出。
+        }
         clearSession();
         wx.reLaunch({ url: "/pages/login/index" });
       }

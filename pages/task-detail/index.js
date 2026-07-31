@@ -52,7 +52,6 @@ Page({
   },
 
   async onLoad(options) {
-    void api.trackPageView("/pages/task-detail/index");
     const session = getSession();
     if (!session || !session.user || !["child", "parent"].includes(session.user.role)) {
       wx.reLaunch({ url: "/pages/login/index" });
@@ -65,7 +64,7 @@ Page({
     const taskDate = String(options.taskDate || (selectedTask && String(selectedTask.id) === taskId ? selectedTask.occurrenceDate || "" : ""));
 
     try {
-      const task = await api.getTask(taskId, taskDate);
+      const task = await api.getTask(taskId, taskDate, "detail");
       if (!task) throw new Error("任务不存在或无权查看。");
       const taskView = taskViewModel(task);
       setSelectedTask(taskView);

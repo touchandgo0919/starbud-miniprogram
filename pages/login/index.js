@@ -11,7 +11,6 @@ Page({
   },
 
   onLoad() {
-    void api.trackPageView("/pages/login/index");
     const session = getSession();
     if (session && session.token && session.user && ["child", "parent"].includes(session.user.role)) {
       wx.switchTab({ url: "/pages/tasks/index" });

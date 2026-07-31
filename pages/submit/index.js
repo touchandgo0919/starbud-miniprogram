@@ -21,7 +21,6 @@ Page({
   },
 
   async onLoad(options) {
-    void api.trackPageView("/pages/submit/index");
     const session = getSession();
     if (!session || !session.user || session.user.role !== "child") {
       wx.showModal({
@@ -51,7 +50,7 @@ Page({
     }
 
     try {
-      const task = await api.getTask(taskId, String(options.taskDate || ""));
+      const task = await api.getTask(taskId, String(options.taskDate || ""), "submit");
       if (!task) throw new Error("任务不存在或今天无需执行。");
       const taskView = {
         ...task,
