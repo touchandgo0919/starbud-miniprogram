@@ -1,5 +1,6 @@
 const { API_BASE_URL } = require("../config");
 const { clearSession, getSession } = require("./storage");
+const accessSessionId = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
 function redirectToLogin() {
   clearSession();
@@ -20,6 +21,8 @@ function request(path, options = {}) {
       timeout: 15000,
       header: {
         "content-type": "application/json",
+        "x-starbud-client": "mini_program",
+        "x-starbud-session-id": accessSessionId,
         ...(session && session.token ? { authorization: `Bearer ${session.token}` } : {}),
         ...(options.header || {})
       },
@@ -49,8 +52,8 @@ function upload(path, filePath) {
       name: "photo",
       timeout: 30000,
       header: session && session.token
-        ? { authorization: `Bearer ${session.token}` }
-        : {},
+        ? { authorization: `Bearer ${session.token}`, "x-starbud-client": "mini_program", "x-starbud-session-id": accessSessionId }
+        : { "x-starbud-client": "mini_program", "x-starbud-session-id": accessSessionId },
       success(response) {
         let body = null;
         try {

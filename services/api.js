@@ -7,6 +7,18 @@ async function login(username, password) {
   });
 }
 
+async function trackAccessEvent(eventName, options = {}) {
+  try {
+    await request("/api/access-events", { method: "POST", data: { eventName, ...options } });
+  } catch {
+    // Tracking must not interrupt the child's workflow.
+  }
+}
+
+function trackPageView(route) {
+  return trackAccessEvent("page_view", { route });
+}
+
 async function getTodayTasks() {
   const body = await request("/api/tasks/today");
   return body.tasks;
@@ -161,6 +173,8 @@ module.exports = {
   updateTask,
   deleteTask,
   remindTask,
+  trackAccessEvent,
+  trackPageView,
   login,
   markNotificationRead,
   uploadSubmissionPhoto,

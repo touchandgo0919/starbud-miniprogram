@@ -21,6 +21,7 @@ Page({
   },
 
   async onLoad(options) {
+    void api.trackPageView("/pages/submit/index");
     const session = getSession();
     if (!session || !session.user || session.user.role !== "child") {
       wx.showModal({
