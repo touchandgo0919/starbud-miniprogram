@@ -91,7 +91,15 @@ function normalizeSubmissionUrls(submission) {
       ...round,
       reviewImageUrl: absoluteUrl(round.reviewImageUrl),
       photos: round.photos.map((photo) => ({ ...photo, url: absoluteUrl(photo.url) })),
-      photoUrls: round.photos.map((photo) => absoluteUrl(photo.url))
+      photoUrls: round.photos.map((photo) => absoluteUrl(photo.url)),
+      reviewImages: (round.reviewImages && round.reviewImages.length
+        ? round.reviewImages
+        : [{ id: `legacy-${round.id}`, url: round.reviewImageUrl, contentType: "image/png", byteSize: 0, createdAt: round.reviewedAt }]
+      ).map((photo) => ({ ...photo, url: absoluteUrl(photo.url) })),
+      reviewImageUrls: (round.reviewImages && round.reviewImages.length
+        ? round.reviewImages
+        : [{ url: round.reviewImageUrl }]
+      ).map((photo) => absoluteUrl(photo.url))
     }))
   };
 }
