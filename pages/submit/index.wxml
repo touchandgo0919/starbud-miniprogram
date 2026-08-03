@@ -11,12 +11,11 @@
     </view>
   </view>
 
-  <view class="form-section">
-    <view class="form-heading">
-      <text class="form-title">作业照片</text>
-      <text class="form-hint">照片或录音至少提交一项</text>
-    </view>
-    <view wx:if="recoveredDraft" class="draft-recovery-note">已恢复草稿附件，可继续提交或补传照片、重新录音。</view>
+  <view class="attachment-tip">图片和录音至少提交一项，录音最多 3 分钟</view>
+  <view wx:if="recoveredDraft" class="draft-recovery-note">已恢复草稿附件，可继续提交或补传照片、重新录音。</view>
+
+  <view class="form-section form-section--photos">
+    <text class="field-label">图片</text>
 
     <view class="photo-grid">
       <view wx:for="{{existingPhotos}}" wx:key="id" class="photo-cell">
@@ -47,7 +46,7 @@
   </view>
 
   <view class="form-section">
-    <view class="form-heading"><text class="form-title">语音说明</text><text class="form-hint">选填，最长 3 分钟</text></view>
+    <text class="field-label">录音</text>
     <view class="audio-card">
       <text wx:if="recording" class="recording-time">录音中 {{recordingDuration}} 秒</text>
       <text wx:elif="audio || existingAudio">语音附件 {{audioDurationLabel}}</text>
@@ -61,7 +60,7 @@
   </view>
 
   <view class="form-section">
-    <text class="form-title">补充说明（选填）</text>
+    <text class="field-label">备注（选填）</text>
     <textarea
       class="note-input"
       value="{{note}}"

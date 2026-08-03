@@ -64,24 +64,25 @@
 }
 
 .form-section {
-  margin-top: 38rpx;
+  margin-top: 30rpx;
 }
 
-.form-heading {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
+.form-section--photos {
+  margin-top: 26rpx;
 }
 
-.form-title {
-  color: #26312d;
+.attachment-tip {
+  margin-top: 28rpx;
+  color: #d9eee4;
+  font-size: 24rpx;
+  line-height: 1.5;
+}
+
+.field-label {
+  display: block;
+  color: #f3fbf7;
   font-size: 31rpx;
   font-weight: 750;
-}
-
-.form-hint {
-  color: #8a918e;
-  font-size: 23rpx;
 }
 
 .draft-recovery-note {
@@ -97,7 +98,7 @@
 .photo-grid {
   display: flex;
   flex-wrap: wrap;
-  margin-top: 22rpx;
+  margin-top: 16rpx;
   gap: 16rpx;
 }
 
@@ -172,7 +173,7 @@
 .audio-card {
   display: flex;
   min-height: 112rpx;
-  margin-top: 22rpx;
+  margin-top: 16rpx;
   padding: 20rpx 22rpx;
   align-items: center;
   justify-content: space-between;
@@ -214,7 +215,7 @@
 .note-input {
   width: 100%;
   height: 240rpx;
-  margin-top: 22rpx;
+  margin-top: 16rpx;
   padding: 24rpx;
   border: 2rpx solid #dce5e0;
   border-radius: 18rpx;

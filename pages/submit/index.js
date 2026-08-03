@@ -99,14 +99,24 @@ Page({
 
   onUnload() {
     if (this.recordingTimer) clearInterval(this.recordingTimer);
+    if (this.recordingRequested) {
+      this.recordingRequested = false;
+      this.recorder?.stop();
+    }
+    this.disableRecordingLeaveGuard();
     this.audioPlayer?.destroy();
   },
 
   setupRecorder() {
     this.recorder = wx.getRecorderManager();
+    this.recordingRequested = false;
     this.recorder.onStart(() => {
+      // RecorderManager 是小程序全局实例。忽略从上一页面遗留的录音事件，
+      // 只有本页面“录音”按钮明确发起的会话才能更新界面。
+      if (!this.recordingRequested) return;
       this.recordingStartedAt = Date.now();
       this.setData({ recording: true, recordingDuration: 0 });
+      this.enableRecordingLeaveGuard();
       this.recordingTimer = setInterval(() => {
         this.setData({ recordingDuration: Math.floor((Date.now() - this.recordingStartedAt) / 1000) });
       }, 1_000);
@@ -114,6 +124,13 @@ Page({
     this.recorder.onStop((result) => {
       if (this.recordingTimer) clearInterval(this.recordingTimer);
       this.recordingTimer = null;
+      const wasRequested = this.recordingRequested;
+      this.recordingRequested = false;
+      this.disableRecordingLeaveGuard();
+      if (!wasRequested) {
+        this.setData({ recording: false, recordingDuration: 0 });
+        return;
+      }
       const duration = Math.max(1, Math.round((result.duration || Date.now() - this.recordingStartedAt) / 1_000));
       this.setData({
         audio: { path: result.tempFilePath, duration },
@@ -125,13 +142,35 @@ Page({
     this.recorder.onError(() => {
       if (this.recordingTimer) clearInterval(this.recordingTimer);
       this.recordingTimer = null;
+      const wasRequested = this.recordingRequested;
+      this.recordingRequested = false;
+      this.disableRecordingLeaveGuard();
       this.setData({ recording: false });
-      wx.showToast({ title: "录音失败，请检查麦克风权限", icon: "none" });
+      if (wasRequested) wx.showToast({ title: "录音失败，请检查麦克风权限", icon: "none" });
     });
+
+    // 若用户曾在上一个提交页离开时仍在录音，先结束该全局会话；它不会被当成
+    // 当前页的录音附件，也不会把当前页切换为“录音中”。
+    this.recorder.stop();
+  },
+
+  enableRecordingLeaveGuard() {
+    if (this.recordingLeaveGuardEnabled || typeof wx.enableAlertBeforeUnload !== "function") return;
+    wx.enableAlertBeforeUnload({
+      message: "正在录音，离开页面将停止且不会保存本次录音。"
+    });
+    this.recordingLeaveGuardEnabled = true;
+  },
+
+  disableRecordingLeaveGuard() {
+    if (!this.recordingLeaveGuardEnabled || typeof wx.disableAlertBeforeUnload !== "function") return;
+    wx.disableAlertBeforeUnload();
+    this.recordingLeaveGuardEnabled = false;
   },
 
   startRecording() {
-    if (this.data.recording) return;
+    if (this.data.recording || this.recordingRequested) return;
+    this.recordingRequested = true;
     this.recorder.start({
       duration: 180_000,
       sampleRate: 16_000,
@@ -142,7 +181,7 @@ Page({
   },
 
   stopRecording() {
-    if (this.data.recording) this.recorder.stop();
+    if (this.recordingRequested) this.recorder.stop();
   },
 
   async deleteAudio() {
