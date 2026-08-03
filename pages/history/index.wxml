@@ -51,7 +51,7 @@
           </view>
           <text class="history-status {{item.statusClass}}">{{item.statusLabel}}</text>
         </view>
-        <scroll-view class="photo-strip" scroll-x enhanced show-scrollbar="{{false}}">
+        <scroll-view wx:if="{{item.photos.length || item.audio}}" class="photo-strip" scroll-x enhanced show-scrollbar="{{false}}">
           <image
             wx:for="{{item.photos}}"
             wx:for-item="photo"
@@ -63,6 +63,17 @@
             data-url="{{photo.url}}"
             bindtap="previewPhoto"
           />
+          <view
+            wx:if="{{item.audio}}"
+            class="history-audio {{playingAudioId === item.id ? 'history-audio--playing' : ''}}"
+            data-id="{{item.id}}"
+            data-url="{{item.audio.url}}"
+            bindtap="playAudio"
+          >
+            <text class="history-audio__icon">{{loadingAudioId === item.id ? '…' : playingAudioId === item.id ? '❚❚' : '▶'}}</text>
+            <text class="history-audio__time">{{(playingAudioId === item.id || loadingAudioId === item.id) && audioPlaybackLabel ? audioPlaybackLabel + ' / ' + item.audio.durationLabel : item.audio.durationLabel}}</text>
+            <text class="history-audio__action">{{loadingAudioId === item.id ? '加载中' : playingAudioId === item.id ? '暂停' : '试听录音'}}</text>
+          </view>
         </scroll-view>
         <view wx:if="{{!isParent && editingSubmissionId === item.id}}" class="history-note-editor">
           <textarea value="{{editingNote}}" maxlength="500" placeholder="填写提交备注" auto-height bindinput="onNoteInput" />

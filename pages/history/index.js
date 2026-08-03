@@ -1,8 +1,14 @@
 const api = require("../../services/api");
+const { useSpeakerOutput } = require("../../utils/audio");
 const { formatSubmittedAt, localDateKey } = require("../../utils/date");
 const { getSession } = require("../../utils/storage");
 
 const PAGE_SIZE = 20;
+
+function formatAudioDuration(seconds) {
+  const safeSeconds = Math.max(0, Math.floor(Number(seconds) || 0));
+  return `${Math.floor(safeSeconds / 60)}:${String(safeSeconds % 60).padStart(2, "0")}`;
+}
 
 function submissionDateRange(filter) {
   const today = new Date();
@@ -33,6 +39,10 @@ function submissionViewModel(submission, showChildName) {
     reviewed: Boolean(submission.reviewedAt),
     statusLabel: submission.finalizedAt ? "已完成" : submission.reviewedAt ? "已批改" : "已提交",
     statusClass: submission.finalizedAt ? "history-status--completed" : "",
+    audio: submission.audio ? {
+      ...submission.audio,
+      durationLabel: formatAudioDuration(Number(submission.audio.durationMs || 0) / 1_000)
+    } : null,
     canEditNote: !submission.finalizedAt
   };
 }
@@ -49,6 +59,9 @@ Page({
       { value: "today", label: "今日" }
     ],
     submissions: [],
+    playingAudioId: "",
+    loadingAudioId: "",
+    audioPlaybackLabel: "",
     isParent: false,
     editingSubmissionId: "",
     editingNote: "",
@@ -95,6 +108,7 @@ Page({
 
   onUnload() {
     if (this.searchTimer) clearTimeout(this.searchTimer);
+    this.destroyAudioPlayer(false);
   },
 
   async onPullDownRefresh() {
@@ -113,6 +127,7 @@ Page({
   },
 
   async loadSubmissions() {
+    this.destroyAudioPlayer();
     this.setData({ loading: true, error: "" });
     try {
       const result = await api.getSubmissionPage({
@@ -191,6 +206,87 @@ Page({
       current,
       urls: submission.photos.map((photo) => photo.url)
     });
+  },
+
+  destroyAudioPlayer(updateData = true) {
+    this.audioPlayRequested = false;
+    this.audioPlayerSource = "";
+    if (this.audioPlayer) {
+      this.audioPlayer.destroy();
+      this.audioPlayer = null;
+    }
+    if (updateData) {
+      this.setData({ playingAudioId: "", loadingAudioId: "", audioPlaybackLabel: "" });
+    }
+  },
+
+  async playAudio(event) {
+    const submissionId = String(event.currentTarget.dataset.id || "");
+    const source = String(event.currentTarget.dataset.url || "");
+    if (!submissionId || !source || this.audioOutputPending) return;
+
+    this.audioOutputPending = true;
+    const speakerReady = await useSpeakerOutput();
+    this.audioOutputPending = false;
+    if (!speakerReady) {
+      wx.showToast({ title: "扬声器设置失败，请重试", icon: "none" });
+      return;
+    }
+
+    if (this.audioPlayer && this.audioPlayerSource === source) {
+      if (this.data.playingAudioId === submissionId) {
+        this.audioPlayer.pause();
+      } else {
+        this.setData({ loadingAudioId: submissionId });
+        this.audioPlayer.play();
+      }
+      return;
+    }
+
+    this.destroyAudioPlayer(false);
+    const player = wx.createInnerAudioContext();
+    this.audioPlayer = player;
+    this.audioPlayerSource = source;
+    this.audioPlayRequested = true;
+    player.obeyMuteSwitch = false;
+    player.volume = 1;
+    this.setData({ playingAudioId: "", loadingAudioId: submissionId, audioPlaybackLabel: "" });
+
+    player.onCanplay(() => {
+      if (this.audioPlayer !== player || !this.audioPlayRequested) return;
+      this.audioPlayRequested = false;
+      player.play();
+    });
+    player.onPlay(() => {
+      if (this.audioPlayer !== player) return;
+      this.setData({
+        playingAudioId: submissionId,
+        loadingAudioId: "",
+        audioPlaybackLabel: formatAudioDuration(player.currentTime || 0)
+      });
+    });
+    player.onTimeUpdate(() => {
+      if (this.audioPlayer === player) {
+        this.setData({ audioPlaybackLabel: formatAudioDuration(player.currentTime || 0) });
+      }
+    });
+    player.onPause(() => {
+      if (this.audioPlayer === player) this.setData({ playingAudioId: "", loadingAudioId: "" });
+    });
+    player.onEnded(() => {
+      if (this.audioPlayer === player) {
+        this.setData({ playingAudioId: "", loadingAudioId: "", audioPlaybackLabel: "" });
+      }
+    });
+    player.onWaiting?.(() => {
+      if (this.audioPlayer === player) this.setData({ loadingAudioId: submissionId });
+    });
+    player.onError(() => {
+      if (this.audioPlayer !== player) return;
+      this.destroyAudioPlayer();
+      wx.showToast({ title: "录音加载失败，请稍后重试", icon: "none" });
+    });
+    player.src = source;
   },
 
   startEditNote(event) {

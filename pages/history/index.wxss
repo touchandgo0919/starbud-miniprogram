@@ -192,11 +192,60 @@
 }
 
 .history-photo {
+  display: inline-block;
   width: 168rpx;
   height: 132rpx;
   margin-right: 14rpx;
   border-radius: 14rpx;
   background: #edf0ee;
+  vertical-align: top;
+}
+
+.history-audio {
+  position: relative;
+  display: inline-flex;
+  box-sizing: border-box;
+  width: 168rpx;
+  height: 132rpx;
+  margin-right: 14rpx;
+  align-items: center;
+  justify-content: center;
+  border: 2rpx solid #dce5e0;
+  border-radius: 14rpx;
+  background: #f7faf8;
+  vertical-align: top;
+}
+
+.history-audio--playing {
+  border-color: #0aa868;
+  background: #effaf5;
+}
+
+.history-audio__icon {
+  color: #0aa868;
+  font-size: 34rpx;
+  line-height: 1;
+}
+
+.history-audio__time {
+  margin-left: 10rpx;
+  color: #5e6964;
+  font-size: 20rpx;
+  line-height: 1;
+}
+
+.history-audio__action {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: 8rpx 0;
+  border-radius: 0 0 12rpx 12rpx;
+  background: #0aa868;
+  color: #ffffff;
+  font-size: 20rpx;
+  line-height: 1;
+  text-align: center;
 }
 
 .history-note-wrap,
