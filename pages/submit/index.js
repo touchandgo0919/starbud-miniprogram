@@ -16,6 +16,7 @@ Page({
     existingAudio: null,
     recording: false,
     recordingDuration: 0,
+    audioDurationLabel: "",
     note: "",
     resubmitSubmissionId: "",
     reopenOnSubmit: false,
@@ -86,6 +87,7 @@ Page({
         resubmitSubmissionId: submission.id,
         existingPhotos: submission.photos,
         existingAudio: submission.audio,
+        audioDurationLabel: submission.audio ? this.formatAudioDuration(Math.round(submission.audio.durationMs / 1_000)) : "",
         note: submission.note || "",
         recoveredDraft: true
       });
@@ -116,7 +118,8 @@ Page({
       this.setData({
         audio: { path: result.tempFilePath, duration },
         recording: false,
-        recordingDuration: duration
+        recordingDuration: duration,
+        audioDurationLabel: this.formatAudioDuration(duration)
       });
     });
     this.recorder.onError(() => {
@@ -143,7 +146,12 @@ Page({
   },
 
   removeAudio() {
-    this.setData({ audio: null, recordingDuration: 0 });
+    this.setData({ audio: null, recordingDuration: 0, audioDurationLabel: this.data.existingAudio ? this.formatAudioDuration(Math.round(this.data.existingAudio.durationMs / 1_000)) : "" });
+  },
+
+  formatAudioDuration(seconds) {
+    const minutes = Math.floor(seconds / 60);
+    return `${minutes}:${String(seconds % 60).padStart(2, "0")}`;
   },
 
   playAudio() {

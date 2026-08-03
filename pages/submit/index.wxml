@@ -47,13 +47,16 @@
   </view>
 
   <view class="form-section">
-    <view class="form-heading"><text class="form-title">语音录音</text><text class="form-hint">最长 3 分钟</text></view>
-    <view wx:if="existingAudio" class="audio-card"><text>已恢复录音</text><button class="audio-action" size="mini" bindtap="playAudio">试听</button></view>
-    <view wx:if="audio" class="audio-card"><text>已录制 {{audio.duration}} 秒</text><view><button class="audio-action" size="mini" bindtap="playAudio">试听</button><button class="audio-action audio-action--danger" size="mini" bindtap="removeAudio">重录</button></view></view>
-    <view wx:if="!audio" class="recording-card">
-      <text wx:if="recording" class="recording-time">正在录音 {{recordingDuration}} 秒</text>
-      <button wx:if="recording" class="record-button record-button--stop" bindtap="stopRecording">停止录音</button>
-      <button wx:else class="record-button" bindtap="startRecording">开始录音</button>
+    <view class="form-heading"><text class="form-title">语音说明</text><text class="form-hint">选填，最长 3 分钟</text></view>
+    <view class="audio-card">
+      <text wx:if="recording" class="recording-time">录音中 {{recordingDuration}} 秒</text>
+      <text wx:elif="audio || existingAudio">语音附件 {{audioDurationLabel}}</text>
+      <text wx:else>添加一段语音说明</text>
+      <view class="audio-card__actions">
+        <button wx:if="recording" class="audio-action audio-action--danger" size="mini" bindtap="stopRecording">停止</button>
+        <block wx:elif="audio || existingAudio"><button class="audio-action" size="mini" bindtap="playAudio">试听</button><button class="audio-action" size="mini" bindtap="startRecording">重录</button></block>
+        <button wx:else class="audio-action" size="mini" bindtap="startRecording">录音</button>
+      </view>
     </view>
   </view>
 

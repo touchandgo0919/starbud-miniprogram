@@ -169,7 +169,6 @@
   font-weight: 300;
 }
 
-.recording-card,
 .audio-card {
   display: flex;
   min-height: 112rpx;
@@ -205,6 +204,11 @@
 
 .audio-action + .audio-action {
   margin-left: 12rpx;
+}
+
+.audio-card__actions {
+  display: flex;
+  align-items: center;
 }
 
 .note-input {
