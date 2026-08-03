@@ -9,6 +9,28 @@ const repeatLabels = {
   weekly: "每周"
 };
 
+function formatAudioDuration(seconds) {
+  const safeSeconds = Math.max(0, Math.floor(Number(seconds) || 0));
+  return `${Math.floor(safeSeconds / 60)}:${String(safeSeconds % 60).padStart(2, "0")}`;
+}
+
+function submissionViewModel(submission) {
+  const withPlayback = (audio, fallbackKey) => audio ? {
+    ...audio,
+    playbackKey: String(audio.id || fallbackKey),
+    durationLabel: formatAudioDuration(Number(audio.durationMs || 0) / 1_000)
+  } : null;
+
+  return {
+    ...submission,
+    audio: withPlayback(submission.audio, `${submission.id}-audio`),
+    reviewRounds: (submission.reviewRounds || []).map((round) => ({
+      ...round,
+      audios: (round.audios || []).map((audio, index) => withPlayback(audio, `${round.id}-audio-${index}`))
+    }))
+  };
+}
+
 function confirmClaim(taskTitle) {
   return new Promise((resolve) => {
     wx.showModal({
@@ -49,7 +71,10 @@ Page({
     task: null,
     submission: null,
     isChild: false,
-    loading: true
+    loading: true,
+    playingAudioKey: "",
+    loadingAudioKey: "",
+    audioPlaybackLabel: ""
   },
 
   async onLoad(options) {
@@ -92,7 +117,7 @@ Page({
     const date = task.occurrenceDate || new Date().toLocaleDateString("en-CA");
     try {
       const submission = await api.getTaskSubmission(task.id, date);
-      this.setData({ submission });
+      this.setData({ submission: submissionViewModel(submission) });
     } catch (error) {
       const message = String(error.message || "");
       if (!message.includes("404") && !/not found/i.test(message)) throw error;
@@ -117,9 +142,22 @@ Page({
     if (current && urls.length) wx.previewImage({ current, urls });
   },
 
+  destroyAudioPlayer(updateData = true) {
+    this.audioPlayRequested = false;
+    this.audioPlayerSource = "";
+    if (this.audioPlayer) {
+      this.audioPlayer.destroy();
+      this.audioPlayer = null;
+    }
+    if (updateData) {
+      this.setData({ playingAudioKey: "", loadingAudioKey: "", audioPlaybackLabel: "" });
+    }
+  },
+
   async playRoundAudio(event) {
-    const source = event.currentTarget.dataset.url;
-    if (!source || this.audioOutputPending) return;
+    const audioKey = String(event.currentTarget.dataset.id || "");
+    const source = String(event.currentTarget.dataset.url || "");
+    if (!audioKey || !source || this.audioOutputPending) return;
     this.audioOutputPending = true;
     const speakerReady = await useSpeakerOutput();
     this.audioOutputPending = false;
@@ -127,14 +165,65 @@ Page({
       wx.showToast({ title: "扬声器设置失败，请重试", icon: "none" });
       return;
     }
-    if (this.audioPlayer) this.audioPlayer.destroy();
-    this.audioPlayer = wx.createInnerAudioContext();
-    this.audioPlayer.src = source;
-    this.audioPlayer.play();
+
+    if (this.audioPlayer && this.audioPlayerSource === source) {
+      if (this.data.playingAudioKey === audioKey) {
+        this.audioPlayer.pause();
+      } else {
+        this.setData({ loadingAudioKey: audioKey });
+        this.audioPlayer.play();
+      }
+      return;
+    }
+
+    this.destroyAudioPlayer(false);
+    const player = wx.createInnerAudioContext();
+    this.audioPlayer = player;
+    this.audioPlayerSource = source;
+    this.audioPlayRequested = true;
+    player.obeyMuteSwitch = false;
+    player.volume = 1;
+    this.setData({ playingAudioKey: "", loadingAudioKey: audioKey, audioPlaybackLabel: "" });
+
+    player.onCanplay(() => {
+      if (this.audioPlayer !== player || !this.audioPlayRequested) return;
+      this.audioPlayRequested = false;
+      player.play();
+    });
+    player.onPlay(() => {
+      if (this.audioPlayer !== player) return;
+      this.setData({
+        playingAudioKey: audioKey,
+        loadingAudioKey: "",
+        audioPlaybackLabel: formatAudioDuration(player.currentTime || 0)
+      });
+    });
+    player.onTimeUpdate(() => {
+      if (this.audioPlayer === player) {
+        this.setData({ audioPlaybackLabel: formatAudioDuration(player.currentTime || 0) });
+      }
+    });
+    player.onPause(() => {
+      if (this.audioPlayer === player) this.setData({ playingAudioKey: "", loadingAudioKey: "" });
+    });
+    player.onEnded(() => {
+      if (this.audioPlayer === player) {
+        this.setData({ playingAudioKey: "", loadingAudioKey: "", audioPlaybackLabel: "" });
+      }
+    });
+    player.onWaiting?.(() => {
+      if (this.audioPlayer === player) this.setData({ loadingAudioKey: audioKey });
+    });
+    player.onError(() => {
+      if (this.audioPlayer !== player) return;
+      this.destroyAudioPlayer();
+      wx.showToast({ title: "录音加载失败，请稍后重试", icon: "none" });
+    });
+    player.src = source;
   },
 
   onUnload() {
-    if (this.audioPlayer) this.audioPlayer.destroy();
+    this.destroyAudioPlayer(false);
   },
 
   async handlePrimaryAction() {
