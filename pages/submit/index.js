@@ -26,8 +26,8 @@ Page({
   },
 
   async onLoad(options) {
-    this.setupRecorder();
     this.resetRecordingState();
+    this.stopInheritedRecording();
     const session = getSession();
     if (!session || !session.user || session.user.role !== "child") {
       wx.showModal({
@@ -114,10 +114,11 @@ Page({
     this.recorder.offStop?.();
     this.recorder.offError?.();
     this.recordingRequestId = 0;
+    this.activeRecordingRequestId = 0;
     this.recorder.onStart(() => {
       // RecorderManager 是小程序全局实例。忽略从上一页面遗留的录音事件，
       // 只有本页面“录音”按钮明确发起的会话才能更新界面。
-      if (!this.recordingRequested || !this.recordingRequestId) return;
+      if (!this.acceptRecordingEvents || !this.recordingRequested || !this.recordingRequestId) return;
       this.activeRecordingRequestId = this.recordingRequestId;
       this.recordingStartedAt = Date.now();
       this.setData({ recording: true, recordingDuration: 0 });
@@ -128,7 +129,7 @@ Page({
     });
     this.recorder.onStop((result) => {
       this.clearRecordingTimer();
-      const wasRequested = this.recordingRequested &&
+      const wasRequested = this.acceptRecordingEvents && this.recordingRequested &&
         this.activeRecordingRequestId &&
         this.activeRecordingRequestId === this.recordingRequestId;
       this.resetRecordingRequest();
@@ -154,9 +155,16 @@ Page({
       if (wasRequested) wx.showToast({ title: "录音失败，请检查麦克风权限", icon: "none" });
     });
 
-    // 若用户曾在上一个提交页离开时仍在录音，先结束该全局会话；它不会被当成
-    // 当前页的录音附件，也不会把当前页切换为“录音中”。
-    this.recorder.stop();
+  },
+
+  stopInheritedRecording() {
+    // RecorderManager 是全局单例。进入提交页时只结束残留会话，不注册回调、
+    // 不改变页面录音状态；本页真正的录音仍只能由“录音”按钮触发。
+    try {
+      wx.getRecorderManager().stop();
+    } catch {
+      // 空闲的 RecorderManager 在部分基础库会同步报错，可安全忽略。
+    }
   },
 
   clearRecordingTimer() {
@@ -165,6 +173,7 @@ Page({
   },
 
   resetRecordingRequest() {
+    this.acceptRecordingEvents = false;
     this.recordingRequested = false;
     this.recordingRequestId = 0;
     this.activeRecordingRequestId = 0;
@@ -193,6 +202,8 @@ Page({
 
   startRecording() {
     if (this.data.recording || this.recordingRequested) return;
+    this.setupRecorder();
+    this.acceptRecordingEvents = true;
     this.recordingRequested = true;
     this.recordingRequestId = Date.now();
     try {
@@ -210,7 +221,12 @@ Page({
   },
 
   stopRecording() {
-    if (this.recordingRequested) this.recorder.stop();
+    if (!this.data.recording && !this.recordingRequested) return;
+    if (!this.recorder) {
+      this.resetRecordingState();
+      return;
+    }
+    this.recorder.stop();
   },
 
   async deleteAudio() {
