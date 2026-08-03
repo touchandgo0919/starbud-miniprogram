@@ -63,6 +63,15 @@ for (const path of await collectFiles(".", ".js")) {
   }
 }
 
+for (const path of await collectFiles(".", ".wxml")) {
+  const source = await readFile(resolve(root, path), "utf8");
+  for (const match of source.matchAll(/\bwx:(?:if|elif)="([^"]*)"/g)) {
+    if (!match[1].trim().startsWith("{{")) {
+      errors.push(`${path}: ${match[0]} must use a {{...}} data binding`);
+    }
+  }
+}
+
 const configSource = await readFile(resolve(root, "config.js"), "utf8");
 if (!configSource.includes("https://")) {
   errors.push("config.js: API_BASE_URL must use HTTPS for WeChat");

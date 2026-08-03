@@ -1,4 +1,5 @@
 const api = require("../../services/api");
+const { useSpeakerOutput } = require("../../utils/audio");
 const { getSelectedTask, getSession, setSelectedTask } = require("../../utils/storage");
 
 const repeatLabels = {
@@ -116,9 +117,16 @@ Page({
     if (current && urls.length) wx.previewImage({ current, urls });
   },
 
-  playRoundAudio(event) {
+  async playRoundAudio(event) {
     const source = event.currentTarget.dataset.url;
-    if (!source) return;
+    if (!source || this.audioOutputPending) return;
+    this.audioOutputPending = true;
+    const speakerReady = await useSpeakerOutput();
+    this.audioOutputPending = false;
+    if (!speakerReady) {
+      wx.showToast({ title: "扬声器设置失败，请重试", icon: "none" });
+      return;
+    }
     if (this.audioPlayer) this.audioPlayer.destroy();
     this.audioPlayer = wx.createInnerAudioContext();
     this.audioPlayer.src = source;

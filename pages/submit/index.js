@@ -6,6 +6,7 @@ const {
   setSelectedTask
 } = require("../../utils/storage");
 const { localDateKey } = require("../../utils/date");
+const { useSpeakerOutput } = require("../../utils/audio");
 
 Page({
   data: {
@@ -16,7 +17,11 @@ Page({
     existingAudio: null,
     recording: false,
     recordingDuration: 0,
+    recordingLevels: [8, 14, 22, 14, 8],
     audioDurationLabel: "",
+    audioPlaybackLabel: "",
+    audioPlaying: false,
+    audioLoading: false,
     note: "",
     resubmitSubmissionId: "",
     reopenOnSubmit: false,
@@ -105,7 +110,7 @@ Page({
       this.recorder?.stop();
     }
     this.disableRecordingLeaveGuard();
-    this.audioPlayer?.destroy();
+    this.destroyAudioPlayer(false);
   },
 
   setupRecorder() {
@@ -113,6 +118,7 @@ Page({
     this.recorder.offStart?.();
     this.recorder.offStop?.();
     this.recorder.offError?.();
+    this.recorder.offFrameRecorded?.();
     this.recordingRequestId = 0;
     this.activeRecordingRequestId = 0;
     this.recorder.onStart(() => {
@@ -121,7 +127,12 @@ Page({
       if (!this.acceptRecordingEvents || !this.recordingRequested || !this.recordingRequestId) return;
       this.activeRecordingRequestId = this.recordingRequestId;
       this.recordingStartedAt = Date.now();
-      this.setData({ recording: true, recordingDuration: 0 });
+      this.recordingLevel = 0;
+      this.setData({
+        recording: true,
+        recordingDuration: 0,
+        recordingLevels: [8, 14, 22, 14, 8]
+      });
       this.enableRecordingLeaveGuard();
       this.recordingTimer = setInterval(() => {
         this.setData({ recordingDuration: Math.floor((Date.now() - this.recordingStartedAt) / 1000) });
@@ -154,7 +165,31 @@ Page({
       this.setData({ recording: false });
       if (wasRequested) wx.showToast({ title: "录音失败，请检查麦克风权限", icon: "none" });
     });
+    this.recorder.onFrameRecorded?.(({ frameBuffer }) => {
+      if (!this.data.recording || !frameBuffer) return;
+      this.updateRecordingLevel(frameBuffer);
+    });
 
+  },
+
+  updateRecordingLevel(frameBuffer) {
+    const samples = new Uint8Array(frameBuffer);
+    if (!samples.length) return;
+    const stride = Math.max(1, Math.floor(samples.length / 320));
+    let energy = 0;
+    let count = 0;
+    for (let index = 0; index < samples.length; index += stride) {
+      const centered = (samples[index] - 128) / 128;
+      energy += centered * centered;
+      count += 1;
+    }
+    const rawLevel = Math.min(1, Math.sqrt(energy / Math.max(1, count)));
+    this.recordingLevel = this.recordingLevel * 0.58 + rawLevel * 0.42;
+    const amplitude = 8 + Math.round(this.recordingLevel * 36);
+    const profile = [0.48, 0.76, 1, 0.7, 0.42];
+    this.setData({
+      recordingLevels: profile.map((ratio, index) => Math.max(6, Math.round(amplitude * ratio + ((samples[index] || 0) % 5))))
+    });
   },
 
   stopInheritedRecording() {
@@ -183,7 +218,12 @@ Page({
     this.clearRecordingTimer();
     this.resetRecordingRequest();
     this.disableRecordingLeaveGuard();
-    this.setData({ recording: false, recordingDuration: 0 });
+    this.recordingLevel = 0;
+    this.setData({
+      recording: false,
+      recordingDuration: 0,
+      recordingLevels: [8, 14, 22, 14, 8]
+    });
   },
 
   enableRecordingLeaveGuard() {
@@ -200,8 +240,71 @@ Page({
     this.recordingLeaveGuardEnabled = false;
   },
 
-  startRecording() {
-    if (this.data.recording || this.recordingRequested) return;
+  requestRecordPermission() {
+    return new Promise((resolve) => {
+      const authorize = () => {
+        wx.authorize({
+          scope: "scope.record",
+          success: () => resolve(true),
+          fail: () => this.promptRecordPermissionSettings(resolve)
+        });
+      };
+
+      wx.getSetting({
+        success: (result) => {
+          const recordPermission = result.authSetting["scope.record"];
+          if (recordPermission === true) {
+            resolve(true);
+          } else if (recordPermission === false) {
+            this.promptRecordPermissionSettings(resolve);
+          } else {
+            authorize();
+          }
+        },
+        fail: authorize
+      });
+    });
+  },
+
+  promptRecordPermissionSettings(resolve) {
+    wx.showModal({
+      title: "需要麦克风权限",
+      content: "录制作业语音需要使用麦克风，请在设置中开启录音权限。",
+      confirmText: "去设置",
+      cancelText: "暂不开启",
+      success: (result) => {
+        if (!result.confirm) {
+          resolve(false);
+          return;
+        }
+        wx.openSetting({
+          success: (setting) => {
+            const granted = setting.authSetting["scope.record"] === true;
+            if (!granted) wx.showToast({ title: "未开启麦克风权限", icon: "none" });
+            resolve(granted);
+          },
+          fail: () => {
+            wx.showToast({ title: "无法打开权限设置", icon: "none" });
+            resolve(false);
+          }
+        });
+      },
+      fail: () => resolve(false)
+    });
+  },
+
+  async startRecording() {
+    if (this.data.recording || this.recordingRequested || this.recordPermissionPending) return;
+    this.recordPermissionPending = true;
+    let hasPermission = false;
+    try {
+      hasPermission = await this.requestRecordPermission();
+    } finally {
+      this.recordPermissionPending = false;
+    }
+    if (!hasPermission || this.data.recording || this.recordingRequested) return;
+
+    this.destroyAudioPlayer();
     this.setupRecorder();
     this.acceptRecordingEvents = true;
     this.recordingRequested = true;
@@ -212,7 +315,8 @@ Page({
         sampleRate: 16_000,
         numberOfChannels: 1,
         encodeBitRate: 48_000,
-        format: "mp3"
+        format: "mp3",
+        frameSize: 1
       });
     } catch (error) {
       this.resetRecordingState();
@@ -230,14 +334,20 @@ Page({
   },
 
   async deleteAudio() {
+    this.destroyAudioPlayer();
     if (this.data.audio) {
-      this.setData({ audio: null, recordingDuration: 0, audioDurationLabel: this.data.existingAudio ? this.formatAudioDuration(Math.round(this.data.existingAudio.durationMs / 1_000)) : "" });
+      this.setData({
+        audio: null,
+        recordingDuration: 0,
+        audioDurationLabel: this.data.existingAudio ? this.formatAudioDuration(Math.round(this.data.existingAudio.durationMs / 1_000)) : "",
+        audioPlaybackLabel: ""
+      });
       return;
     }
     if (!this.data.existingAudio || !this.data.resubmitSubmissionId) return;
     try {
       await api.deleteSubmissionAudio(this.data.resubmitSubmissionId);
-      this.setData({ existingAudio: null, audioDurationLabel: "" });
+      this.setData({ existingAudio: null, audioDurationLabel: "", audioPlaybackLabel: "" });
     } catch (error) {
       wx.showToast({ title: error.message || "录音删除失败", icon: "none" });
     }
@@ -248,13 +358,86 @@ Page({
     return `${minutes}:${String(seconds % 60).padStart(2, "0")}`;
   },
 
-  playAudio() {
+  destroyAudioPlayer(updateData = true) {
+    this.audioPlayRequested = false;
+    this.audioPlayerSource = "";
+    if (this.audioPlayer) {
+      this.audioPlayer.destroy();
+      this.audioPlayer = null;
+    }
+    if (updateData) this.setData({ audioPlaying: false, audioLoading: false, audioPlaybackLabel: "" });
+  },
+
+  async playAudio() {
     const source = this.data.audio?.path || this.data.existingAudio?.url;
-    if (!source) return;
-    this.audioPlayer?.destroy();
-    this.audioPlayer = wx.createInnerAudioContext();
-    this.audioPlayer.src = source;
-    this.audioPlayer.play();
+    if (!source || this.audioOutputPending) return;
+
+    this.audioOutputPending = true;
+    const speakerReady = await useSpeakerOutput();
+    this.audioOutputPending = false;
+    if (!speakerReady) {
+      wx.showToast({ title: "扬声器设置失败，请重试", icon: "none" });
+      return;
+    }
+
+    if (this.audioPlayer && this.audioPlayerSource === source) {
+      if (this.data.audioPlaying) {
+        this.audioPlayer.pause();
+      } else {
+        this.setData({ audioLoading: true });
+        this.audioPlayer.play();
+      }
+      return;
+    }
+
+    this.destroyAudioPlayer(false);
+    const player = wx.createInnerAudioContext();
+    this.audioPlayer = player;
+    this.audioPlayerSource = source;
+    this.audioPlayRequested = true;
+    player.obeyMuteSwitch = false;
+    player.volume = 1;
+    this.setData({ audioPlaying: false, audioLoading: true });
+
+    player.onCanplay(() => {
+      if (this.audioPlayer !== player) return;
+      if (this.audioPlayRequested) {
+        this.audioPlayRequested = false;
+        player.play();
+      } else if (this.data.audioPlaying) {
+        this.setData({ audioLoading: false });
+      }
+    });
+    player.onPlay(() => {
+      if (this.audioPlayer === player) {
+        this.setData({
+          audioPlaying: true,
+          audioLoading: false,
+          audioPlaybackLabel: this.formatAudioDuration(Math.floor(player.currentTime || 0))
+        });
+      }
+    });
+    player.onTimeUpdate(() => {
+      if (this.audioPlayer !== player) return;
+      this.setData({ audioPlaybackLabel: this.formatAudioDuration(Math.floor(player.currentTime || 0)) });
+    });
+    player.onPause(() => {
+      if (this.audioPlayer === player) this.setData({ audioPlaying: false, audioLoading: false });
+    });
+    player.onEnded(() => {
+      if (this.audioPlayer === player) {
+        this.setData({ audioPlaying: false, audioLoading: false, audioPlaybackLabel: "" });
+      }
+    });
+    player.onWaiting?.(() => {
+      if (this.audioPlayer === player) this.setData({ audioLoading: true });
+    });
+    player.onError(() => {
+      if (this.audioPlayer !== player) return;
+      this.destroyAudioPlayer();
+      wx.showToast({ title: "录音加载失败，请稍后重试", icon: "none" });
+    });
+    player.src = source;
   },
 
   choosePhotos() {

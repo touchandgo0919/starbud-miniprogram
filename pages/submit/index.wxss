@@ -103,7 +103,9 @@
 }
 
 .photo-cell,
-.photo-add {
+.photo-add,
+.audio-cell,
+.audio-add {
   position: relative;
   flex: 0 0 160rpx;
   width: 160rpx;
@@ -170,46 +172,120 @@
   font-weight: 300;
 }
 
-.audio-card {
+.attachment-add__label {
+  position: absolute;
+  right: 0;
+  bottom: 26rpx;
+  left: 0;
+  line-height: 1;
+  text-align: center;
+}
+
+.audio-cell,
+.audio-add {
+  position: relative;
   display: flex;
-  min-height: 112rpx;
-  margin-top: 16rpx;
-  padding: 20rpx 22rpx;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   border: 2rpx solid #dce5e0;
   border-radius: 18rpx;
   background: #fbfcfb;
   color: #26312d;
-  font-size: 25rpx;
+  font-size: 23rpx;
+}
+
+.audio-add {
+  border-style: dashed;
+  border-color: #b9c8c0;
+  color: #078d59;
+}
+
+.audio-cell--recording {
+  border-color: #e6a9ae;
+  background: #fff7f8;
+}
+
+.audio-cell--playing {
+  border-color: #0aa868;
+}
+
+.audio-recording-main {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16rpx;
+}
+
+.audio-level {
+  display: flex;
+  width: 48rpx;
+  height: 48rpx;
+  align-items: center;
+  justify-content: center;
+  gap: 3rpx;
+}
+
+.audio-level__bar {
+  width: 5rpx;
+  min-height: 6rpx;
+  max-height: 44rpx;
+  border-radius: 4rpx;
+  background: #c74c57;
+  transition: height 120ms ease-out;
+}
+
+.audio-cell__main {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.audio-cell__icon {
+  color: #0aa868;
+  font-size: 44rpx;
+  line-height: 1;
+}
+
+.audio-add .audio-cell__icon {
+  margin-bottom: 12rpx;
+  color: #c74c57;
+}
+
+.audio-cell--recording .audio-cell__icon {
+  color: #c74c57;
+  font-size: 34rpx;
+}
+
+.audio-cell__duration {
+  margin-top: 14rpx;
+  color: #5e6964;
+  font-size: 23rpx;
+}
+
+.audio-cell__status {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: 8rpx 0;
+  background: rgba(7, 141, 89, 0.9);
+  color: #ffffff;
+  font-size: 20rpx;
+  line-height: 1;
+  text-align: center;
+}
+
+.audio-cell__status--danger {
+  background: rgba(199, 76, 87, 0.92);
 }
 
 .recording-time {
   color: #c74c57;
   font-weight: 700;
-}
-
-.record-button,
-.audio-action {
-  margin: 0;
-  border-radius: 12rpx;
-  background: #0aa868;
-  color: #ffffff;
-  font-size: 23rpx;
-}
-
-.record-button--stop,
-.audio-action--danger {
-  background: #c74c57;
-}
-
-.audio-action + .audio-action {
-  margin-left: 12rpx;
-}
-
-.audio-card__actions {
-  display: flex;
-  align-items: center;
 }
 
 .note-input {

@@ -12,7 +12,7 @@
   </view>
 
   <view class="attachment-tip">图片和录音至少提交一项，录音最多 3 分钟</view>
-  <view wx:if="recoveredDraft" class="draft-recovery-note">已恢复草稿附件，可继续提交或补传照片、重新录音。</view>
+  <view wx:if="{{recoveredDraft}}" class="draft-recovery-note">已恢复草稿附件，可继续提交或补传照片、重新录音。</view>
 
   <view class="form-section form-section--photos">
     <text class="field-label">图片</text>
@@ -40,21 +40,40 @@
       </view>
       <view wx:if="{{existingPhotos.length + photos.length < 8}}" class="photo-add" bindtap="choosePhotos">
         <text class="photo-add__icon">＋</text>
-        <text>拍照 / 相册</text>
+        <text class="attachment-add__label">拍照 / 相册</text>
       </view>
     </view>
   </view>
 
   <view class="form-section">
     <text class="field-label">录音</text>
-    <view class="audio-card">
-      <text wx:if="recording" class="recording-time">录音中 {{recordingDuration}} 秒</text>
-      <text wx:elif="audio || existingAudio">语音附件 {{audioDurationLabel}}</text>
-      <text wx:else>添加一段语音说明</text>
-      <view class="audio-card__actions">
-        <button wx:if="recording" class="audio-action audio-action--danger" size="mini" bindtap="stopRecording">停止</button>
-        <block wx:elif="audio || existingAudio"><button class="audio-action" size="mini" bindtap="playAudio">试听</button><button class="audio-action audio-action--danger" size="mini" bindtap="deleteAudio">删除</button></block>
-        <button wx:else class="audio-action" size="mini" bindtap="startRecording">录音</button>
+    <view class="photo-grid">
+      <view wx:if="{{recording}}" class="audio-cell audio-cell--recording" bindtap="stopRecording">
+        <view class="audio-recording-main">
+          <view class="audio-level" aria-label="实时录音音量">
+            <view
+              wx:for="{{recordingLevels}}"
+              wx:key="index"
+              class="audio-level__bar"
+              style="height: {{item}}rpx;"
+            ></view>
+          </view>
+          <text class="audio-cell__icon">■</text>
+        </view>
+        <text class="recording-time">{{recordingDuration}} 秒</text>
+        <view class="audio-cell__status audio-cell__status--danger">停止</view>
+      </view>
+      <view wx:elif="{{audio || existingAudio}}" class="audio-cell {{audioPlaying ? 'audio-cell--playing' : ''}}">
+        <view class="audio-cell__main" bindtap="playAudio">
+          <text class="audio-cell__icon">{{audioLoading ? '…' : audioPlaying ? '❚❚' : '▶'}}</text>
+          <text class="audio-cell__duration">{{audioPlaybackLabel ? audioPlaybackLabel + ' / ' + audioDurationLabel : audioDurationLabel}}</text>
+        </view>
+        <view class="photo-remove" catchtap="deleteAudio">×</view>
+        <view class="audio-cell__status">{{audioLoading ? "加载中" : audioPlaying ? "暂停" : "试听"}}</view>
+      </view>
+      <view wx:else class="audio-add" bindtap="startRecording">
+        <text class="audio-cell__icon">●</text>
+        <text class="attachment-add__label">录音</text>
       </view>
     </view>
   </view>
