@@ -39,6 +39,11 @@
       </view>
     </view>
 
+    <view wx:if="{{submission && submission.audioFeedback}}" class="audio-feedback surface">
+      <text>录音评价</text>
+      <text>{{submission.audioFeedback}}</text>
+    </view>
+
     <view wx:if="{{submission && submission.reviewRounds.length}}" class="review-rounds-section">
       <text class="rounds-title">批改记录</text>
       <view wx:for="{{submission.reviewRounds}}" wx:key="id" wx:for-item="round" class="review-round surface">

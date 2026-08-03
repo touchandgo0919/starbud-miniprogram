@@ -54,7 +54,7 @@
       <text wx:else>添加一段语音说明</text>
       <view class="audio-card__actions">
         <button wx:if="recording" class="audio-action audio-action--danger" size="mini" bindtap="stopRecording">停止</button>
-        <block wx:elif="audio || existingAudio"><button class="audio-action" size="mini" bindtap="playAudio">试听</button><button class="audio-action" size="mini" bindtap="startRecording">重录</button></block>
+        <block wx:elif="audio || existingAudio"><button class="audio-action" size="mini" bindtap="playAudio">试听</button><button class="audio-action audio-action--danger" size="mini" bindtap="deleteAudio">删除</button></block>
         <button wx:else class="audio-action" size="mini" bindtap="startRecording">录音</button>
       </view>
     </view>

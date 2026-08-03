@@ -68,6 +68,10 @@ async function uploadSubmissionAudio(submissionId, filePath, durationMs) {
   return body.audio;
 }
 
+async function deleteSubmissionAudio(submissionId) {
+  return request(`/api/submissions/${submissionId}/audio`, { method: "DELETE" });
+}
+
 async function finalizeSubmission(submissionId) {
   const body = await request(`/api/submissions/${submissionId}/submit`, {
     method: "POST"
@@ -180,6 +184,7 @@ module.exports = {
   markNotificationRead,
   uploadSubmissionPhoto,
   uploadSubmissionAudio,
+  deleteSubmissionAudio,
   updateSubmissionNote,
   reopenSubmissionForResubmit
 };

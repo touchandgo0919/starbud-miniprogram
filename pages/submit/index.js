@@ -145,8 +145,18 @@ Page({
     if (this.data.recording) this.recorder.stop();
   },
 
-  removeAudio() {
-    this.setData({ audio: null, recordingDuration: 0, audioDurationLabel: this.data.existingAudio ? this.formatAudioDuration(Math.round(this.data.existingAudio.durationMs / 1_000)) : "" });
+  async deleteAudio() {
+    if (this.data.audio) {
+      this.setData({ audio: null, recordingDuration: 0, audioDurationLabel: this.data.existingAudio ? this.formatAudioDuration(Math.round(this.data.existingAudio.durationMs / 1_000)) : "" });
+      return;
+    }
+    if (!this.data.existingAudio || !this.data.resubmitSubmissionId) return;
+    try {
+      await api.deleteSubmissionAudio(this.data.resubmitSubmissionId);
+      this.setData({ existingAudio: null, audioDurationLabel: "" });
+    } catch (error) {
+      wx.showToast({ title: error.message || "录音删除失败", icon: "none" });
+    }
   },
 
   formatAudioDuration(seconds) {
