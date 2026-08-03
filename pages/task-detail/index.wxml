@@ -39,7 +39,7 @@
       </view>
     </view>
 
-    <view wx:if="{{submission && submission.audioFeedback}}" class="audio-feedback surface">
+    <view wx:if="{{submission && submission.audioFeedback && !submission.reviewRounds.length}}" class="audio-feedback surface">
       <text>录音评价</text>
       <text>{{submission.audioFeedback}}</text>
     </view>
@@ -48,16 +48,16 @@
       <text class="rounds-title">批改记录</text>
       <view wx:for="{{submission.reviewRounds}}" wx:key="id" wx:for-item="round" class="review-round surface">
         <text class="round-title">第 {{round.sequence}} 次批改</text>
-        <text class="round-label">批改前图片</text>
-        <scroll-view class="round-image-scroll" scroll-x="true"><view class="round-original-grid"><image wx:for="{{round.photos}}" wx:key="id" wx:for-item="photo" class="round-original-photo" mode="aspectFill" src="{{photo.url}}" data-url="{{photo.url}}" data-urls="{{round.photoUrls}}" bindtap="previewRoundPhoto" /></view></scroll-view>
-        <text class="round-label">批改后图片</text>
-        <scroll-view class="round-image-scroll" scroll-x="true"><view class="round-original-grid"><image wx:for="{{round.reviewImages}}" wx:key="id" wx:for-item="photo" class="round-reviewed-photo" mode="aspectFill" src="{{photo.url}}" data-url="{{photo.url}}" data-urls="{{round.reviewImageUrls}}" bindtap="previewRoundPhoto" /></view></scroll-view>
+        <block wx:if="{{round.photos.length}}"><text class="round-label">批改前图片</text><scroll-view class="round-image-scroll" scroll-x="true"><view class="round-original-grid"><image wx:for="{{round.photos}}" wx:key="id" wx:for-item="photo" class="round-original-photo" mode="aspectFill" src="{{photo.url}}" data-url="{{photo.url}}" data-urls="{{round.photoUrls}}" bindtap="previewRoundPhoto" /></view></scroll-view></block>
+        <block wx:if="{{round.audios.length}}"><text class="round-label">提交录音</text><view wx:for="{{round.audios}}" wx:key="id" wx:for-item="audio" class="round-audio"><text>语音附件</text><button class="round-audio-play" size="mini" data-url="{{audio.url}}" bindtap="playRoundAudio">试听</button></view></block>
+        <block wx:if="{{round.reviewImages.length}}"><text class="round-label">批改后图片</text><scroll-view class="round-image-scroll" scroll-x="true"><view class="round-original-grid"><image wx:for="{{round.reviewImages}}" wx:key="id" wx:for-item="photo" class="round-reviewed-photo" mode="aspectFill" src="{{photo.url}}" data-url="{{photo.url}}" data-urls="{{round.reviewImageUrls}}" bindtap="previewRoundPhoto" /></view></scroll-view></block>
+        <view wx:if="{{round.feedback}}" class="round-note"><text>录音评价</text><text>{{round.feedback}}</text></view>
         <view class="round-note"><text>提交备注</text><text>{{round.note || "未填写"}}</text></view>
       </view>
-      <view wx:if="{{submission.photos.length && !submission.reviewImageUrl}}" class="review-round review-round--pending surface">
+      <view wx:if="{{(submission.photos.length || submission.audio) && !submission.reviewImageUrl && !submission.audioFeedback}}" class="review-round review-round--pending surface">
         <text class="round-title">第 {{submission.reviewRounds.length + 1}} 次提交</text>
-        <text class="round-label">批改前图片</text>
-        <scroll-view class="round-image-scroll" scroll-x="true"><view class="round-original-grid"><image wx:for="{{submission.photos}}" wx:key="id" class="round-original-photo" mode="aspectFill" src="{{item.url}}" data-url="{{item.url}}" data-urls="{{submission.photoUrls}}" bindtap="previewRoundPhoto" /></view></scroll-view>
+        <block wx:if="{{submission.photos.length}}"><text class="round-label">批改前图片</text><scroll-view class="round-image-scroll" scroll-x="true"><view class="round-original-grid"><image wx:for="{{submission.photos}}" wx:key="id" class="round-original-photo" mode="aspectFill" src="{{item.url}}" data-url="{{item.url}}" data-urls="{{submission.photoUrls}}" bindtap="previewRoundPhoto" /></view></scroll-view></block>
+        <block wx:if="{{submission.audio}}"><text class="round-label">提交录音</text><view class="round-audio"><text>语音附件</text><button class="round-audio-play" size="mini" data-url="{{submission.audio.url}}" bindtap="playRoundAudio">试听</button></view></block>
         <text class="round-label">批改后图片</text>
         <text class="round-pending-text">家长未批改</text>
         <view class="round-note"><text>提交备注</text><text>{{submission.note || "未填写"}}</text></view>

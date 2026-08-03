@@ -27,6 +27,7 @@ Page({
 
   async onLoad(options) {
     this.setupRecorder();
+    this.resetRecordingState();
     const session = getSession();
     if (!session || !session.user || session.user.role !== "child") {
       wx.showModal({
@@ -98,7 +99,7 @@ Page({
   },
 
   onUnload() {
-    if (this.recordingTimer) clearInterval(this.recordingTimer);
+    this.clearRecordingTimer();
     if (this.recordingRequested) {
       this.recordingRequested = false;
       this.recorder?.stop();
@@ -109,11 +110,15 @@ Page({
 
   setupRecorder() {
     this.recorder = wx.getRecorderManager();
-    this.recordingRequested = false;
+    this.recorder.offStart?.();
+    this.recorder.offStop?.();
+    this.recorder.offError?.();
+    this.recordingRequestId = 0;
     this.recorder.onStart(() => {
       // RecorderManager 是小程序全局实例。忽略从上一页面遗留的录音事件，
       // 只有本页面“录音”按钮明确发起的会话才能更新界面。
-      if (!this.recordingRequested) return;
+      if (!this.recordingRequested || !this.recordingRequestId) return;
+      this.activeRecordingRequestId = this.recordingRequestId;
       this.recordingStartedAt = Date.now();
       this.setData({ recording: true, recordingDuration: 0 });
       this.enableRecordingLeaveGuard();
@@ -122,10 +127,11 @@ Page({
       }, 1_000);
     });
     this.recorder.onStop((result) => {
-      if (this.recordingTimer) clearInterval(this.recordingTimer);
-      this.recordingTimer = null;
-      const wasRequested = this.recordingRequested;
-      this.recordingRequested = false;
+      this.clearRecordingTimer();
+      const wasRequested = this.recordingRequested &&
+        this.activeRecordingRequestId &&
+        this.activeRecordingRequestId === this.recordingRequestId;
+      this.resetRecordingRequest();
       this.disableRecordingLeaveGuard();
       if (!wasRequested) {
         this.setData({ recording: false, recordingDuration: 0 });
@@ -140,10 +146,9 @@ Page({
       });
     });
     this.recorder.onError(() => {
-      if (this.recordingTimer) clearInterval(this.recordingTimer);
-      this.recordingTimer = null;
+      this.clearRecordingTimer();
       const wasRequested = this.recordingRequested;
-      this.recordingRequested = false;
+      this.resetRecordingRequest();
       this.disableRecordingLeaveGuard();
       this.setData({ recording: false });
       if (wasRequested) wx.showToast({ title: "录音失败，请检查麦克风权限", icon: "none" });
@@ -152,6 +157,24 @@ Page({
     // 若用户曾在上一个提交页离开时仍在录音，先结束该全局会话；它不会被当成
     // 当前页的录音附件，也不会把当前页切换为“录音中”。
     this.recorder.stop();
+  },
+
+  clearRecordingTimer() {
+    if (this.recordingTimer) clearInterval(this.recordingTimer);
+    this.recordingTimer = null;
+  },
+
+  resetRecordingRequest() {
+    this.recordingRequested = false;
+    this.recordingRequestId = 0;
+    this.activeRecordingRequestId = 0;
+  },
+
+  resetRecordingState() {
+    this.clearRecordingTimer();
+    this.resetRecordingRequest();
+    this.disableRecordingLeaveGuard();
+    this.setData({ recording: false, recordingDuration: 0 });
   },
 
   enableRecordingLeaveGuard() {
@@ -171,13 +194,19 @@ Page({
   startRecording() {
     if (this.data.recording || this.recordingRequested) return;
     this.recordingRequested = true;
-    this.recorder.start({
-      duration: 180_000,
-      sampleRate: 16_000,
-      numberOfChannels: 1,
-      encodeBitRate: 48_000,
-      format: "mp3"
-    });
+    this.recordingRequestId = Date.now();
+    try {
+      this.recorder.start({
+        duration: 180_000,
+        sampleRate: 16_000,
+        numberOfChannels: 1,
+        encodeBitRate: 48_000,
+        format: "mp3"
+      });
+    } catch (error) {
+      this.resetRecordingState();
+      wx.showToast({ title: "录音启动失败", icon: "none" });
+    }
   },
 
   stopRecording() {

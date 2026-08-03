@@ -116,6 +116,19 @@ Page({
     if (current && urls.length) wx.previewImage({ current, urls });
   },
 
+  playRoundAudio(event) {
+    const source = event.currentTarget.dataset.url;
+    if (!source) return;
+    if (this.audioPlayer) this.audioPlayer.destroy();
+    this.audioPlayer = wx.createInnerAudioContext();
+    this.audioPlayer.src = source;
+    this.audioPlayer.play();
+  },
+
+  onUnload() {
+    if (this.audioPlayer) this.audioPlayer.destroy();
+  },
+
   async handlePrimaryAction() {
     const task = this.data.task;
     if (!this.data.isChild || !task) return;
