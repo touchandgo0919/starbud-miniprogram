@@ -63,6 +63,11 @@ async function uploadSubmissionPhoto(submissionId, filePath) {
   return body.photo;
 }
 
+async function uploadSubmissionAudio(submissionId, filePath, durationMs) {
+  const body = await upload(`/api/submissions/${submissionId}/audio`, filePath, "audio", { durationMs: String(durationMs) });
+  return body.audio;
+}
+
 async function finalizeSubmission(submissionId) {
   const body = await request(`/api/submissions/${submissionId}/submit`, {
     method: "POST"
@@ -92,12 +97,14 @@ function normalizeSubmissionUrls(submission) {
   return {
     ...submission,
     photos: submission.photos.map((photo) => ({ ...photo, url: absoluteUrl(photo.url) })),
+    audio: submission.audio ? { ...submission.audio, url: absoluteUrl(submission.audio.url) } : null,
     photoUrls: submission.photos.map((photo) => absoluteUrl(photo.url)),
     reviewImageUrl: submission.reviewImageUrl ? absoluteUrl(submission.reviewImageUrl) : "",
     reviewRounds: (submission.reviewRounds || []).map((round) => ({
       ...round,
       reviewImageUrl: absoluteUrl(round.reviewImageUrl),
       photos: round.photos.map((photo) => ({ ...photo, url: absoluteUrl(photo.url) })),
+      audios: (round.audios || []).map((audio) => ({ ...audio, url: absoluteUrl(audio.url) })),
       photoUrls: round.photos.map((photo) => absoluteUrl(photo.url)),
       reviewImages: (round.reviewImages && round.reviewImages.length
         ? round.reviewImages
@@ -172,6 +179,7 @@ module.exports = {
   logout,
   markNotificationRead,
   uploadSubmissionPhoto,
+  uploadSubmissionAudio,
   updateSubmissionNote,
   reopenSubmissionForResubmit
 };

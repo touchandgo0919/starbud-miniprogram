@@ -39,7 +39,7 @@
     <view wx:elif="{{!submissions.length}}" class="empty-state surface">
       <text class="empty-state__mark">照</text>
       <text class="empty-state__title">暂无提交记录</text>
-      <text class="empty-state__copy">完成任务并上传作业照片后，会在这里留下记录。</text>
+      <text class="empty-state__copy">完成任务并提交照片或录音后，会在这里留下记录。</text>
     </view>
     <view wx:else class="history-list surface">
       <view wx:for="{{submissions}}" wx:key="id" class="history-row">

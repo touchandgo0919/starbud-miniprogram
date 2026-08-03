@@ -43,13 +43,13 @@ function request(path, options = {}) {
   });
 }
 
-function upload(path, filePath) {
+function upload(path, filePath, name = "photo", formData) {
   const session = getSession();
   return new Promise((resolve, reject) => {
-    wx.uploadFile({
+    const options = {
       url: `${API_BASE_URL}${path}`,
       filePath,
-      name: "photo",
+      name,
       timeout: 30000,
       header: session && session.token
         ? { authorization: `Bearer ${session.token}`, "x-starbud-client": "mini_program", "x-starbud-session-id": accessSessionId }
@@ -74,7 +74,9 @@ function upload(path, filePath) {
       fail(error) {
         reject(new Error(error.errMsg || "照片上传失败，请稍后重试。"));
       }
-    });
+    };
+    if (formData) options.formData = formData;
+    wx.uploadFile(options);
   });
 }
 

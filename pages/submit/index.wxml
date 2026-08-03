@@ -14,9 +14,9 @@
   <view class="form-section">
     <view class="form-heading">
       <text class="form-title">作业照片</text>
-      <text class="form-hint">至少 1 张，最多 8 张</text>
+      <text class="form-hint">照片或录音至少提交一项</text>
     </view>
-    <view wx:if="recoveredDraft" class="draft-recovery-note">已恢复 {{existingPhotos.length}} 张已上传照片，可继续提交或补传新照片。</view>
+    <view wx:if="recoveredDraft" class="draft-recovery-note">已恢复草稿附件，可继续提交或补传照片、重新录音。</view>
 
     <view class="photo-grid">
       <view wx:for="{{existingPhotos}}" wx:key="id" class="photo-cell">
@@ -47,6 +47,17 @@
   </view>
 
   <view class="form-section">
+    <view class="form-heading"><text class="form-title">语音录音</text><text class="form-hint">最长 3 分钟</text></view>
+    <view wx:if="existingAudio" class="audio-card"><text>已恢复录音</text><button class="audio-action" size="mini" bindtap="playAudio">试听</button></view>
+    <view wx:if="audio" class="audio-card"><text>已录制 {{audio.duration}} 秒</text><view><button class="audio-action" size="mini" bindtap="playAudio">试听</button><button class="audio-action audio-action--danger" size="mini" bindtap="removeAudio">重录</button></view></view>
+    <view wx:if="!audio" class="recording-card">
+      <text wx:if="recording" class="recording-time">正在录音 {{recordingDuration}} 秒</text>
+      <button wx:if="recording" class="record-button record-button--stop" bindtap="stopRecording">停止录音</button>
+      <button wx:else class="record-button" bindtap="startRecording">开始录音</button>
+    </view>
+  </view>
+
+  <view class="form-section">
     <text class="form-title">补充说明（选填）</text>
     <textarea
       class="note-input"
@@ -60,7 +71,7 @@
     <text class="note-count">{{note.length}} / 500</text>
   </view>
 
-  <view class="privacy-note">照片仅用于本次作业提交，请勿上传与作业无关的内容。</view>
+  <view class="privacy-note">照片和录音仅用于本次作业提交，请勿上传与作业无关的内容。</view>
   <view class="submit-spacer"></view>
   <view class="submit-bar">
     <text wx:if="{{uploadProgress}}" class="upload-progress">{{uploadProgress}}</text>

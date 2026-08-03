@@ -12,6 +12,10 @@ Page({
     task: null,
     photos: [],
     existingPhotos: [],
+    audio: null,
+    existingAudio: null,
+    recording: false,
+    recordingDuration: 0,
     note: "",
     resubmitSubmissionId: "",
     reopenOnSubmit: false,
@@ -21,6 +25,7 @@ Page({
   },
 
   async onLoad(options) {
+    this.setupRecorder();
     const session = getSession();
     if (!session || !session.user || session.user.role !== "child") {
       wx.showModal({
@@ -76,10 +81,11 @@ Page({
         task.id,
         task.occurrenceDate || localDateKey(new Date())
       );
-      if (submission.status !== "draft" || !submission.photos.length) return;
+      if (submission.status !== "draft" || (!submission.photos.length && !submission.audio)) return;
       this.setData({
         resubmitSubmissionId: submission.id,
         existingPhotos: submission.photos,
+        existingAudio: submission.audio,
         note: submission.note || "",
         recoveredDraft: true
       });
@@ -87,6 +93,66 @@ Page({
       // 首次提交没有草稿时接口会返回 404，保持空白提交页即可。
       if (!String(error && error.message || "").includes("404")) console.warn("恢复提交草稿失败", error);
     }
+  },
+
+  onUnload() {
+    if (this.recordingTimer) clearInterval(this.recordingTimer);
+    this.audioPlayer?.destroy();
+  },
+
+  setupRecorder() {
+    this.recorder = wx.getRecorderManager();
+    this.recorder.onStart(() => {
+      this.recordingStartedAt = Date.now();
+      this.setData({ recording: true, recordingDuration: 0 });
+      this.recordingTimer = setInterval(() => {
+        this.setData({ recordingDuration: Math.floor((Date.now() - this.recordingStartedAt) / 1000) });
+      }, 1_000);
+    });
+    this.recorder.onStop((result) => {
+      if (this.recordingTimer) clearInterval(this.recordingTimer);
+      this.recordingTimer = null;
+      const duration = Math.max(1, Math.round((result.duration || Date.now() - this.recordingStartedAt) / 1_000));
+      this.setData({
+        audio: { path: result.tempFilePath, duration },
+        recording: false,
+        recordingDuration: duration
+      });
+    });
+    this.recorder.onError(() => {
+      if (this.recordingTimer) clearInterval(this.recordingTimer);
+      this.recordingTimer = null;
+      this.setData({ recording: false });
+      wx.showToast({ title: "录音失败，请检查麦克风权限", icon: "none" });
+    });
+  },
+
+  startRecording() {
+    if (this.data.recording) return;
+    this.recorder.start({
+      duration: 180_000,
+      sampleRate: 16_000,
+      numberOfChannels: 1,
+      encodeBitRate: 48_000,
+      format: "mp3"
+    });
+  },
+
+  stopRecording() {
+    if (this.data.recording) this.recorder.stop();
+  },
+
+  removeAudio() {
+    this.setData({ audio: null, recordingDuration: 0 });
+  },
+
+  playAudio() {
+    const source = this.data.audio?.path || this.data.existingAudio?.url;
+    if (!source) return;
+    this.audioPlayer?.destroy();
+    this.audioPlayer = wx.createInnerAudioContext();
+    this.audioPlayer.src = source;
+    this.audioPlayer.play();
   },
 
   choosePhotos() {
@@ -151,17 +217,17 @@ Page({
 
   submit() {
     if (!this.data.task || this.data.submitting) return;
-    const photoCount = this.data.existingPhotos.length + this.data.photos.length;
-    if (!photoCount) {
-      wx.showToast({ title: "请至少上传一张作业照片", icon: "none" });
+    const hasAttachment = this.data.existingPhotos.length + this.data.photos.length > 0 || this.data.audio || this.data.existingAudio;
+    if (!hasAttachment) {
+      wx.showToast({ title: "请提交照片或录音", icon: "none" });
       return;
     }
 
     wx.showModal({
       title: "确认提交作业？",
-      content: this.data.existingPhotos.length
+      content: this.data.existingPhotos.length || this.data.existingAudio
         ? `已恢复 ${this.data.existingPhotos.length} 张照片${this.data.photos.length ? `，将补传 ${this.data.photos.length} 张` : ""}，确认提交吗？`
-        : `将上传 ${this.data.photos.length} 张照片，提交后不能继续添加。`,
+        : `将上传 ${this.data.photos.length} 张照片${this.data.audio ? "和 1 段录音" : ""}，确认提交吗？`,
       confirmText: "确认提交",
       confirmColor: "#0AA868",
       success: (result) => {
@@ -187,6 +253,10 @@ Page({
             uploadProgress: `正在上传第 ${index + 1} / ${this.data.photos.length} 张照片…`
           });
           await api.uploadSubmissionPhoto(submission.id, this.data.photos[index].path);
+        }
+        if (this.data.audio) {
+          this.setData({ uploadProgress: "正在上传录音…" });
+          await api.uploadSubmissionAudio(submission.id, this.data.audio.path, this.data.audio.duration * 1_000);
         }
         this.setData({ uploadProgress: "正在确认提交…" });
         await api.finalizeSubmission(submission.id);

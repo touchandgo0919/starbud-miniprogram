@@ -169,6 +169,44 @@
   font-weight: 300;
 }
 
+.recording-card,
+.audio-card {
+  display: flex;
+  min-height: 112rpx;
+  margin-top: 22rpx;
+  padding: 20rpx 22rpx;
+  align-items: center;
+  justify-content: space-between;
+  border: 2rpx solid #dce5e0;
+  border-radius: 18rpx;
+  background: #fbfcfb;
+  color: #26312d;
+  font-size: 25rpx;
+}
+
+.recording-time {
+  color: #c74c57;
+  font-weight: 700;
+}
+
+.record-button,
+.audio-action {
+  margin: 0;
+  border-radius: 12rpx;
+  background: #0aa868;
+  color: #ffffff;
+  font-size: 23rpx;
+}
+
+.record-button--stop,
+.audio-action--danger {
+  background: #c74c57;
+}
+
+.audio-action + .audio-action {
+  margin-left: 12rpx;
+}
+
 .note-input {
   width: 100%;
   height: 240rpx;

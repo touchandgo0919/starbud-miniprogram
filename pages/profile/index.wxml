@@ -42,7 +42,7 @@
     </view>
     <view class="responsibility-row">
       <text class="responsibility-index">2</text>
-      <text>完成后拍照或从相册选择作业照片</text>
+      <text>完成后提交照片或录音附件</text>
     </view>
     <view class="responsibility-row">
       <text class="responsibility-index">3</text>

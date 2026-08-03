@@ -16,7 +16,7 @@
       <view class="detail-row"><text>提醒时间</text><text>{{task.scheduleTime}}</text></view>
       <view class="detail-row"><text>重复方式</text><text>{{task.repeatLabel}}</text></view>
       <view class="detail-row"><text>提醒方式</text><text>{{task.voiceLabel}}</text></view>
-      <view class="detail-row"><text>上传照片</text><text>{{task.requiresPhotoUpload ? "需要上传" : "无需上传"}}</text></view>
+      <view class="detail-row"><text>提交附件</text><text>{{task.requiresPhotoUpload ? "照片或录音" : "无需提交"}}</text></view>
       <view class="detail-row"><text>领取状态</text><text>{{task.claimLabel}}</text></view>
       <view class="detail-row"><text>提交状态</text><text>{{task.submissionLabel}}</text></view>
     </view>
