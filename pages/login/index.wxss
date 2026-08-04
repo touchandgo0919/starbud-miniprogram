@@ -128,10 +128,18 @@
   align-items: flex-start;
 }
 
+.agreement-required {
+  margin-top: 4rpx;
+  color: #ef4d5a;
+  font-size: 31rpx;
+  font-weight: 800;
+  line-height: 38rpx;
+}
+
 .agreement-checkbox {
   width: 38rpx;
   height: 38rpx;
-  margin: 1rpx 8rpx 0 0;
+  margin: 1rpx 8rpx 0 2rpx;
   flex: 0 0 38rpx;
 }
 

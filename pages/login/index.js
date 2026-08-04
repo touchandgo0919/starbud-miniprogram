@@ -55,7 +55,11 @@ Page({
       setSession(result);
       wx.switchTab({ url: "/pages/tasks/index" });
     } catch (error) {
-      this.setData({ error: error.message || "登录失败，请稍后重试。" });
+      this.setData({
+        error: error.statusCode === 401
+          ? "用户名或密码错误。"
+          : error.message || "登录失败，请稍后重试。"
+      });
     } finally {
       this.setData({ submitting: false });
     }

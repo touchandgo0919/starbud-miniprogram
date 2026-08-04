@@ -23,7 +23,7 @@ function request(path, options = {}) {
         "content-type": "application/json",
         "x-starbud-client": "mini_program",
         "x-starbud-session-id": accessSessionId,
-        ...(session && session.token ? { authorization: `Bearer ${session.token}` } : {}),
+        ...(options.auth !== false && session && session.token ? { authorization: `Bearer ${session.token}` } : {}),
         ...(options.header || {})
       },
       success(response) {
@@ -31,10 +31,12 @@ function request(path, options = {}) {
           resolve(response.data);
           return;
         }
-        if (response.statusCode === 401) {
+        if (response.statusCode === 401 && options.redirectOnUnauthorized !== false) {
           redirectToLogin();
         }
-        reject(new Error(errorMessage(response.data, response.statusCode)));
+        const requestError = new Error(errorMessage(response.data, response.statusCode));
+        requestError.statusCode = response.statusCode;
+        reject(requestError);
       },
       fail(error) {
         reject(new Error(error.errMsg || "网络连接失败，请稍后重试。"));

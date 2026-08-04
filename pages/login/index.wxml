@@ -50,6 +50,7 @@
 
     <checkbox-group class="agreement-control" bindchange="onAgreementChange">
       <label class="agreement-label">
+        <text class="agreement-required">*</text>
         <checkbox class="agreement-checkbox" value="accepted" checked="{{agreementAccepted}}" color="#0AA868" />
         <view class="agreement-copy">我已阅读并同意<navigator class="agreement-link" url="/pages/legal/index?type=agreement">《用户服务协议》</navigator>和<navigator class="agreement-link" url="/pages/legal/index?type=privacy">《隐私政策》</navigator></view>
       </label>

@@ -3,7 +3,9 @@ const { absoluteUrl, request, upload } = require("../utils/request");
 async function login(username, password) {
   return request("/api/auth/login", {
     method: "POST",
-    data: { username, password }
+    data: { username, password },
+    auth: false,
+    redirectOnUnauthorized: false
   });
 }
 
