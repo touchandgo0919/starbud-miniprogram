@@ -1,6 +1,7 @@
 {
   "pages": [
     "pages/login/index",
+    "pages/legal/index",
     "pages/tasks/index",
     "pages/task-detail/index",
     "pages/submit/index",

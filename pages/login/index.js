@@ -6,6 +6,7 @@ Page({
     username: "",
     password: "",
     passwordVisible: false,
+    agreementAccepted: false,
     submitting: false,
     error: ""
   },
@@ -29,11 +30,19 @@ Page({
     this.setData({ passwordVisible: !this.data.passwordVisible });
   },
 
+  onAgreementChange(event) {
+    this.setData({ agreementAccepted: event.detail.value.includes("accepted"), error: "" });
+  },
+
   async submit() {
     const username = this.data.username.trim();
     const password = this.data.password;
     if (!username || !password) {
       this.setData({ error: "请输入用户名和密码。" });
+      return;
+    }
+    if (!this.data.agreementAccepted) {
+      this.setData({ error: "请先阅读并同意《用户服务协议》和《隐私政策》。" });
       return;
     }
 

@@ -1,0 +1,12 @@
+<scroll-view class="legal-page" scroll-y="true">
+  <view class="legal-brand"><image src="/assets/starbud-icon.png" mode="aspectFit" /><text>星星芽AI助手</text></view>
+  <view class="legal-card">
+    <text class="legal-title">{{title}}</text>
+    <text class="legal-version">{{version}}</text>
+    <text class="legal-intro">请仔细阅读本页面内容。点击登录页的同意勾选，即表示您已阅读并同意本协议或政策。</text>
+    <view wx:for="{{sections}}" wx:key="index" class="legal-section">
+      <text class="legal-section-title">{{item[0]}}</text>
+      <text class="legal-section-content">{{item[1]}}</text>
+    </view>
+  </view>
+</scroll-view>
