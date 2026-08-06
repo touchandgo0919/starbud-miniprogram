@@ -5,20 +5,37 @@
   </view>
 
   <view class="login-copy">
-    <text class="login-title">欢迎回来</text>
-    <text class="login-subtitle">查看任务状态，完成后拍照提交</text>
+    <text class="login-title">{{mode === 'register' ? '创建家长账号' : '欢迎回来'}}</text>
+    <text class="login-subtitle">{{mode === 'register' ? '注册后可以创建家庭和子女账号' : '查看任务状态，完成后提交作业'}}</text>
   </view>
 
   <view class="login-form">
+    <view class="auth-mode" role="tablist">
+      <button class="auth-mode-button {{mode === 'login' ? 'is-active' : ''}}" data-mode="login" bindtap="switchMode">登录</button>
+      <button class="auth-mode-button {{mode === 'register' ? 'is-active' : ''}}" data-mode="register" bindtap="switchMode">注册</button>
+    </view>
+
     <view class="field">
       <text class="field-label">用户名</text>
       <input
         class="field-input"
         value="{{username}}"
-        placeholder="请输入家长或儿童账号"
+        placeholder="{{mode === 'register' ? '3-40 位字母、数字、点、横线或下划线' : '请输入家长或儿童账号'}}"
         placeholder-class="field-placeholder"
         maxlength="40"
         bindinput="onUsernameInput"
+      />
+    </view>
+
+    <view wx:if="{{mode === 'register'}}" class="field">
+      <text class="field-label">家长姓名（选填）</text>
+      <input
+        class="field-input"
+        value="{{displayName}}"
+        placeholder="用于家庭成员展示"
+        placeholder-class="field-placeholder"
+        maxlength="40"
+        bindinput="onDisplayNameInput"
       />
     </view>
 
@@ -29,10 +46,36 @@
           class="field-input password-input"
           value="{{password}}"
           password="{{!passwordVisible}}"
-          placeholder="请输入密码"
+          placeholder="{{mode === 'register' ? '至少 6 个字符' : '请输入密码'}}"
           placeholder-class="field-placeholder"
           maxlength="80"
           bindinput="onPasswordInput"
+        />
+        <button
+          class="password-toggle"
+          aria-label="{{passwordVisible ? '隐藏密码' : '显示密码'}}"
+          bindtap="togglePassword"
+        >
+          <image
+            class="password-icon"
+            src="{{passwordVisible ? '/assets/eye-open.png' : '/assets/eye-closed.png'}}"
+            mode="aspectFit"
+          />
+        </button>
+      </view>
+    </view>
+
+    <view wx:if="{{mode === 'register'}}" class="field">
+      <text class="field-label">确认密码</text>
+      <view class="password-control">
+        <input
+          class="field-input password-input"
+          value="{{confirmPassword}}"
+          password="{{!passwordVisible}}"
+          placeholder="再次输入密码"
+          placeholder-class="field-placeholder"
+          maxlength="80"
+          bindinput="onConfirmPasswordInput"
         />
         <button
           class="password-toggle"
@@ -59,9 +102,9 @@
     <view wx:if="{{error}}" class="login-error">{{error}}</view>
 
     <button class="primary-button login-submit" loading="{{submitting}}" disabled="{{submitting || !agreementAccepted}}" bindtap="submit">
-      登录
+      {{mode === 'register' ? '注册并登录' : '登录'}}
     </button>
   </view>
 
-  <text class="login-note">账号由家长在网页端创建和维护</text>
+  <text class="login-note">{{mode === 'register' ? '注册账号默认为家长权限' : '儿童账号由家长创建和维护'}}</text>
 </view>

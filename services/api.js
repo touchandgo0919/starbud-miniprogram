@@ -9,6 +9,15 @@ async function login(username, password) {
   });
 }
 
+async function registerParent(username, displayName, password) {
+  return request("/api/auth/register", {
+    method: "POST",
+    data: { username, displayName, password },
+    auth: false,
+    redirectOnUnauthorized: false
+  });
+}
+
 async function logout() {
   return request("/api/auth/logout", { method: "POST" });
 }
@@ -184,6 +193,7 @@ module.exports = {
   deleteTask,
   remindTask,
   login,
+  registerParent,
   logout,
   markNotificationRead,
   uploadSubmissionPhoto,

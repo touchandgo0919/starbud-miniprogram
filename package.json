@@ -3,6 +3,7 @@
   "version": "1.1.4",
   "private": true,
   "scripts": {
-    "check": "node scripts/validate.mjs"
+    "check": "node scripts/validate.mjs",
+    "test": "npm run check && node --test --test-concurrency=1 tests/*.test.cjs"
   }
 }

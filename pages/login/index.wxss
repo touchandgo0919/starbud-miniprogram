@@ -1,6 +1,6 @@
 .login-page {
   min-height: 100vh;
-  padding: 96rpx 48rpx 56rpx;
+  padding: 76rpx 48rpx calc(56rpx + env(safe-area-inset-bottom));
   background: #ffffff;
 }
 
@@ -21,7 +21,7 @@
 
 .login-copy {
   display: flex;
-  margin-top: 104rpx;
+  margin-top: 72rpx;
   flex-direction: column;
 }
 
@@ -29,7 +29,7 @@
   color: #13231e;
   font-size: 54rpx;
   font-weight: 800;
-  letter-spacing: -1rpx;
+  letter-spacing: 0;
 }
 
 .login-subtitle {
@@ -39,7 +39,31 @@
 }
 
 .login-form {
-  margin-top: 72rpx;
+  margin-top: 52rpx;
+}
+
+.auth-mode {
+  display: grid;
+  margin-bottom: 38rpx;
+  padding: 6rpx;
+  grid-template-columns: 1fr 1fr;
+  border-radius: 18rpx;
+  background: #eef3f0;
+}
+
+.auth-mode-button {
+  height: 68rpx;
+  border-radius: 14rpx;
+  color: #66706c;
+  font-size: 27rpx;
+  font-weight: 650;
+  line-height: 68rpx;
+}
+
+.auth-mode-button.is-active {
+  background: #ffffff;
+  color: #08794f;
+  box-shadow: 0 2rpx 10rpx rgba(19, 58, 44, 0.1);
 }
 
 .field + .field {
@@ -161,10 +185,8 @@
 }
 
 .login-note {
-  position: fixed;
-  right: 0;
-  bottom: calc(44rpx + env(safe-area-inset-bottom));
-  left: 0;
+  display: block;
+  margin-top: 42rpx;
   color: #9aa19e;
   font-size: 23rpx;
   text-align: center;
