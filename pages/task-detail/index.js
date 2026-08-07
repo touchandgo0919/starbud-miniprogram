@@ -1,5 +1,6 @@
 const api = require("../../services/api");
 const { useSpeakerOutput } = require("../../utils/audio");
+const { buildTaskGuidance } = require("../../utils/guidance");
 const { getSelectedTask, getSession, setSelectedTask } = require("../../utils/storage");
 
 const repeatLabels = {
@@ -69,6 +70,7 @@ function taskViewModel(task) {
 Page({
   data: {
     task: null,
+    guidance: null,
     submission: null,
     isChild: false,
     loading: true,
@@ -88,14 +90,11 @@ Page({
     this.setData({ isChild: session.user.role === "child" });
     const selectedTask = getSelectedTask();
     const taskDate = String(options.taskDate || (selectedTask && String(selectedTask.id) === taskId ? selectedTask.occurrenceDate || "" : ""));
+    this.taskId = taskId;
+    this.taskDate = taskDate;
 
     try {
-      const task = await api.getTask(taskId, taskDate, "detail");
-      if (!task) throw new Error("任务不存在或无权查看。");
-      const taskView = taskViewModel(task);
-      setSelectedTask(taskView);
-      await this.loadSubmission(taskView);
-      this.setData({ task: taskView });
+      await this.loadTaskData();
     } catch (error) {
       wx.showModal({
         title: "无法打开任务",
@@ -105,6 +104,28 @@ Page({
       });
     } finally {
       this.setData({ loading: false });
+    }
+  },
+
+  onShow() {
+    if (!this.hasAppeared) {
+      this.hasAppeared = true;
+      return;
+    }
+    if (this.taskId && !this.data.loading) this.loadTaskData(true);
+  },
+
+  async loadTaskData(silent = false) {
+    try {
+      const task = await api.getTask(this.taskId, this.taskDate, "detail");
+      if (!task) throw new Error("任务不存在或无权查看。");
+      const taskView = taskViewModel(task);
+      setSelectedTask(taskView);
+      await this.loadSubmission(taskView);
+      this.setData({ task: taskView, guidance: buildTaskGuidance(taskView) });
+    } catch (error) {
+      if (!silent) throw error;
+      wx.showToast({ title: error.message || "任务状态更新失败", icon: "none" });
     }
   },
 
@@ -244,7 +265,7 @@ Page({
         const claimedTask = await api.claimTask(task.id, task.occurrenceDate);
         const taskView = taskViewModel(claimedTask);
         setSelectedTask(taskView);
-        this.setData({ task: taskView });
+        this.setData({ task: taskView, guidance: buildTaskGuidance(taskView) });
         wx.showToast({ title: taskView.completed ? "任务已完成" : "任务已领取", icon: "success" });
       } catch (error) {
         wx.showToast({ title: error.message || "领取失败", icon: "none" });
@@ -257,7 +278,7 @@ Page({
         const completedTask = await api.completeTask(task.id, task.occurrenceDate);
         const taskView = taskViewModel(completedTask);
         setSelectedTask(taskView);
-        this.setData({ task: taskView });
+        this.setData({ task: taskView, guidance: buildTaskGuidance(taskView) });
         wx.showToast({ title: "任务已完成", icon: "success" });
       } catch (error) {
         wx.showToast({ title: error.message || "完成失败", icon: "none" });

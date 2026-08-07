@@ -171,6 +171,19 @@ describe("mini-program sharing", () => {
 });
 
 describe("mini-program API facade", () => {
+  test("loads the child next-step suggestion", async () => {
+    nextRequestResponse = {
+      statusCode: 200,
+      data: { nextStep: { title: "先领取数学作业", taskId: "t1", stage: "claim" } }
+    };
+    const api = require("../services/api");
+
+    const nextStep = await api.getChildNextStep();
+
+    assert.equal(nextStep.taskId, "t1");
+    assert.match(requestCalls[0].url, /\/api\/ai\/child-next-step$/);
+  });
+
   test("encodes paging filters and returns backend pagination", async () => {
     nextRequestResponse = {
       statusCode: 200,
@@ -247,6 +260,34 @@ describe("mini-program API facade", () => {
     assert.ok(submission.reviewRounds[0].photos[0].url.startsWith("https://"));
     assert.ok(submission.reviewRounds[0].audios[0].url.startsWith("https://"));
     assert.ok(submission.reviewRounds[0].reviewImages[0].url.startsWith("https://"));
+  });
+});
+
+describe("task guidance ladder", () => {
+  const { buildTaskGuidance } = require("../utils/guidance");
+
+  test("moves from claim to attachment submission", () => {
+    const unclaimed = buildTaskGuidance({ status: "pending", reviewStatus: "pending_submission", requiresPhotoUpload: true });
+    assert.equal(unclaimed.title, "先领取这个任务");
+    assert.deepEqual(unclaimed.steps.map((item) => item.state), ["active", "upcoming", "upcoming"]);
+
+    const claimed = buildTaskGuidance({ status: "pending", reviewStatus: "pending_submission", requiresPhotoUpload: true, claimedAt: "2026-08-07 18:00:00" });
+    assert.equal(claimed.title, "完成后提交附件");
+    assert.deepEqual(claimed.steps.map((item) => item.state), ["done", "active", "upcoming"]);
+  });
+
+  test("shows revision, review waiting and completion states", () => {
+    const revision = buildTaskGuidance({ status: "pending", reviewStatus: "needs_revision", requiresPhotoUpload: true, claimedAt: "now", needsRevision: true });
+    assert.equal(revision.title, "按批改内容修改");
+    assert.equal(revision.steps[1].label, "修改并重交");
+
+    const waiting = buildTaskGuidance({ status: "pending", reviewStatus: "pending_review", submissionStatus: "submitted", requiresPhotoUpload: true, claimedAt: "now" });
+    assert.equal(waiting.title, "等待家长批改");
+    assert.deepEqual(waiting.steps.map((item) => item.state), ["done", "done", "active"]);
+
+    const completed = buildTaskGuidance({ status: "completed", reviewStatus: "completed", requiresPhotoUpload: true, finalizedAt: "now" });
+    assert.equal(completed.title, "任务已经完成");
+    assert.deepEqual(completed.steps.map((item) => item.state), ["done", "done", "done"]);
   });
 });
 

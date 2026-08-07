@@ -46,6 +46,16 @@
     </view>
   </view>
 
+  <view wx:if="{{!isParent && selectedDate === todayDate && (nextStep || nextStepLoading)}}" class="next-step-card" bindtap="openNextStep">
+    <view class="next-step-mark">{{nextStepLoading ? '…' : '→'}}</view>
+    <view class="next-step-copy">
+      <text class="next-step-kicker">{{nextStep && nextStep.source === 'model' ? 'AI 下一步' : '下一步'}}</text>
+      <text class="next-step-title">{{nextStepLoading ? '正在整理今天的建议' : nextStep.title}}</text>
+      <text wx:if="{{nextStep && nextStep.description}}" class="next-step-description">{{nextStep.description}}</text>
+    </view>
+    <text wx:if="{{nextStep && nextStep.taskId}}" class="next-step-action">{{nextStep.actionLabel}}</text>
+  </view>
+
   <scroll-view
     class="task-scroll"
     scroll-y

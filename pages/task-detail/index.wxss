@@ -120,6 +120,23 @@
   margin-top: 34rpx;
 }
 
+.guidance-section { margin-top: 28rpx; padding: 28rpx 30rpx; border-left: 8rpx solid #0aa868; }
+.guidance-kicker, .guidance-title, .guidance-description { display: block; }
+.guidance-kicker { color: #0aa868; font-size: 21rpx; font-weight: 800; }
+.guidance-title { margin-top: 6rpx; color: #18372c; font-size: 31rpx; font-weight: 800; }
+.guidance-description { margin-top: 10rpx; color: #68746f; font-size: 24rpx; line-height: 1.6; }
+.guidance-steps { display: grid; margin-top: 24rpx; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.guidance-step { position: relative; display: flex; min-width: 0; align-items: center; flex-direction: column; gap: 9rpx; color: #9aa39f; font-size: 21rpx; text-align: center; }
+.guidance-step::before { position: absolute; top: 19rpx; right: 50%; left: -50%; height: 3rpx; background: #dce4e0; content: ""; }
+.guidance-step:first-child::before { display: none; }
+.guidance-step__mark { position: relative; z-index: 1; display: flex; width: 40rpx; height: 40rpx; align-items: center; justify-content: center; border: 3rpx solid #dce4e0; border-radius: 50%; background: #ffffff; color: #909a95; font-size: 20rpx; font-weight: 800; }
+.guidance-step--done { color: #4f7463; }
+.guidance-step--done::before { background: #8bd2ae; }
+.guidance-step--done .guidance-step__mark { border-color: #8bd2ae; background: #eaf8f1; color: #078d59; }
+.guidance-step--active { color: #18372c; font-weight: 750; }
+.guidance-step--active::before { background: #8bd2ae; }
+.guidance-step--active .guidance-step__mark { border-color: #0aa868; background: #0aa868; color: #ffffff; }
+
 .photo-section { margin-top: 28rpx; padding: 28rpx 30rpx; }
 .photo-title, .photo-tip { display: block; }
 .photo-title { color: #26312d; font-size: 28rpx; font-weight: 750; }

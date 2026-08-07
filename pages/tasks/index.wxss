@@ -59,6 +59,27 @@
 .calendar-day__dot--pending { background: #f2b63d; }
 .calendar-day__dot--completed { background: #8a9490; }
 
+.next-step-card {
+  display: grid;
+  min-height: 132rpx;
+  margin: 0 0 12rpx;
+  padding: 22rpx 24rpx;
+  grid-template-columns: 58rpx minmax(0, 1fr) auto;
+  gap: 18rpx;
+  align-items: center;
+  border-left: 8rpx solid #0aa868;
+  border-radius: 20rpx;
+  background: #ffffff;
+  box-shadow: 0 8rpx 24rpx rgba(40, 52, 47, 0.05);
+}
+.next-step-mark { display: flex; width: 58rpx; height: 58rpx; align-items: center; justify-content: center; border-radius: 16rpx; background: #eaf8f1; color: #0aa868; font-size: 32rpx; font-weight: 800; }
+.next-step-copy { min-width: 0; }
+.next-step-kicker, .next-step-title, .next-step-description { display: block; }
+.next-step-kicker { color: #0aa868; font-size: 20rpx; font-weight: 800; }
+.next-step-title { margin-top: 4rpx; color: #18372c; font-size: 28rpx; font-weight: 800; line-height: 1.35; }
+.next-step-description { display: -webkit-box; overflow: hidden; margin-top: 6rpx; -webkit-box-orient: vertical; -webkit-line-clamp: 2; color: #78847f; font-size: 22rpx; line-height: 1.45; }
+.next-step-action { color: #078d59; font-size: 22rpx; font-weight: 750; white-space: nowrap; }
+
 .section-heading {
   display: flex;
   box-sizing: border-box;

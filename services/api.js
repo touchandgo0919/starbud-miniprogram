@@ -27,6 +27,11 @@ async function getTodayTasks() {
   return body.tasks;
 }
 
+async function getChildNextStep() {
+  const body = await request("/api/ai/child-next-step");
+  return body.nextStep;
+}
+
 async function getTasks() {
   const body = await request("/api/tasks");
   return body.tasks;
@@ -182,6 +187,7 @@ module.exports = {
   createSubmission,
   finalizeSubmission,
   getNotifications,
+  getChildNextStep,
   getSubmissions,
   getTaskSubmission,
   getSubmissionPage,

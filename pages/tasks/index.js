@@ -115,6 +115,7 @@ Page({
     navBarHeight: 68,
     weekdayLabels,
     selectedDate: localDateKey(),
+    todayDate: localDateKey(),
     calendarYear: new Date().getFullYear(),
     calendarMonth: new Date().getMonth() + 1,
     calendarTitle: "",
@@ -125,6 +126,8 @@ Page({
     totalCount: 0,
     completedCount: 0,
     progressPercent: 0,
+    nextStep: null,
+    nextStepLoading: false,
     loading: true,
     refreshing: false,
     loadingMore: false,
@@ -156,10 +159,7 @@ Page({
       return;
     }
     this.setData({ user: session.user, isParent: session.user.role === "parent" });
-    if (!this.hasLoadedTasks) {
-      this.hasLoadedTasks = true;
-      this.refreshTaskPage();
-    }
+    this.refreshTaskPage();
     this.startReviewNotificationPolling();
   },
 
@@ -190,7 +190,32 @@ Page({
   },
 
   async refreshTaskPage() {
-    await Promise.all([this.loadTasks(), this.loadCalendarTasks()]);
+    await Promise.all([this.loadTasks(), this.loadCalendarTasks(), this.loadNextStep()]);
+  },
+
+  async loadNextStep() {
+    if (this.data.isParent) {
+      this.setData({ nextStep: null, nextStepLoading: false });
+      return;
+    }
+    this.setData({ nextStepLoading: true });
+    try {
+      this.setData({ nextStep: await api.getChildNextStep() });
+    } catch (_) {
+      this.setData({ nextStep: null });
+    } finally {
+      this.setData({ nextStepLoading: false });
+    }
+  },
+
+  openNextStep() {
+    const nextStep = this.data.nextStep;
+    if (!nextStep || !nextStep.taskId) return;
+    const task = this.data.tasks.find((item) => String(item.id) === String(nextStep.taskId));
+    if (task) setSelectedTask(task);
+    wx.navigateTo({
+      url: `/pages/task-detail/index?taskId=${encodeURIComponent(nextStep.taskId)}&taskDate=${encodeURIComponent(nextStep.taskDate || "")}`
+    });
   },
 
   startReviewNotificationPolling() {

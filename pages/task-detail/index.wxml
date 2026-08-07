@@ -11,6 +11,18 @@
       </view>
     </view>
 
+    <view wx:if="{{isChild && guidance}}" class="guidance-section surface">
+      <text class="guidance-kicker">下一步</text>
+      <text class="guidance-title">{{guidance.title}}</text>
+      <text class="guidance-description">{{guidance.description}}</text>
+      <view class="guidance-steps">
+        <view wx:for="{{guidance.steps}}" wx:key="key" class="guidance-step guidance-step--{{item.state}}">
+          <view class="guidance-step__mark">{{item.state === 'done' ? '✓' : index + 1}}</view>
+          <text>{{item.label}}</text>
+        </view>
+      </view>
+    </view>
+
     <view class="detail-section surface">
       <view class="detail-row"><text>执行日期</text><text>{{task.occurrenceDate || "今天"}}</text></view>
       <view class="detail-row"><text>提醒时间</text><text>{{task.scheduleTime}}</text></view>
