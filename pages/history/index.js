@@ -1,6 +1,7 @@
 const api = require("../../services/api");
 const { useSpeakerOutput } = require("../../utils/audio");
 const { formatSubmittedAt, localDateKey } = require("../../utils/date");
+const { buildSharePayload } = require("../../utils/share");
 const { getSession } = require("../../utils/storage");
 
 const PAGE_SIZE = 20;
@@ -83,14 +84,11 @@ Page({
   },
 
   onShareAppMessage() {
-    return {
-      title: "星星芽AI助手 · 我的提交",
-      path: "/pages/history/index"
-    };
+    return buildSharePayload("我的提交", "/pages/history/index");
   },
 
   onShareTimeline() {
-    return { title: "星星芽AI助手 · 我的提交" };
+    return buildSharePayload("我的提交");
   },
 
   onShow() {

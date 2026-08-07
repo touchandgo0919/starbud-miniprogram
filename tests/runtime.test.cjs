@@ -147,6 +147,29 @@ describe("mini-program request runtime", () => {
   });
 });
 
+describe("mini-program sharing", () => {
+  test("uses the app name and branded share image", () => {
+    const { BRAND_NAME, SHARE_IMAGE_URL, buildSharePayload } = require("../utils/share");
+
+    assert.equal(BRAND_NAME, "星星芽AI助手");
+    assert.equal(SHARE_IMAGE_URL, "/assets/starbud-share.png");
+    assert.deepEqual(buildSharePayload("我的任务", "/pages/tasks/index"), {
+      title: "星星芽AI助手 · 我的任务",
+      imageUrl: "/assets/starbud-share.png",
+      path: "/pages/tasks/index"
+    });
+    assert.deepEqual(buildSharePayload("我的提交"), {
+      title: "星星芽AI助手 · 我的提交",
+      imageUrl: "/assets/starbud-share.png"
+    });
+    assert.deepEqual(buildSharePayload("关于我们", "/pages/profile/index"), {
+      title: "星星芽AI助手 · 关于我们",
+      imageUrl: "/assets/starbud-share.png",
+      path: "/pages/profile/index"
+    });
+  });
+});
+
 describe("mini-program API facade", () => {
   test("encodes paging filters and returns backend pagination", async () => {
     nextRequestResponse = {

@@ -1,5 +1,6 @@
 const api = require("../../services/api");
 const { localDateKey } = require("../../utils/date");
+const { buildSharePayload } = require("../../utils/share");
 const { getSession, setSelectedTask } = require("../../utils/storage");
 
 const PAGE_SIZE = 20;
@@ -141,14 +142,11 @@ Page({
   },
 
   onShareAppMessage() {
-    return {
-      title: "星星芽AI助手 · 我的任务",
-      path: "/pages/tasks/index"
-    };
+    return buildSharePayload("我的任务", "/pages/tasks/index");
   },
 
   onShareTimeline() {
-    return { title: "星星芽AI助手 · 我的任务" };
+    return buildSharePayload("我的任务");
   },
 
   onShow() {

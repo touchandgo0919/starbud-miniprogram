@@ -41,6 +41,10 @@ const appConfig = await readJson("app.json");
 await readJson("project.config.json");
 await readJson("sitemap.json");
 
+if (!await exists("assets/starbud-share.png")) {
+  errors.push("assets/starbud-share.png: missing branded share image");
+}
+
 if (appConfig) {
   for (const page of appConfig.pages || []) {
     for (const extension of [".js", ".json", ".wxml", ".wxss"]) {

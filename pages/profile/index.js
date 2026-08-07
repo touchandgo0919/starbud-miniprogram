@@ -1,4 +1,5 @@
 const api = require("../../services/api");
+const { buildSharePayload } = require("../../utils/share");
 const { clearSession, getSession } = require("../../utils/storage");
 
 Page({
@@ -12,6 +13,15 @@ Page({
     const system = wx.getSystemInfoSync();
     const statusBarHeight = system.statusBarHeight || 24;
     this.setData({ statusBarHeight, navBarHeight: statusBarHeight + 44 });
+    wx.showShareMenu({ menus: ["shareAppMessage", "shareTimeline"] });
+  },
+
+  onShareAppMessage() {
+    return buildSharePayload("关于我们", "/pages/profile/index");
+  },
+
+  onShareTimeline() {
+    return buildSharePayload("关于我们");
   },
 
   onShow() {
