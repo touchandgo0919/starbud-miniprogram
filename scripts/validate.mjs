@@ -52,6 +52,25 @@ if (appConfig) {
       if (!await exists(path)) errors.push(`${path}: missing page file`);
     }
   }
+
+  const globalBackground = appConfig.window?.backgroundColor?.toLowerCase();
+  const globalBackgroundTextStyle = appConfig.window?.backgroundTextStyle;
+  for (const tab of appConfig.tabBar?.list || []) {
+    const configPath = `${tab.pagePath}.json`;
+    const pageConfig = await readJson(configPath);
+    const pageBackground = pageConfig?.backgroundColor?.toLowerCase();
+    const pageBackgroundTextStyle = pageConfig?.backgroundTextStyle;
+    if (pageBackground && pageBackground !== globalBackground) {
+      errors.push(
+        `${configPath}: tab page backgroundColor must match the global background to prevent switch flicker`
+      );
+    }
+    if (pageBackgroundTextStyle && pageBackgroundTextStyle !== globalBackgroundTextStyle) {
+      errors.push(
+        `${configPath}: tab page backgroundTextStyle must match the global background text style`
+      );
+    }
+  }
 }
 
 for (const path of await collectFiles(".", ".json")) {

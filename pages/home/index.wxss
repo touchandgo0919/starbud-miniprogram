@@ -1,11 +1,12 @@
 .home-page { min-height: 100vh; padding-bottom: calc(40rpx + env(safe-area-inset-bottom)); background: #f3f6f4; }
-.home-hero { min-height: 360rpx; padding-right: 36rpx; padding-left: 36rpx; background: #08372b; color: #ffffff; }
-.home-brand { display: flex; height: 64rpx; align-items: center; gap: 14rpx; font-size: 26rpx; font-weight: 750; }
+.home-hero { padding: 0 26rpx; background: #08372b; color: #ffffff; }
+.home-nav { display: flex; box-sizing: border-box; padding-right: 10rpx; padding-left: 10rpx; align-items: center; }
+.home-brand { display: flex; align-items: center; gap: 14rpx; font-size: 26rpx; font-weight: 750; }
 .home-brand image { width: 48rpx; height: 48rpx; }
-.home-greeting { margin-top: 40rpx; }
+.home-greeting { margin-top: 28rpx; padding: 0 10rpx; }
 .home-greeting text { display: block; }
 .home-greeting__date { color: rgba(255, 255, 255, 0.66); font-size: 24rpx; }
-.home-greeting__title { margin-top: 10rpx; font-size: 46rpx; font-weight: 800; line-height: 1.25; }
+.home-greeting__title { overflow: hidden; margin-top: 10rpx; font-size: 46rpx; font-weight: 800; line-height: 1.25; text-overflow: ellipsis; white-space: nowrap; }
 .home-greeting__copy { margin-top: 12rpx; color: rgba(255, 255, 255, 0.76); font-size: 27rpx; }
 .home-content { position: relative; z-index: 1; margin-top: -66rpx; padding: 0 28rpx; }
 .home-state { padding: 72rpx 34rpx; color: #7a817e; text-align: center; }

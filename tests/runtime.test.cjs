@@ -11,6 +11,10 @@ let nextUploadResponse;
 
 global.getApp = () => ({ globalData: { session: null } });
 global.wx = {
+  getSystemInfoSync() {
+    return { statusBarHeight: 47 };
+  },
+  showShareMenu() {},
   getStorageSync(key) {
     return storage.get(key);
   },
@@ -306,10 +310,29 @@ describe("task guidance ladder", () => {
 });
 
 describe("child home view model", () => {
-  function loadHomeModule() {
-    global.Page = () => {};
-    return require("../pages/home/index");
+  function loadHomeModule(capturePage = false) {
+    let definition;
+    global.Page = (pageDefinition) => {
+      definition = pageDefinition;
+    };
+    const exports = require("../pages/home/index");
+    if (!capturePage) return exports;
+    return {
+      ...definition,
+      data: { ...definition.data },
+      setData(update) {
+        Object.assign(this.data, update);
+      }
+    };
   }
+
+  test("uses the same status-bar plus 44px navigation height as other tabs", () => {
+    const page = loadHomeModule(true);
+    page.onLoad();
+
+    assert.equal(page.data.statusBarHeight, 47);
+    assert.equal(page.data.navBarHeight, 91);
+  });
 
   test("formats progress and labels model-backed actions", () => {
     const { viewModel } = loadHomeModule();

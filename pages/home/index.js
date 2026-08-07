@@ -34,6 +34,7 @@ Page({
   data: {
     user: null,
     statusBarHeight: 24,
+    navBarHeight: 68,
     home: null,
     loading: true,
     refreshing: false,
@@ -42,7 +43,8 @@ Page({
 
   onLoad() {
     const system = wx.getSystemInfoSync();
-    this.setData({ statusBarHeight: system.statusBarHeight || 24 });
+    const statusBarHeight = system.statusBarHeight || 24;
+    this.setData({ statusBarHeight, navBarHeight: statusBarHeight + 44 });
     wx.showShareMenu({ menus: ["shareAppMessage", "shareTimeline"] });
   },
 
