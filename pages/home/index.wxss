@@ -1,7 +1,7 @@
 .home-page { min-height: 100vh; padding-bottom: calc(40rpx + env(safe-area-inset-bottom)); background: #f3f6f4; }
 .home-hero { padding: 0 26rpx; background: #08372b; color: #ffffff; }
 .home-nav { display: flex; box-sizing: border-box; padding-right: 10rpx; padding-left: 10rpx; align-items: center; }
-.home-brand { display: flex; align-items: center; gap: 14rpx; font-size: 26rpx; font-weight: 750; }
+.home-brand { display: flex; align-items: center; gap: 14rpx; font-size: 34rpx; font-weight: 800; }
 .home-brand image { width: 48rpx; height: 48rpx; }
 .home-greeting { margin-top: 28rpx; padding: 0 10rpx; }
 .home-greeting text { display: block; }
