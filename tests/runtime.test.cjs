@@ -46,7 +46,8 @@ function resetModules() {
     "../utils/request",
     "../utils/storage",
     "../services/api",
-    "../pages/login/index"
+    "../pages/login/index",
+    "../pages/home/index"
   ]) {
     delete require.cache[require.resolve(path)];
   }
@@ -171,6 +172,19 @@ describe("mini-program sharing", () => {
 });
 
 describe("mini-program API facade", () => {
+  test("loads the aggregated child home", async () => {
+    nextRequestResponse = {
+      statusCode: 200,
+      data: { home: { date: "2026-08-07", progress: { total: 2, completed: 1 } } }
+    };
+    const api = require("../services/api");
+
+    const home = await api.getChildHome();
+
+    assert.equal(home.progress.completed, 1);
+    assert.match(requestCalls[0].url, /\/api\/child\/home$/);
+  });
+
   test("loads the child next-step suggestion", async () => {
     nextRequestResponse = {
       statusCode: 200,
@@ -291,6 +305,36 @@ describe("task guidance ladder", () => {
   });
 });
 
+describe("child home view model", () => {
+  function loadHomeModule() {
+    global.Page = () => {};
+    return require("../pages/home/index");
+  }
+
+  test("formats progress and labels model-backed actions", () => {
+    const { viewModel } = loadHomeModule();
+    const home = viewModel({
+      date: "2026-08-07",
+      nextStep: { taskId: "t1", stage: "continue", source: "model" }
+    });
+
+    assert.match(home.dateLabel, /8月7日/);
+    assert.equal(home.nextStep.stageLabel, "建议下一步");
+    assert.equal(home.nextStep.hasTask, true);
+  });
+
+  test("keeps rest guidance actionable without a task id", () => {
+    const { viewModel } = loadHomeModule();
+    const home = viewModel({
+      date: "2026-08-07",
+      nextStep: { taskId: null, stage: "rest", source: "rules" }
+    });
+
+    assert.equal(home.nextStep.stageLabel, "今日安排");
+    assert.equal(home.nextStep.hasTask, false);
+  });
+});
+
 describe("login page", () => {
   function loadPage() {
     let definition;
@@ -318,7 +362,7 @@ describe("login page", () => {
     assert.equal(requestCalls.length, 0);
   });
 
-  test("stores an allowed account and enters the task tab", async () => {
+  test("stores a child account and enters the home tab", async () => {
     const app = { globalData: { session: null } };
     global.getApp = () => app;
     nextRequestResponse = {
@@ -332,7 +376,7 @@ describe("login page", () => {
 
     assert.equal(storage.get("starbud.childSession").token, "token-1");
     assert.equal(app.globalData.session.token, "token-1");
-    assert.deepEqual(navigationCalls.at(-1), ["switchTab", { url: "/pages/tasks/index" }]);
+    assert.deepEqual(navigationCalls.at(-1), ["switchTab", { url: "/pages/home/index" }]);
     assert.equal(page.data.submitting, false);
   });
 

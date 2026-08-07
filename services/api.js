@@ -32,6 +32,11 @@ async function getChildNextStep() {
   return body.nextStep;
 }
 
+async function getChildHome() {
+  const body = await request("/api/child/home");
+  return body.home;
+}
+
 async function getTasks() {
   const body = await request("/api/tasks");
   return body.tasks;
@@ -187,6 +192,7 @@ module.exports = {
   createSubmission,
   finalizeSubmission,
   getNotifications,
+  getChildHome,
   getChildNextStep,
   getSubmissions,
   getTaskSubmission,

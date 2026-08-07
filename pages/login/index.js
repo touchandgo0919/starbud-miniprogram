@@ -17,7 +17,7 @@ Page({
   onLoad() {
     const session = getSession();
     if (session && session.token && session.user && ["child", "parent"].includes(session.user.role)) {
-      wx.switchTab({ url: "/pages/tasks/index" });
+      wx.switchTab({ url: session.user.role === "child" ? "/pages/home/index" : "/pages/tasks/index" });
     }
   },
 
@@ -94,7 +94,7 @@ Page({
       if (registering) {
         wx.showToast({ title: "注册成功", icon: "success" });
       }
-      wx.switchTab({ url: "/pages/tasks/index" });
+      wx.switchTab({ url: result.user.role === "child" ? "/pages/home/index" : "/pages/tasks/index" });
     } catch (error) {
       this.setData({
         error: !registering && error.statusCode === 401

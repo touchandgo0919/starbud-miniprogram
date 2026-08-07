@@ -1,5 +1,6 @@
 {
   "pages": [
+    "pages/home/index",
     "pages/login/index",
     "pages/legal/index",
     "pages/tasks/index",
@@ -21,6 +22,12 @@
     "backgroundColor": "#FFFFFF",
     "borderStyle": "white",
     "list": [
+      {
+        "pagePath": "pages/home/index",
+        "text": "首页",
+        "iconPath": "assets/tabbar/home.png",
+        "selectedIconPath": "assets/tabbar/home-selected.png"
+      },
       {
         "pagePath": "pages/tasks/index",
         "text": "任务",

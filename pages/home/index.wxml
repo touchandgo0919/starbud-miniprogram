@@ -1,0 +1,55 @@
+<view class="home-page">
+  <view class="home-hero" style="padding-top: {{statusBarHeight + 20}}px;">
+    <view class="home-brand">
+      <image src="/assets/starbud-icon.png" mode="aspectFit" />
+      <text>星星芽AI助手</text>
+    </view>
+    <view wx:if="{{home}}" class="home-greeting">
+      <text class="home-greeting__date">{{home.dateLabel}}</text>
+      <text class="home-greeting__title">{{home.greeting}}，{{user.displayName || user.username}}</text>
+      <text class="home-greeting__copy">今天先做好一件事，就很好。</text>
+    </view>
+  </view>
+
+  <view class="home-content">
+    <view wx:if="{{loading}}" class="home-state surface">正在整理今天的安排…</view>
+    <view wx:elif="{{error && !home}}" class="home-state surface">
+      <text class="home-state__title">首页加载失败</text>
+      <text class="home-state__copy">{{error}}</text>
+      <button class="secondary-button" bindtap="loadHome">重新加载</button>
+    </view>
+
+    <block wx:if="{{home}}">
+      <view class="progress-card surface">
+        <view class="progress-card__copy">
+          <text>今日进度</text>
+          <text class="progress-card__number">{{home.progress.completed}} / {{home.progress.total}}</text>
+        </view>
+        <view class="progress-track"><view class="progress-track__value" style="width: {{home.progress.percent}}%;"></view></view>
+        <text class="progress-card__hint">{{home.progress.pending ? '还有 ' + home.progress.pending + ' 项待完成' : '今天的任务已完成'}}</text>
+      </view>
+
+      <view wx:for="{{home.attention}}" wx:key="notificationId" class="attention-card" data-id="{{item.notificationId}}" bindtap="openAttention">
+        <view class="attention-card__mark">!</view>
+        <view class="attention-card__copy"><text>{{item.title}}</text><text>{{item.description}}</text></view>
+        <text class="attention-card__action">{{item.actionLabel}}</text>
+      </view>
+
+      <view class="section-label"><text>下一步</text><text bindtap="openTasks">全部任务</text></view>
+      <view class="next-card">
+        <view class="next-card__head">
+          <text>{{home.nextStep.stageLabel}}</text>
+        </view>
+        <text class="next-card__title">{{home.nextStep.title}}</text>
+        <text class="next-card__description">{{home.nextStep.description}}</text>
+        <button class="next-card__button" bindtap="openNextStep">{{home.nextStep.actionLabel}}</button>
+      </view>
+
+      <view class="encouragement-card surface">
+        <view class="encouragement-card__mark">芽</view>
+        <view><text class="encouragement-card__title">{{home.encouragement.title}}</text><text class="encouragement-card__copy">{{home.encouragement.description}}</text></view>
+      </view>
+      <text wx:if="{{error}}" class="home-inline-error">{{error}}</text>
+    </block>
+  </view>
+</view>
