@@ -52,6 +52,12 @@ async function getTaskPage({ page, pageSize, date, dateFrom, dateTo, scope }) {
   return body;
 }
 
+async function getTaskCalendar(dateFrom, dateTo) {
+  const params = [`dateFrom=${encodeURIComponent(dateFrom)}`, `dateTo=${encodeURIComponent(dateTo)}`];
+  const body = await request(`/api/tasks/calendar?${params.join("&")}`);
+  return body.dates;
+}
+
 async function getTask(taskId, taskDate, purpose) {
   const params = [];
   if (taskDate) params.push(`date=${encodeURIComponent(taskDate)}`);
@@ -200,6 +206,7 @@ module.exports = {
   getTasks,
   getTask,
   getTaskPage,
+  getTaskCalendar,
   getTodayTasks,
   updateTask,
   deleteTask,

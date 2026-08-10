@@ -223,6 +223,19 @@ describe("mini-program API facade", () => {
     assert.match(requestCalls[0].url, /scope=definitions/);
   });
 
+  test("loads compact calendar task statuses for the requested date range", async () => {
+    nextRequestResponse = {
+      statusCode: 200,
+      data: { dates: { "2026-08-10": "pending", "2026-08-11": "completed" } }
+    };
+    const api = require("../services/api");
+
+    const dates = await api.getTaskCalendar("2026-06-26", "2026-10-04");
+
+    assert.deepEqual(dates, { "2026-08-10": "pending", "2026-08-11": "completed" });
+    assert.match(requestCalls[0].url, /\/api\/tasks\/calendar\?dateFrom=2026-06-26&dateTo=2026-10-04/);
+  });
+
   test("sends task dates for claim and submission creation", async () => {
     const api = require("../services/api");
     nextRequestResponse = { statusCode: 200, data: { task: { id: "t1", claimedAt: "now" } } };
