@@ -4,6 +4,8 @@ const { buildSharePayload } = require("../../utils/share");
 const { getSession, setSelectedTask } = require("../../utils/storage");
 
 const PAGE_SIZE = 20;
+const CALENDAR_RANGE_DAYS = 50;
+const CALENDAR_PAGE_SIZE = 50;
 const REVIEW_NOTIFICATION_INTERVAL = 10000;
 const weekdayLabels = ["日", "一", "二", "三", "四", "五", "六"];
 const calendarDotPriority = { revision: 5, review: 4, active: 3, pending: 2, completed: 1 };
@@ -264,14 +266,30 @@ Page({
       this.data.calendarYear,
       this.data.calendarMonth
     );
+    const selectedDate = dateFromKey(this.data.selectedDate);
+    const selectedRangeStart = localDateKey(addDays(selectedDate, -CALENDAR_RANGE_DAYS));
+    const selectedRangeEnd = localDateKey(addDays(selectedDate, CALENDAR_RANGE_DAYS));
+    const dateFrom = days[0].key < selectedRangeStart ? days[0].key : selectedRangeStart;
+    const dateTo = days[days.length - 1].key > selectedRangeEnd ? days[days.length - 1].key : selectedRangeEnd;
+    const requestId = (this.calendarRequestId || 0) + 1;
+    this.calendarRequestId = requestId;
     try {
-      const result = await api.getTaskPage({
-        page: 1,
-        pageSize: 50,
-        dateFrom: days[0].key,
-        dateTo: days[days.length - 1].key
-      });
-      const calendarTaskDates = result.tasks.reduce((dates, task) => {
+      const tasks = [];
+      let page = 1;
+      let hasMore = true;
+      while (hasMore) {
+        const result = await api.getTaskPage({
+          page,
+          pageSize: CALENDAR_PAGE_SIZE,
+          dateFrom,
+          dateTo
+        });
+        tasks.push(...result.tasks);
+        hasMore = result.pagination.hasMore;
+        page += 1;
+      }
+      if (requestId !== this.calendarRequestId) return;
+      const calendarTaskDates = tasks.reduce((dates, task) => {
         if (!task.occurrenceDate) return dates;
         const status = calendarDotStatus(task);
         const current = dates[task.occurrenceDate];
@@ -283,6 +301,7 @@ Page({
       this.setData({ calendarTaskDates });
       this.refreshCalendarView(calendarTaskDates);
     } catch (_) {
+      if (requestId !== this.calendarRequestId) return;
       this.refreshCalendarView({});
     }
   },
