@@ -205,6 +205,19 @@
   height: 50rpx;
 }
 
+.task-control__label {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  color: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: 1;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .task-control--done {
   border-color: #d8dfdc;
   background: #f3f5f4;

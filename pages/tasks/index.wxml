@@ -78,8 +78,8 @@
           <text class="task-description">{{item.description}}</text>
         </view>
         <view class="task-actions">
-          <view wx:if="{{!isParent && item.canChildAct}}" class="{{item.actionClass}}" data-id="{{item.id}}" catchtap="handleTaskAction">{{item.actionText}}</view>
-          <view wx:elif="{{!isParent}}" class="{{item.actionClass}}">{{item.actionText}}</view>
+          <view wx:if="{{!isParent && item.canChildAct}}" class="{{item.actionClass}}" data-id="{{item.id}}" catchtap="handleTaskAction"><text class="task-control__label">{{item.actionText}}</text></view>
+          <view wx:elif="{{!isParent}}" class="{{item.actionClass}}"><text class="task-control__label">{{item.actionText}}</text></view>
           <view wx:else class="parent-task-actions">
             <view wx:if="{{item.canParentRemind}}" class="parent-task-action parent-task-action--{{item.parentReminderType}}" data-id="{{item.id}}" catchtap="remindTask">{{item.parentReminderLabel}}</view>
             <view wx:else class="parent-task-status">{{item.parentStatusLabel}}</view>
