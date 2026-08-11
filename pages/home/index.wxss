@@ -31,6 +31,7 @@
 .parent-summary__stats text:first-child { color: #24352f; font-size: 34rpx; font-weight: 800; }
 .parent-summary__stats text:last-child { color: #858e8a; font-size: 22rpx; }
 .parent-section-label { margin-top: 30rpx; }
+.parent-task-scroll { height: calc(100vh - 650rpx); min-height: 380rpx; }
 .parent-task-list { overflow: hidden; }
 .parent-task-row { display: grid; min-height: 174rpx; padding: 24rpx; grid-template-columns: 64rpx minmax(0, 1fr) 112rpx; gap: 18rpx; align-items: center; border-bottom: 1rpx solid #e7ece9; }
 .parent-task-row:last-child { border-bottom: 0; }

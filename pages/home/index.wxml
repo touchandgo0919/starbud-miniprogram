@@ -40,22 +40,24 @@
       </view>
 
       <view class="section-label parent-section-label"><text>未完成项</text><text bindtap="openTasks">查看全部任务</text></view>
-      <view wx:if="{{!parentHome.pendingTasks.length}}" class="parent-empty surface">
-        <view class="parent-empty__mark">✓</view>
-        <text class="parent-empty__title">今天没有需要催促的任务</text>
-        <text class="parent-empty__copy">孩子已完成或已提交待批改的任务不会出现在这里。</text>
-      </view>
-      <view wx:else class="parent-task-list surface">
-        <view wx:for="{{parentHome.pendingTasks}}" wx:key="id" class="parent-task-row" data-id="{{item.id}}" bindtap="openParentTask">
-          <view class="parent-task-mark parent-task-mark--{{item.reminderType}}">{{item.subjectMark}}</view>
-          <view class="parent-task-copy">
-            <view class="parent-task-meta"><text>{{item.childName}}</text><text>{{item.scheduleTime}}</text><text>{{item.label}}</text></view>
-            <text class="parent-task-title">{{item.title}}</text>
-            <text class="parent-task-description">{{item.description}}</text>
-          </view>
-          <view class="parent-remind-button parent-remind-button--{{item.reminderType}} {{remindingTaskId === item.id ? 'parent-remind-button--loading' : ''}}" data-id="{{item.id}}" catchtap="remindParentTask"><text>{{remindingTaskId === item.id ? '发送中' : item.actionLabel}}</text></view>
+      <scroll-view class="parent-task-scroll" scroll-y refresher-enabled="{{true}}" refresher-triggered="{{refreshing}}" bindrefresherrefresh="onParentListRefresh">
+        <view wx:if="{{!parentHome.pendingTasks.length}}" class="parent-empty surface">
+          <view class="parent-empty__mark">✓</view>
+          <text class="parent-empty__title">今天没有需要催促的任务</text>
+          <text class="parent-empty__copy">孩子已完成或已提交待批改的任务不会出现在这里。</text>
         </view>
-      </view>
+        <view wx:else class="parent-task-list surface">
+          <view wx:for="{{parentHome.pendingTasks}}" wx:key="id" class="parent-task-row" data-id="{{item.id}}" bindtap="openParentTask">
+            <view class="parent-task-mark parent-task-mark--{{item.reminderType}}">{{item.subjectMark}}</view>
+            <view class="parent-task-copy">
+              <view class="parent-task-meta"><text>{{item.childName}}</text><text>{{item.scheduleTime}}</text><text>{{item.label}}</text></view>
+              <text class="parent-task-title">{{item.title}}</text>
+              <text class="parent-task-description">{{item.description}}</text>
+            </view>
+            <view class="parent-remind-button parent-remind-button--{{item.reminderType}} {{remindingTaskId === item.id ? 'parent-remind-button--loading' : ''}}" data-id="{{item.id}}" catchtap="remindParentTask"><text>{{remindingTaskId === item.id ? '发送中' : item.actionLabel}}</text></view>
+          </view>
+        </view>
+      </scroll-view>
       <text wx:if="{{error}}" class="home-inline-error">{{error}}</text>
     </block>
 

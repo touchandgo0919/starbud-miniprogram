@@ -173,11 +173,9 @@ Page({
     }
   },
 
-  async onPullDownRefresh() {
+  async onParentListRefresh() {
     this.setData({ refreshing: true });
-    if (this.data.isParent) await this.loadParentHome();
-    else await this.loadHome();
-    wx.stopPullDownRefresh();
+    await this.loadParentHome();
   },
 
   retryHome() {
