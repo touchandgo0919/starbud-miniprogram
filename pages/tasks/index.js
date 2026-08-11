@@ -199,7 +199,7 @@ Page({
     this.checkingReviewNotifications = true;
     try {
       const notifications = await api.getNotifications();
-      const notification = notifications.find((item) => item.type === "review_completed" && !item.readAt);
+      const notification = notifications.find((item) => ["review_completed", "revision_reminder"].includes(item.type) && !item.readAt);
       if (!notification) return;
       await api.markNotificationRead(notification.id);
       await this.refreshTaskPage();
