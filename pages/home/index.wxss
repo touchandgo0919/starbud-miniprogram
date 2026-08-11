@@ -43,10 +43,11 @@
 .parent-task-meta text:last-child { overflow: hidden; padding: 3rpx 8rpx; border-radius: 6rpx; background: #edf5f1; color: #18835b; text-overflow: ellipsis; }
 .parent-task-title { display: block; overflow: hidden; margin-top: 10rpx; color: #202d28; font-size: 29rpx; font-weight: 800; text-overflow: ellipsis; white-space: nowrap; }
 .parent-task-description { display: -webkit-box; overflow: hidden; margin-top: 7rpx; -webkit-box-orient: vertical; -webkit-line-clamp: 1; color: #8a938f; font-size: 22rpx; line-height: 1.45; }
-.parent-remind-button { display: flex; width: 112rpx; height: 58rpx; align-items: center; justify-content: center; border: 2rpx solid #dba928; border-radius: 14rpx; background: #fff8e6; color: #956100; font-size: 22rpx; font-weight: 750; }
+.parent-remind-button { display: flex; width: 112rpx; height: 58rpx; padding: 0; box-sizing: border-box; align-items: center; justify-content: center; border: 2rpx solid #dba928; border-radius: 14rpx; background: #fff8e6; color: #956100; font-size: 22rpx; font-weight: 750; line-height: 1; }
+.parent-remind-button text { display: block; color: inherit; font-size: inherit; font-weight: inherit; line-height: 1; text-align: center; white-space: nowrap; }
 .parent-remind-button--complete { border-color: #0aa868; background: #eff8f3; color: #078d59; }
 .parent-remind-button--revision { border-color: #e5484d; background: #fff3f3; color: #d7373d; }
-.parent-remind-button[disabled] { opacity: 0.55; }
+.parent-remind-button--loading { opacity: 0.55; }
 .parent-empty { padding: 58rpx 34rpx; text-align: center; }
 .parent-empty text { display: block; }
 .parent-empty__mark { display: flex; width: 64rpx; height: 64rpx; margin: 0 auto 18rpx; align-items: center; justify-content: center; border-radius: 18rpx; background: #eaf8f1; color: #0a8b59; font-size: 31rpx; font-weight: 800; }
