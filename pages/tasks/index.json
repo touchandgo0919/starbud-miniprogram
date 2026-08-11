@@ -1,3 +1,6 @@
 {
-  "navigationStyle": "custom"
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "parent-remind-button": "/components/parent-remind-button/index"
+  }
 }

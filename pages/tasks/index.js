@@ -123,6 +123,7 @@ Page({
     totalCount: 0,
     completedCount: 0,
     progressPercent: 0,
+    remindingTaskId: "",
     loading: true,
     refreshing: false,
     loadingMore: false,
@@ -478,14 +479,18 @@ Page({
   },
 
   async remindTask(event) {
-    const task = this.data.tasks.find((item) => item.id === event.currentTarget.dataset.id);
-    if (!task || !task.canParentRemind) return;
+    const taskId = event.detail && event.detail.taskId;
+    const task = this.data.tasks.find((item) => item.id === taskId);
+    if (!task || !task.canParentRemind || this.data.remindingTaskId) return;
+    this.setData({ remindingTaskId: task.id });
     try {
       await api.remindTask(task.id, task.occurrenceDate, task.parentReminderType);
       wx.showToast({ title: `${task.parentReminderLabel}提醒已发送`, icon: "success" });
     } catch (error) {
       wx.showToast({ title: error.message || "提醒失败", icon: "none" });
-      this.refreshTaskPage();
+      await this.refreshTaskPage();
+    } finally {
+      this.setData({ remindingTaskId: "" });
     }
   }
 });

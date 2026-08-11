@@ -1,0 +1,3 @@
+<view class="parent-remind-button parent-remind-button--{{reminderType}} {{loading ? 'parent-remind-button--loading' : ''}}" catchtap="handleTap">
+  <text>{{loading ? '发送中' : label}}</text>
+</view>

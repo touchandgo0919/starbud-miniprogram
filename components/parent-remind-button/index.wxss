@@ -1,0 +1,5 @@
+.parent-remind-button { display: flex; width: 112rpx; height: 58rpx; padding: 0; box-sizing: border-box; align-items: center; justify-content: center; border: 2rpx solid #dba928; border-radius: 14rpx; background: #fff8e6; color: #956100; font-size: 22rpx; font-weight: 750; line-height: 1; }
+.parent-remind-button text { display: block; color: inherit; font-size: inherit; font-weight: inherit; line-height: 1; text-align: center; white-space: nowrap; }
+.parent-remind-button--complete { border-color: #0aa868; background: #eff8f3; color: #078d59; }
+.parent-remind-button--revision { border-color: #e5484d; background: #fff3f3; color: #d7373d; }
+.parent-remind-button--loading { opacity: 0.55; }

@@ -54,7 +54,7 @@
               <text class="parent-task-title">{{item.title}}</text>
               <text class="parent-task-description">{{item.description}}</text>
             </view>
-            <view class="parent-remind-button parent-remind-button--{{item.reminderType}} {{remindingTaskId === item.id ? 'parent-remind-button--loading' : ''}}" data-id="{{item.id}}" catchtap="remindParentTask"><text>{{remindingTaskId === item.id ? '发送中' : item.actionLabel}}</text></view>
+            <parent-remind-button task-id="{{item.id}}" reminder-type="{{item.reminderType}}" label="{{item.actionLabel}}" loading="{{remindingTaskId === item.id}}" bind:remind="remindParentTask" />
           </view>
         </view>
       </scroll-view>

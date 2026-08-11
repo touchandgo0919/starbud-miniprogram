@@ -220,7 +220,8 @@ Page({
   },
 
   async remindParentTask(event) {
-    const task = this.data.parentHome && this.data.parentHome.pendingTasks.find((item) => item.id === event.currentTarget.dataset.id);
+    const taskId = event.detail && event.detail.taskId;
+    const task = this.data.parentHome && this.data.parentHome.pendingTasks.find((item) => item.id === taskId);
     if (!task || this.data.remindingTaskId) return;
     this.setData({ remindingTaskId: task.id });
     try {
