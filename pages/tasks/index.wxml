@@ -3,7 +3,7 @@
     <view class="section-heading" style="height: {{navBarHeight}}px; padding-top: {{statusBarHeight}}px;">
       <view class="section-title-group">
         <image class="section-title-logo" src="/assets/starbud-icon.png" mode="aspectFit" />
-        <text>我的任务</text>
+        <text>{{isParent ? '家庭任务' : '我的任务'}}</text>
         <text class="section-count">{{totalCount}} 项</text>
       </view>
     </view>
@@ -81,9 +81,8 @@
           <view wx:if="{{!isParent && item.canChildAct}}" class="{{item.actionClass}}" data-id="{{item.id}}" catchtap="handleTaskAction">{{item.actionText}}</view>
           <view wx:elif="{{!isParent}}" class="{{item.actionClass}}">{{item.actionText}}</view>
           <view wx:else class="parent-task-actions">
-            <view class="parent-task-action" data-id="{{item.id}}" catchtap="editTask">编辑</view>
-            <view class="parent-task-action parent-task-action--danger" data-id="{{item.id}}" catchtap="deleteTask">删除</view>
-            <view class="parent-task-action" data-id="{{item.id}}" catchtap="remindTask">提醒</view>
+            <view wx:if="{{item.canParentRemind}}" class="parent-task-action parent-task-action--{{item.parentReminderType}}" data-id="{{item.id}}" catchtap="remindTask">{{item.parentReminderLabel}}</view>
+            <view wx:else class="parent-task-status">{{item.parentStatusLabel}}</view>
           </view>
         </view>
       </view>

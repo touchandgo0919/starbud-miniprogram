@@ -62,15 +62,21 @@ function buildCalendarDays(selectedDate, expanded, year, month) {
 }
 
 function taskViewModel(task, showChildName) {
-  const completed = task.status === "completed";
+  const completed = task.status === "completed" || task.reviewStatus === "completed" || Boolean(task.finalizedAt);
   const reviewed = Boolean(task.reviewedAt);
   const waitingReview = task.submissionStatus === "submitted" && !task.finalizedAt && !task.needsRevision;
+  const parentReminderType = task.needsRevision ? "revision" : task.claimedAt ? "complete" : "claim";
+  const canParentRemind = !completed && !waitingReview;
   const actionText = task.needsRevision ? "待修改" : waitingReview ? "待批改" : completed ? "已完成" : reviewed ? "已批改" : task.claimedAt ? "去完成" : "去领取";
   return {
     ...task,
     completed,
     reviewed,
     waitingReview,
+    canParentRemind,
+    parentReminderType,
+    parentReminderLabel: parentReminderType === "revision" ? "催改" : parentReminderType === "claim" ? "催领" : "催完成",
+    parentStatusLabel: completed ? "已完成" : waitingReview ? "待批改" : "",
     canChildAct: !completed && !waitingReview && (!reviewed || task.needsRevision),
     actionText,
     actionClass: completed
@@ -199,7 +205,7 @@ Page({
     this.checkingReviewNotifications = true;
     try {
       const notifications = await api.getNotifications();
-      const notification = notifications.find((item) => ["review_completed", "revision_reminder"].includes(item.type) && !item.readAt);
+      const notification = notifications.find((item) => ["review_completed", "claim_reminder", "revision_reminder", "voice_reminder"].includes(item.type) && !item.readAt);
       if (!notification) return;
       await api.markNotificationRead(notification.id);
       await this.refreshTaskPage();
@@ -449,10 +455,21 @@ Page({
   async deleteTask(event) {
     const task = this.data.tasks.find((item) => item.id === event.currentTarget.dataset.id);
     if (!task) return;
-    const result = await new Promise((resolve) => wx.showModal({ title: "删除任务", content: `确定删除“${task.title}”吗？`, success: resolve }));
+    const scopes = task.repeatType === "once"
+      ? [{ label: "全部任务", value: "all" }]
+      : [
+        { label: "全部任务", value: "all" },
+        { label: "今天及以后未开始的任务", value: "future" },
+        { label: "仅删除本次", value: "single" }
+      ];
+    const selection = await new Promise((resolve) => wx.showActionSheet({ itemList: scopes.map((item) => item.label), success: resolve, fail: resolve }));
+    if (selection.cancel || selection.tapIndex === undefined) return;
+    const scope = scopes[selection.tapIndex];
+    if (!scope) return;
+    const result = await new Promise((resolve) => wx.showModal({ title: "删除任务", content: `提交、照片和批改记录会保留。确认${scope.label}吗？`, success: resolve }));
     if (!result.confirm) return;
     try {
-      await api.deleteTask(task.id);
+      await api.deleteTask(task.id, scope.value, task.occurrenceDate);
       wx.showToast({ title: "任务已删除", icon: "success" });
       this.refreshTaskPage();
     } catch (error) {
@@ -461,11 +478,14 @@ Page({
   },
 
   async remindTask(event) {
+    const task = this.data.tasks.find((item) => item.id === event.currentTarget.dataset.id);
+    if (!task || !task.canParentRemind) return;
     try {
-      await api.remindTask(event.currentTarget.dataset.id);
-      wx.showToast({ title: "已发起语音提醒", icon: "success" });
+      await api.remindTask(task.id, task.occurrenceDate, task.parentReminderType);
+      wx.showToast({ title: `${task.parentReminderLabel}提醒已发送`, icon: "success" });
     } catch (error) {
       wx.showToast({ title: error.message || "提醒失败", icon: "none" });
+      this.refreshTaskPage();
     }
   }
 });

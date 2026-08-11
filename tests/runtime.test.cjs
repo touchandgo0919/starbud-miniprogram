@@ -247,6 +247,28 @@ describe("mini-program API facade", () => {
     assert.deepEqual(requestCalls[1].data, { note: "说明", taskDate: "2026-08-06" });
   });
 
+  test("sends the selected scope when deleting a repeated task", async () => {
+    nextRequestResponse = { statusCode: 200, data: { deleted: true } };
+    const api = require("../services/api");
+
+    await api.deleteTask("t1", "single", "2026-08-06");
+
+    assert.match(requestCalls[0].url, /\/api\/tasks\/t1$/);
+    assert.equal(requestCalls[0].method, "DELETE");
+    assert.deepEqual(requestCalls[0].data, { scope: "single", date: "2026-08-06" });
+  });
+
+  test("sends the task date and contextual type for parent reminders", async () => {
+    nextRequestResponse = { statusCode: 200, data: { task: { id: "t1" } } };
+    const api = require("../services/api");
+
+    await api.remindTask("t1", "2026-08-06", "revision");
+
+    assert.match(requestCalls[0].url, /\/api\/tasks\/t1\/remind$/);
+    assert.equal(requestCalls[0].method, "POST");
+    assert.deepEqual(requestCalls[0].data, { taskDate: "2026-08-06", reminderType: "revision" });
+  });
+
   test("uses uploadFile fields for photos and audio duration", async () => {
     const api = require("../services/api");
     nextUploadResponse = { statusCode: 201, data: JSON.stringify({ photo: { id: "p1" } }) };
@@ -369,6 +391,23 @@ describe("child home view model", () => {
     assert.equal(home.nextStep.stageLabel, "今日安排");
     assert.equal(home.nextStep.hasTask, false);
   });
+
+  test("keeps only unfinished parent tasks and assigns the correct reminder action", () => {
+    const { parentHomeViewModel } = loadHomeModule();
+    const home = parentHomeViewModel([
+      { id: "claimed", childId: "c1", childName: "赵佑宁", title: "英语阅读", scheduleTime: "19:00", claimedAt: "now" },
+      { id: "revision", childId: "c2", childName: "赵佳宁", title: "数学订正", scheduleTime: "20:00", claimedAt: "now", needsRevision: true },
+      { id: "claim", childId: "c1", childName: "赵佑宁", title: "晨读", scheduleTime: "08:00" },
+      { id: "review", childId: "c2", childName: "赵佳宁", title: "作文", scheduleTime: "18:00", reviewStatus: "pending_review" },
+      { id: "done", childId: "c1", childName: "赵佑宁", title: "运动", scheduleTime: "17:00", status: "completed" }
+    ], "2026-08-11");
+
+    assert.deepEqual(home.pendingTasks.map((task) => task.id), ["revision", "claim", "claimed"]);
+    assert.deepEqual(home.pendingTasks.map((task) => task.actionLabel), ["催改", "催领", "催完成"]);
+    assert.deepEqual(home.counts, { claim: 1, complete: 1, revision: 1 });
+    assert.equal(home.total, 3);
+    assert.equal(home.childCount, 2);
+  });
 });
 
 describe("login page", () => {
@@ -461,6 +500,6 @@ describe("login page", () => {
     });
     assert.equal(storage.get("starbud.childSession").token, "parent-token");
     assert.deepEqual(toastCalls[0], { title: "注册成功", icon: "success" });
-    assert.deepEqual(navigationCalls.at(-1), ["switchTab", { url: "/pages/tasks/index" }]);
+    assert.deepEqual(navigationCalls.at(-1), ["switchTab", { url: "/pages/home/index" }]);
   });
 });

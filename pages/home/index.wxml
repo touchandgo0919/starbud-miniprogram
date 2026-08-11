@@ -6,7 +6,12 @@
         <text>星星芽AI助手</text>
       </view>
     </view>
-    <view wx:if="{{home}}" class="home-greeting">
+    <view wx:if="{{isParent && parentHome}}" class="home-greeting parent-greeting">
+      <text class="home-greeting__date">{{parentHome.dateLabel}}</text>
+      <text class="home-greeting__title">{{user.displayName || user.username}}，今天需要跟进</text>
+      <text class="home-greeting__copy">只看孩子还需要行动的任务，及时提醒就好。</text>
+    </view>
+    <view wx:elif="{{home}}" class="home-greeting">
       <text class="home-greeting__date">{{home.dateLabel}}</text>
       <text class="home-greeting__title">{{home.greeting}}，{{user.displayName || user.username}}</text>
       <text class="home-greeting__copy">今天先做好一件事，就很好。</text>
@@ -15,13 +20,46 @@
 
   <view class="home-content">
     <view wx:if="{{loading}}" class="home-state surface">正在整理今天的安排…</view>
-    <view wx:elif="{{error && !home}}" class="home-state surface">
+    <view wx:elif="{{error && !home && !parentHome}}" class="home-state surface">
       <text class="home-state__title">首页加载失败</text>
       <text class="home-state__copy">{{error}}</text>
-      <button class="secondary-button" bindtap="loadHome">重新加载</button>
+      <button class="secondary-button" bindtap="retryHome">重新加载</button>
     </view>
 
-    <block wx:if="{{home}}">
+    <block wx:if="{{isParent && parentHome}}">
+      <view class="parent-summary surface">
+        <view class="parent-summary__head">
+          <view><text>今日待跟进</text><text>{{parentHome.childCount ? '涉及 ' + parentHome.childCount + ' 个孩子' : '今天进展顺利'}}</text></view>
+          <text class="parent-summary__number">{{parentHome.total}}</text>
+        </view>
+        <view class="parent-summary__stats">
+          <view><text>{{parentHome.counts.claim}}</text><text>待领取</text></view>
+          <view><text>{{parentHome.counts.complete}}</text><text>进行中</text></view>
+          <view><text>{{parentHome.counts.revision}}</text><text>待修改</text></view>
+        </view>
+      </view>
+
+      <view class="section-label parent-section-label"><text>未完成项</text><text bindtap="openTasks">查看全部任务</text></view>
+      <view wx:if="{{!parentHome.pendingTasks.length}}" class="parent-empty surface">
+        <view class="parent-empty__mark">✓</view>
+        <text class="parent-empty__title">今天没有需要催促的任务</text>
+        <text class="parent-empty__copy">孩子已完成或已提交待批改的任务不会出现在这里。</text>
+      </view>
+      <view wx:else class="parent-task-list surface">
+        <view wx:for="{{parentHome.pendingTasks}}" wx:key="id" class="parent-task-row" data-id="{{item.id}}" bindtap="openParentTask">
+          <view class="parent-task-mark parent-task-mark--{{item.reminderType}}">{{item.subjectMark}}</view>
+          <view class="parent-task-copy">
+            <view class="parent-task-meta"><text>{{item.childName}}</text><text>{{item.scheduleTime}}</text><text>{{item.label}}</text></view>
+            <text class="parent-task-title">{{item.title}}</text>
+            <text class="parent-task-description">{{item.description}}</text>
+          </view>
+          <button class="parent-remind-button parent-remind-button--{{item.reminderType}}" loading="{{remindingTaskId === item.id}}" disabled="{{remindingTaskId}}" data-id="{{item.id}}" catchtap="remindParentTask">{{item.actionLabel}}</button>
+        </view>
+      </view>
+      <text wx:if="{{error}}" class="home-inline-error">{{error}}</text>
+    </block>
+
+    <block wx:elif="{{home}}">
       <view class="progress-card surface">
         <view class="progress-card__copy">
           <text>今日进度</text>

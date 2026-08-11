@@ -1,6 +1,8 @@
 const api = require("../../services/api");
+const { localDateKey } = require("../../utils/date");
 const { buildSharePayload } = require("../../utils/share");
 const { getSession } = require("../../utils/storage");
+const REMINDER_NOTIFICATION_INTERVAL = 10000;
 
 function formatDate(dateKey) {
   const date = dateKey ? new Date(`${dateKey}T00:00:00`) : new Date();
@@ -30,12 +32,53 @@ function viewModel(home) {
   };
 }
 
+function parentTaskViewModel(task) {
+  const completed = task.status === "completed" || task.reviewStatus === "completed" || Boolean(task.finalizedAt);
+  const waitingReview = task.reviewStatus === "pending_review";
+  if (completed || waitingReview) return null;
+  const reminderType = task.needsRevision ? "revision" : task.claimedAt ? "complete" : "claim";
+  const state = reminderType === "revision"
+    ? { label: "待修改", description: "已批改，等待孩子修改后重新提交", actionLabel: "催改", priority: 0 }
+    : reminderType === "claim"
+      ? { label: "待领取", description: "还没有领取，可以提醒孩子开始", actionLabel: "催领", priority: 1 }
+      : { label: "进行中", description: task.submissionStatus === "draft" ? "附件还在准备中，尚未提交" : "已经领取，尚未完成提交", actionLabel: "催完成", priority: 2 };
+  return {
+    ...task,
+    ...state,
+    reminderType,
+    subjectMark: task.title.slice(0, 1),
+    childName: task.childName || "家庭成员"
+  };
+}
+
+function parentHomeViewModel(tasks, date = localDateKey()) {
+  const pendingTasks = tasks
+    .map(parentTaskViewModel)
+    .filter(Boolean)
+    .sort((left, right) => left.priority - right.priority || left.scheduleTime.localeCompare(right.scheduleTime));
+  return {
+    date,
+    dateLabel: formatDate(date),
+    pendingTasks,
+    total: pendingTasks.length,
+    childCount: new Set(pendingTasks.map((task) => task.childId)).size,
+    counts: {
+      claim: pendingTasks.filter((task) => task.reminderType === "claim").length,
+      complete: pendingTasks.filter((task) => task.reminderType === "complete").length,
+      revision: pendingTasks.filter((task) => task.reminderType === "revision").length
+    }
+  };
+}
+
 Page({
   data: {
     user: null,
     statusBarHeight: 24,
     navBarHeight: 68,
+    isParent: false,
     home: null,
+    parentHome: null,
+    remindingTaskId: "",
     loading: true,
     refreshing: false,
     error: ""
@@ -54,12 +97,21 @@ Page({
       wx.reLaunch({ url: "/pages/login/index" });
       return;
     }
-    if (session.user.role === "parent") {
-      wx.switchTab({ url: "/pages/tasks/index" });
-      return;
+    const isParent = session.user.role === "parent";
+    this.setData({ user: session.user, isParent });
+    if (isParent) this.loadParentHome();
+    else {
+      this.loadHome();
+      this.startReminderNotificationPolling();
     }
-    this.setData({ user: session.user });
-    this.loadHome();
+  },
+
+  onHide() {
+    this.stopReminderNotificationPolling();
+  },
+
+  onUnload() {
+    this.stopReminderNotificationPolling();
   },
 
   onShareAppMessage() {
@@ -81,10 +133,56 @@ Page({
     }
   },
 
+  async loadParentHome() {
+    this.setData({ loading: !this.data.parentHome, error: "" });
+    try {
+      this.setData({ parentHome: parentHomeViewModel(await api.getTodayTasks()) });
+    } catch (error) {
+      this.setData({ error: error.message || "首页加载失败。" });
+    } finally {
+      this.setData({ loading: false, refreshing: false });
+    }
+  },
+
+  startReminderNotificationPolling() {
+    if (this.reminderNotificationTimer) return;
+    this.checkReminderNotifications();
+    this.reminderNotificationTimer = setInterval(() => this.checkReminderNotifications(), REMINDER_NOTIFICATION_INTERVAL);
+  },
+
+  stopReminderNotificationPolling() {
+    if (!this.reminderNotificationTimer) return;
+    clearInterval(this.reminderNotificationTimer);
+    this.reminderNotificationTimer = null;
+  },
+
+  async checkReminderNotifications() {
+    if (this.checkingReminderNotifications) return;
+    this.checkingReminderNotifications = true;
+    try {
+      const notifications = await api.getNotifications();
+      const notification = notifications.find((item) => ["claim_reminder", "revision_reminder", "voice_reminder"].includes(item.type) && !item.readAt);
+      if (!notification) return;
+      await api.markNotificationRead(notification.id);
+      await this.loadHome();
+      wx.showModal({ title: notification.title, content: notification.content, showCancel: false, confirmText: "知道了" });
+    } catch (_) {
+      // 提醒轮询失败不影响首页任务展示。
+    } finally {
+      this.checkingReminderNotifications = false;
+    }
+  },
+
   async onPullDownRefresh() {
     this.setData({ refreshing: true });
-    await this.loadHome();
+    if (this.data.isParent) await this.loadParentHome();
+    else await this.loadHome();
     wx.stopPullDownRefresh();
+  },
+
+  retryHome() {
+    if (this.data.isParent) return this.loadParentHome();
+    return this.loadHome();
   },
 
   openNextStep() {
@@ -113,7 +211,30 @@ Page({
 
   openTasks() {
     wx.switchTab({ url: "/pages/tasks/index" });
+  },
+
+  openParentTask(event) {
+    const task = this.data.parentHome && this.data.parentHome.pendingTasks.find((item) => item.id === event.currentTarget.dataset.id);
+    if (!task) return;
+    wx.navigateTo({
+      url: `/pages/task-detail/index?taskId=${encodeURIComponent(task.id)}&taskDate=${encodeURIComponent(task.occurrenceDate || "")}`
+    });
+  },
+
+  async remindParentTask(event) {
+    const task = this.data.parentHome && this.data.parentHome.pendingTasks.find((item) => item.id === event.currentTarget.dataset.id);
+    if (!task || this.data.remindingTaskId) return;
+    this.setData({ remindingTaskId: task.id });
+    try {
+      await api.remindTask(task.id, task.occurrenceDate, task.reminderType);
+      wx.showToast({ title: `${task.actionLabel}提醒已发送`, icon: "success" });
+    } catch (error) {
+      wx.showToast({ title: error.message || "提醒失败", icon: "none" });
+      await this.loadParentHome();
+    } finally {
+      this.setData({ remindingTaskId: "" });
+    }
   }
 });
 
-module.exports = { formatDate, stageLabel, viewModel };
+module.exports = { formatDate, stageLabel, viewModel, parentTaskViewModel, parentHomeViewModel };

@@ -252,28 +252,30 @@
 
 .parent-task-actions {
   display: flex;
-  flex: 0 0 104rpx;
-  width: 104rpx;
-  flex-direction: column;
-  gap: 8rpx;
+  flex: 0 0 120rpx;
+  width: 120rpx;
+  align-items: center;
+  justify-content: flex-end;
 }
 
 .parent-task-action {
   display: flex;
-  width: 104rpx;
-  height: 40rpx;
+  width: 120rpx;
+  height: 54rpx;
   align-items: center;
   justify-content: center;
   border: 2rpx solid #0aa868;
   border-radius: 14rpx;
   background: #eff8f3;
   color: #078d59;
-  font-size: 20rpx;
+  font-size: 22rpx;
   font-weight: 700;
   line-height: 1;
 }
 
-.parent-task-action--danger { border-color: #e5484d; background: #fff3f3; color: #d7373d; }
+.parent-task-action--claim { border-color: #e2ad32; background: #fff9e8; color: #9a6500; }
+.parent-task-action--revision { border-color: #e5484d; background: #fff3f3; color: #d7373d; }
+.parent-task-status { color: #8a9490; font-size: 22rpx; font-weight: 700; white-space: nowrap; }
 
 .retry-button {
   width: 220rpx;

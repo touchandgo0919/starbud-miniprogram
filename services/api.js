@@ -183,12 +183,15 @@ async function updateTask(taskId, data) {
   return body.task;
 }
 
-async function deleteTask(taskId) {
-  return request(`/api/tasks/${taskId}`, { method: "DELETE" });
+async function deleteTask(taskId, scope = "all", date) {
+  return request(`/api/tasks/${taskId}`, { method: "DELETE", data: { scope, date } });
 }
 
-async function remindTask(taskId) {
-  const body = await request(`/api/tasks/${taskId}/remind`, { method: "POST" });
+async function remindTask(taskId, taskDate, reminderType) {
+  const body = await request(`/api/tasks/${taskId}/remind`, {
+    method: "POST",
+    data: { taskDate, reminderType }
+  });
   return body.task;
 }
 

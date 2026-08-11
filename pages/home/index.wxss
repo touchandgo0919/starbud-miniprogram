@@ -19,6 +19,39 @@
 .progress-track { height: 14rpx; margin-top: 22rpx; overflow: hidden; border-radius: 999rpx; background: #e5ece8; }
 .progress-track__value { height: 100%; border-radius: inherit; background: #0aa868; }
 .progress-card__hint { display: block; margin-top: 14rpx; color: #87908c; font-size: 23rpx; }
+.parent-summary { padding: 28rpx 30rpx; box-shadow: 0 12rpx 32rpx rgba(8, 55, 43, 0.08); }
+.parent-summary__head { display: flex; align-items: center; justify-content: space-between; }
+.parent-summary__head > view { display: grid; gap: 7rpx; }
+.parent-summary__head > view text:first-child { color: #253c34; font-size: 28rpx; font-weight: 800; }
+.parent-summary__head > view text:last-child { color: #89928e; font-size: 22rpx; }
+.parent-summary__number { color: #0a8b59; font-size: 52rpx; font-weight: 850; line-height: 1; }
+.parent-summary__stats { display: grid; margin-top: 26rpx; padding-top: 22rpx; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1rpx solid #e6ece8; }
+.parent-summary__stats view { display: grid; gap: 6rpx; border-right: 1rpx solid #e6ece8; text-align: center; }
+.parent-summary__stats view:last-child { border-right: 0; }
+.parent-summary__stats text:first-child { color: #24352f; font-size: 34rpx; font-weight: 800; }
+.parent-summary__stats text:last-child { color: #858e8a; font-size: 22rpx; }
+.parent-section-label { margin-top: 30rpx; }
+.parent-task-list { overflow: hidden; }
+.parent-task-row { display: grid; min-height: 174rpx; padding: 24rpx; grid-template-columns: 64rpx minmax(0, 1fr) 112rpx; gap: 18rpx; align-items: center; border-bottom: 1rpx solid #e7ece9; }
+.parent-task-row:last-child { border-bottom: 0; }
+.parent-task-mark { display: flex; width: 64rpx; height: 64rpx; align-items: center; justify-content: center; border-radius: 16rpx; background: #fff5db; color: #9a6500; font-size: 25rpx; font-weight: 800; }
+.parent-task-mark--complete { background: #eaf8f1; color: #0a8b59; }
+.parent-task-mark--revision { background: #fff0f0; color: #d7373d; }
+.parent-task-copy { min-width: 0; }
+.parent-task-meta { display: flex; min-width: 0; align-items: center; gap: 10rpx; color: #77817c; font-size: 21rpx; }
+.parent-task-meta text { white-space: nowrap; }
+.parent-task-meta text:last-child { overflow: hidden; padding: 3rpx 8rpx; border-radius: 6rpx; background: #edf5f1; color: #18835b; text-overflow: ellipsis; }
+.parent-task-title { display: block; overflow: hidden; margin-top: 10rpx; color: #202d28; font-size: 29rpx; font-weight: 800; text-overflow: ellipsis; white-space: nowrap; }
+.parent-task-description { display: -webkit-box; overflow: hidden; margin-top: 7rpx; -webkit-box-orient: vertical; -webkit-line-clamp: 1; color: #8a938f; font-size: 22rpx; line-height: 1.45; }
+.parent-remind-button { display: flex; width: 112rpx; height: 58rpx; align-items: center; justify-content: center; border: 2rpx solid #dba928; border-radius: 14rpx; background: #fff8e6; color: #956100; font-size: 22rpx; font-weight: 750; }
+.parent-remind-button--complete { border-color: #0aa868; background: #eff8f3; color: #078d59; }
+.parent-remind-button--revision { border-color: #e5484d; background: #fff3f3; color: #d7373d; }
+.parent-remind-button[disabled] { opacity: 0.55; }
+.parent-empty { padding: 58rpx 34rpx; text-align: center; }
+.parent-empty text { display: block; }
+.parent-empty__mark { display: flex; width: 64rpx; height: 64rpx; margin: 0 auto 18rpx; align-items: center; justify-content: center; border-radius: 18rpx; background: #eaf8f1; color: #0a8b59; font-size: 31rpx; font-weight: 800; }
+.parent-empty__title { color: #26352f; font-size: 29rpx; font-weight: 800; }
+.parent-empty__copy { margin-top: 10rpx; color: #87908c; font-size: 22rpx; line-height: 1.55; }
 .attention-card { display: grid; min-height: 112rpx; margin-top: 20rpx; padding: 22rpx; grid-template-columns: 54rpx minmax(0, 1fr) auto; gap: 16rpx; align-items: center; border: 1rpx solid #f2d18a; border-radius: 20rpx; background: #fff9e9; }
 .attention-card__mark { display: flex; width: 54rpx; height: 54rpx; align-items: center; justify-content: center; border-radius: 16rpx; background: #f4bd42; color: #684500; font-weight: 800; }
 .attention-card__copy text { display: block; }
