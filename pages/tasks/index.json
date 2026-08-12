@@ -1,5 +1,6 @@
 {
   "navigationStyle": "custom",
+  "enablePullDownRefresh": false,
   "usingComponents": {
     "parent-remind-button": "/components/parent-remind-button/index"
   }

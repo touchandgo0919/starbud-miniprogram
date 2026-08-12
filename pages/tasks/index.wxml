@@ -67,8 +67,21 @@
       <text class="empty-state__title">该日期还没有任务</text>
       <text class="empty-state__copy">可以先休息一下，任务会由家长在网页端安排。</text>
     </view>
-    <view wx:else class="task-list surface">
-      <view wx:for="{{tasks}}" wx:key="id" class="task-row" data-id="{{item.id}}" bindtap="handleTaskDetail">
+    <view wx:else class="task-list task-list--{{isParent ? 'parent' : 'child'}} surface">
+      <block wx:if="{{isParent}}">
+        <view wx:for="{{tasks}}" wx:key="id" class="parent-task-row" data-id="{{item.id}}" bindtap="handleTaskDetail">
+          <view class="parent-task-mark parent-task-mark--{{item.parentReminderType}}">{{item.subjectMark}}</view>
+          <view class="parent-task-copy">
+            <view class="parent-task-meta"><text>{{item.childName}}</text><text>{{item.scheduleTime}}</text><text>{{item.parentStatusHint}}</text></view>
+            <text class="parent-task-title">{{item.title}}</text>
+            <text class="parent-task-description">{{item.description}}</text>
+          </view>
+          <parent-remind-button wx:if="{{item.canParentRemind}}" task-id="{{item.id}}" reminder-type="{{item.parentReminderType}}" label="{{item.parentReminderLabel}}" loading="{{remindingTaskId === item.id}}" bind:remind="remindTask" />
+          <view wx:else class="parent-task-status">{{item.parentStatusLabel}}</view>
+        </view>
+      </block>
+      <block wx:else>
+        <view wx:for="{{tasks}}" wx:key="id" class="task-row" data-id="{{item.id}}" bindtap="handleTaskDetail">
         <view class="task-time">
           <text>{{item.scheduleTime}}</text>
           <view class="task-dot {{item.dotClass}}"></view>
@@ -80,12 +93,9 @@
         <view class="task-actions">
           <view wx:if="{{!isParent && item.canChildAct}}" class="{{item.actionClass}}" data-id="{{item.id}}" catchtap="handleTaskAction"><text class="task-control__label">{{item.actionText}}</text></view>
           <view wx:elif="{{!isParent}}" class="{{item.actionClass}}"><text class="task-control__label">{{item.actionText}}</text></view>
-          <view wx:else class="parent-task-actions">
-            <parent-remind-button wx:if="{{item.canParentRemind}}" task-id="{{item.id}}" reminder-type="{{item.parentReminderType}}" label="{{item.parentReminderLabel}}" loading="{{remindingTaskId === item.id}}" bind:remind="remindTask" />
-            <view wx:else class="parent-task-status">{{item.parentStatusLabel}}</view>
-          </view>
         </view>
-      </view>
+        </view>
+      </block>
     </view>
     <view wx:if="{{loadingMore}}" class="list-footer">正在加载更多任务…</view>
   </scroll-view>

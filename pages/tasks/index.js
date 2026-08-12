@@ -76,6 +76,7 @@ function taskViewModel(task, showChildName) {
     canParentRemind,
     parentReminderType,
     parentReminderLabel: parentReminderType === "revision" ? "催改" : parentReminderType === "claim" ? "催领" : "催完成",
+    parentStatusHint: parentReminderType === "revision" ? "待修改" : parentReminderType === "claim" ? "待领取" : "进行中",
     parentStatusLabel: completed ? "已完成" : waitingReview ? "待批改" : "",
     canChildAct: !completed && !waitingReview && (!reviewed || task.needsRevision),
     actionText,
