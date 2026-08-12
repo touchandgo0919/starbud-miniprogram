@@ -442,11 +442,33 @@ Page({
   async editTask(event) {
     const task = this.data.tasks.find((item) => item.id === event.currentTarget.dataset.id);
     if (!task) return;
+    const today = localDateKey();
+    const effectiveDate = task.occurrenceDate || today;
+    if (effectiveDate < today) {
+      wx.showToast({ title: "历史任务不可编辑", icon: "none" });
+      return;
+    }
     const result = await new Promise((resolve) => wx.showModal({ title: "编辑任务名称", editable: true, placeholderText: task.title, content: "", success: resolve }));
     if (!result.confirm || !String(result.content || "").trim()) return;
+    let editScope = "single";
+    if (task.repeatType !== "once") {
+      const scopeResult = await new Promise((resolve) => wx.showActionSheet({
+        itemList: [`仅本次（${effectiveDate}）`, "今天及以后"],
+        success: resolve,
+        fail: resolve
+      }));
+      if (scopeResult.cancel || scopeResult.tapIndex === undefined) return;
+      editScope = scopeResult.tapIndex === 1 ? "future" : "single";
+    }
     try {
-      await api.updateTask(task.id, { ...task, title: String(result.content).trim() });
-      wx.showToast({ title: "任务已更新", icon: "success" });
+      await api.updateTask(task.id, {
+        ...task,
+        title: String(result.content).trim(),
+        editScope,
+        effectiveDate,
+        startDate: effectiveDate
+      });
+      wx.showToast({ title: editScope === "single" ? "已更新本次任务" : "已更新今天及以后", icon: "success" });
       this.refreshTaskPage();
     } catch (error) {
       wx.showToast({ title: error.message || "编辑失败", icon: "none" });
