@@ -548,6 +548,8 @@ Page({
       }
 
       clearSelectedTask();
+      getApp().globalData.submissionDataDirty = true;
+      getApp().globalData.taskDataDirty = true;
       wx.showToast({ title: "作业已提交", icon: "success", duration: 1200 });
       setTimeout(() => {
         wx.switchTab({ url: "/pages/history/index" });

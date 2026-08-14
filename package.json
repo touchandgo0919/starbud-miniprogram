@@ -1,6 +1,6 @@
 {
   "name": "starbud-miniprogram",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "private": true,
   "scripts": {
     "check": "node scripts/validate.mjs",

@@ -19,7 +19,7 @@ function submissionDateRange(filter) {
 
   if (filter === "week") {
     const start = new Date(today);
-    start.setDate(today.getDate() - ((today.getDay() + 6) % 7));
+    start.setDate(today.getDate() - today.getDay());
     return { dateFrom: localDateKey(start), dateTo };
   }
 
@@ -98,7 +98,10 @@ Page({
       return;
     }
     this.setData({ isParent: session.user.role === "parent" });
-    if (!this.hasLoadedSubmissions) {
+    const app = getApp();
+    const submissionDataDirty = Boolean(app.globalData.submissionDataDirty);
+    app.globalData.submissionDataDirty = false;
+    if (!this.hasLoadedSubmissions || submissionDataDirty) {
       this.hasLoadedSubmissions = true;
       this.loadSubmissions();
     }

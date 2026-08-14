@@ -2,7 +2,9 @@ const { getSession } = require("./utils/storage");
 
 App({
   globalData: {
-    session: null
+    session: null,
+    submissionDataDirty: false,
+    taskDataDirty: false
   },
 
   onLaunch() {

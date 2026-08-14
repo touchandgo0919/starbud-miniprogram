@@ -156,7 +156,15 @@ Page({
       return;
     }
     this.setData({ user: session.user, isParent: session.user.role === "parent" });
-    this.refreshTaskPage();
+    const app = getApp();
+    const taskDataDirty = Boolean(app.globalData.taskDataDirty);
+    app.globalData.taskDataDirty = false;
+    if (!this.hasLoadedTasks) {
+      this.hasLoadedTasks = true;
+      this.refreshTaskPage();
+    } else if (taskDataDirty) {
+      this.refreshTaskPage();
+    }
     this.startReviewNotificationPolling();
   },
 

@@ -264,6 +264,7 @@ Page({
       try {
         const claimedTask = await api.claimTask(task.id, task.occurrenceDate);
         const taskView = taskViewModel(claimedTask);
+        getApp().globalData.taskDataDirty = true;
         setSelectedTask(taskView);
         this.setData({ task: taskView, guidance: buildTaskGuidance(taskView) });
         wx.showToast({ title: taskView.completed ? "任务已完成" : "任务已领取", icon: "success" });
@@ -277,6 +278,7 @@ Page({
       try {
         const completedTask = await api.completeTask(task.id, task.occurrenceDate);
         const taskView = taskViewModel(completedTask);
+        getApp().globalData.taskDataDirty = true;
         setSelectedTask(taskView);
         this.setData({ task: taskView, guidance: buildTaskGuidance(taskView) });
         wx.showToast({ title: "任务已完成", icon: "success" });
