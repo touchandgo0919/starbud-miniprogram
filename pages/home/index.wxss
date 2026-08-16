@@ -10,7 +10,7 @@
 .home-greeting__date { color: rgba(255, 255, 255, 0.66); font-size: 24rpx; }
 .home-greeting__title { overflow: hidden; margin-top: 10rpx; font-size: 46rpx; font-weight: 800; line-height: 1.25; text-overflow: ellipsis; white-space: nowrap; }
 .home-greeting__copy { margin-top: 12rpx; color: rgba(255, 255, 255, 0.76); font-size: 27rpx; }
-.home-reward-entry { display: flex; width: 176rpx; flex: 0 0 176rpx; flex-direction: column; align-items: flex-end; padding: 0; }
+.home-reward-entry { display: flex; width: 176rpx; flex: 0 0 176rpx; flex-direction: column; align-items: flex-end; margin-right: 24rpx; padding: 0; }
 .home-reward-entry__label { color: rgba(255, 255, 255, 0.66); font-size: 24rpx; line-height: 1; }
 .home-reward-entry__balance { margin-top: 10rpx; color: #ffffff; font-size: 46rpx; font-weight: 800; line-height: 1.25; }
 .home-reward-entry__action { display: flex; margin-top: 10rpx; align-items: center; gap: 4rpx; color: #8ee5bb; font-size: 22rpx; font-weight: 750; line-height: 1; }
