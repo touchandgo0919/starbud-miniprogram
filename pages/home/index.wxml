@@ -1,5 +1,5 @@
 <view class="home-page">
-  <view class="home-hero" style="height: {{navBarHeight + 142}}px;">
+  <view class="home-hero" style="height: {{navBarHeight + 164}}px;">
     <view class="home-nav" style="height: {{navBarHeight}}px; padding-top: {{statusBarHeight}}px;">
       <view class="home-brand">
         <image src="/assets/starbud-icon.png" mode="aspectFit" />
@@ -11,10 +11,17 @@
       <text class="home-greeting__title">{{user.displayName || user.username}}，今天需要跟进</text>
       <text class="home-greeting__copy">只看孩子还需要行动的任务，及时提醒就好。</text>
     </view>
-    <view wx:elif="{{home}}" class="home-greeting">
-      <text class="home-greeting__date">{{home.dateLabel}}</text>
-      <text class="home-greeting__title">{{home.greeting}}，{{user.displayName || user.username}}</text>
-      <text class="home-greeting__copy">今天先做好一件事，就很好。</text>
+    <view wx:elif="{{home}}" class="home-greeting home-greeting--child">
+      <view class="home-greeting__main">
+        <text class="home-greeting__date">{{home.dateLabel}}</text>
+        <text class="home-greeting__title">{{home.greeting}}，{{user.displayName || user.username}}</text>
+        <text class="home-greeting__copy">今天先做好一件事，就很好。</text>
+      </view>
+      <view class="home-reward-entry" bindtap="openRewards">
+        <text class="home-reward-entry__label">星芽积分</text>
+        <text class="home-reward-entry__balance">{{rewardBalance}}</text>
+        <view class="home-reward-entry__action"><text>去兑换</text><text>›</text></view>
+      </view>
     </view>
   </view>
 

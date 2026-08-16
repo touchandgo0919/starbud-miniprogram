@@ -77,6 +77,7 @@ Page({
     navBarHeight: 68,
     isParent: false,
     home: null,
+    rewardBalance: 0,
     parentHome: null,
     remindingTaskId: "",
     loading: true,
@@ -125,7 +126,8 @@ Page({
   async loadHome() {
     this.setData({ loading: !this.data.home, error: "" });
     try {
-      this.setData({ home: viewModel(await api.getChildHome()) });
+      const [home, rewardCenter] = await Promise.all([api.getChildHome(), api.getRewardCenter()]);
+      this.setData({ home: viewModel(home), rewardBalance: rewardCenter.balance || 0 });
     } catch (error) {
       this.setData({ error: error.message || "首页加载失败。" });
     } finally {
@@ -209,6 +211,10 @@ Page({
 
   openTasks() {
     wx.switchTab({ url: "/pages/tasks/index" });
+  },
+
+  openRewards() {
+    wx.navigateTo({ url: "/pages/rewards/index" });
   },
 
   openParentTask(event) {

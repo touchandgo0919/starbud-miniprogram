@@ -50,10 +50,6 @@
     </view>
   </view>
 
-  <view wx:if="{{user.role === 'child'}}" class="responsibility surface profile-rewards" bindtap="openRewards">
-    <view><text class="responsibility-title">星芽奖励</text><text class="reward-entry-copy">完成任务攒积分，兑换奖励需家长确认</text></view><text class="reward-entry-arrow">›</text>
-  </view>
-
   <view wx:if="{{user.role === 'parent'}}" class="scope-note">
     家长仍可在网页端安排作业；小程序用于查看孩子的任务和提交状态。
   </view>

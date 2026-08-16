@@ -4,10 +4,17 @@
 .home-brand { display: flex; align-items: center; gap: 14rpx; font-size: 34rpx; font-weight: 800; }
 .home-brand image { width: 48rpx; height: 48rpx; }
 .home-greeting { margin-top: 28rpx; padding: 0 10rpx; }
+.home-greeting--child { margin-top: 20rpx; padding-right: 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 20rpx; }
+.home-greeting__main { min-width: 0; flex: 1; }
 .home-greeting text { display: block; }
 .home-greeting__date { color: rgba(255, 255, 255, 0.66); font-size: 24rpx; }
 .home-greeting__title { overflow: hidden; margin-top: 10rpx; font-size: 46rpx; font-weight: 800; line-height: 1.25; text-overflow: ellipsis; white-space: nowrap; }
 .home-greeting__copy { margin-top: 12rpx; color: rgba(255, 255, 255, 0.76); font-size: 27rpx; }
+.home-reward-entry { display: flex; width: 176rpx; flex: 0 0 176rpx; flex-direction: column; align-items: flex-end; padding: 0; }
+.home-reward-entry__label { color: rgba(255, 255, 255, 0.66); font-size: 24rpx; line-height: 1; }
+.home-reward-entry__balance { margin-top: 10rpx; color: #ffffff; font-size: 46rpx; font-weight: 800; line-height: 1.25; }
+.home-reward-entry__action { display: flex; margin-top: 10rpx; align-items: center; gap: 4rpx; color: #8ee5bb; font-size: 22rpx; font-weight: 750; line-height: 1; }
+.home-reward-entry__action text:last-child { font-size: 31rpx; line-height: 18rpx; }
 .home-content { position: relative; z-index: 1; margin-top: -66rpx; padding: 0 28rpx; }
 .home-state { padding: 72rpx 34rpx; color: #7a817e; text-align: center; }
 .home-state text { display: block; }

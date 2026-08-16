@@ -51,7 +51,4 @@ Page({
       }
     });
   }
-  ,openRewards() {
-    wx.navigateTo({ url: "/pages/rewards/index" });
-  }
 });
