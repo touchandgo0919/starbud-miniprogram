@@ -27,6 +27,15 @@ async function getTodayTasks() {
   return body.tasks;
 }
 
+async function getRewardCenter() {
+  const body = await request("/api/rewards");
+  return body.center;
+}
+
+async function requestRewardRedemption(rewardId, note) {
+  return request("/api/rewards/redemptions", { method: "POST", data: { rewardId, note } });
+}
+
 async function getChildNextStep() {
   const body = await request("/api/ai/child-next-step");
   return body.nextStep;
@@ -211,6 +220,8 @@ module.exports = {
   getTaskPage,
   getTaskCalendar,
   getTodayTasks,
+  getRewardCenter,
+  requestRewardRedemption,
   updateTask,
   deleteTask,
   remindTask,

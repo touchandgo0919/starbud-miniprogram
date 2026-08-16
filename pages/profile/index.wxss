@@ -74,6 +74,17 @@
   border-bottom: 0;
 }
 
+.profile-rewards {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #ecfbf4;
+}
+
+.profile-rewards .responsibility-title { margin-bottom: 6rpx; }
+.reward-entry-copy { display: block; color: #63736b; font-size: 24rpx; }
+.reward-entry-arrow { color: #08a868; font-size: 48rpx; line-height: 1; }
+
 .responsibility-index {
   display: flex;
   width: 48rpx;
