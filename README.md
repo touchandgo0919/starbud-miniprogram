@@ -49,3 +49,9 @@ npm run deploy
 5. 后端将当天任务标记为完成，并在“提交记录”中展示照片。
 
 设计参考见 `docs/design-concept.png`。
+
+## License
+
+This project is available for personal learning, research, and other
+non-commercial use only. Commercial use requires prior written permission. See
+[LICENSE](LICENSE) for details.
