@@ -55,7 +55,7 @@
 .calendar-day__dot { width: 7rpx; height: 7rpx; border-radius: 50%; background: #00913a; }
 .calendar-day__dot--revision { background: #e5484d; }
 .calendar-day__dot--review { background: #3b82f6; }
-.calendar-day__dot--active { background: #00913a; }
+.calendar-day__dot--active { background: #f08a24; }
 .calendar-day__dot--pending { background: #f2b63d; }
 .calendar-day__dot--completed { background: #8a9490; }
 
@@ -102,7 +102,7 @@
 .parent-task-row { display: grid; min-height: 174rpx; padding: 24rpx; grid-template-columns: 64rpx minmax(0, 1fr) 112rpx; gap: 18rpx; align-items: center; border-bottom: 1rpx solid #e7ece9; }
 .parent-task-row:last-child { border-bottom: 0; }
 .parent-task-mark { display: flex; width: 64rpx; height: 64rpx; align-items: center; justify-content: center; border-radius: 16rpx; background: #fff5db; color: #9a6500; font-size: 25rpx; font-weight: 800; }
-.parent-task-mark--complete { background: #eaf8f1; color: #0a8b59; }
+.parent-task-mark--complete { background: #fff1e5; color: #b65c00; }
 .parent-task-mark--revision { background: #fff0f0; color: #d7373d; }
 .parent-task-copy { min-width: 0; }
 .parent-task-meta { display: flex; min-width: 0; align-items: center; gap: 8rpx; color: #909994; font-size: 20rpx; white-space: nowrap; }
@@ -149,7 +149,7 @@
 }
 
 .task-dot--claim { background: #ffc947; }
-.task-dot--complete { background: #0aa868; }
+.task-dot--complete { background: #f08a24; }
 .task-dot--waiting-review { background: #3b82f6; }
 .task-dot--reviewed { background: #e5484d; }
 .task-dot--done {
@@ -257,9 +257,9 @@
 }
 
 .task-control--complete {
-  border-color: #0aa868;
-  background: #eff8f3;
-  color: #078d59;
+  border-color: #ea8a2d;
+  background: #fff3e8;
+  color: #b65c00;
 }
 
 .task-status-text {

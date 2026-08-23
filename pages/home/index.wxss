@@ -43,7 +43,7 @@
 .parent-task-row { display: grid; min-height: 174rpx; padding: 24rpx; grid-template-columns: 64rpx minmax(0, 1fr) 112rpx; gap: 18rpx; align-items: center; border-bottom: 1rpx solid #e7ece9; }
 .parent-task-row:last-child { border-bottom: 0; }
 .parent-task-mark { display: flex; width: 64rpx; height: 64rpx; align-items: center; justify-content: center; border-radius: 16rpx; background: #fff5db; color: #9a6500; font-size: 25rpx; font-weight: 800; }
-.parent-task-mark--complete { background: #eaf8f1; color: #0a8b59; }
+.parent-task-mark--complete { background: #fff1e5; color: #b65c00; }
 .parent-task-mark--revision { background: #fff0f0; color: #d7373d; }
 .parent-task-copy { min-width: 0; }
 .parent-task-meta { display: flex; min-width: 0; align-items: center; gap: 10rpx; color: #77817c; font-size: 21rpx; }
