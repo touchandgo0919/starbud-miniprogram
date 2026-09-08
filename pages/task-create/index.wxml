@@ -1,0 +1,43 @@
+<view class="create-page">
+  <view class="create-hero">
+    <text class="create-hero__eyebrow">家庭任务</text>
+    <text class="create-hero__title">新建任务</text>
+    <text class="create-hero__copy">可以安排给孩子，也可以给自己创建待办。</text>
+  </view>
+
+  <view class="form-card">
+    <view class="field">
+      <text class="field__label">任务名称</text>
+      <input class="field__input" value="{{title}}" maxlength="40" placeholder="例如：整理明天要带的物品" bindinput="onTitleInput" />
+    </view>
+    <view class="field">
+      <text class="field__label">任务对象</text>
+      <picker mode="selector" range="{{targetNames}}" value="{{targetIndex}}" bindchange="onTargetChange">
+        <view class="picker-value">{{targetNames[targetIndex]}} <text>⌄</text></view>
+      </picker>
+    </view>
+    <view class="form-grid">
+      <view class="field">
+        <text class="field__label">执行日期</text>
+        <picker mode="date" value="{{date}}" bindchange="onDateChange"><view class="picker-value">{{date}}</view></picker>
+      </view>
+      <view class="field">
+        <text class="field__label">提醒时间</text>
+        <picker mode="time" value="{{time}}" bindchange="onTimeChange"><view class="picker-value">{{time}}</view></picker>
+      </view>
+    </view>
+    <view class="field">
+      <text class="field__label">重复方式</text>
+      <picker mode="selector" range="{{repeatLabels}}" value="{{repeatIndex}}" bindchange="onRepeatChange"><view class="picker-value">{{repeatLabels[repeatIndex]}} <text>⌄</text></view></picker>
+    </view>
+    <view class="voice-row">
+      <view><text class="field__label">语音提醒</text><text class="voice-row__hint">待办默认不催领、不要求提交附件</text></view>
+      <switch color="#00A967" checked="{{voiceEnabled}}" bindchange="onVoiceSwitch" />
+    </view>
+    <view class="field" wx:if="{{voiceEnabled}}">
+      <text class="field__label">提醒内容</text>
+      <input class="field__input" value="{{voiceContent}}" maxlength="120" placeholder="留空时使用任务名称" bindinput="onVoiceInput" />
+    </view>
+  </view>
+  <button class="submit-button" loading="{{saving}}" bindtap="submit">保存任务</button>
+</view>

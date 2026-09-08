@@ -6,6 +6,7 @@
         <text>{{isParent ? '家庭任务' : '我的任务'}}</text>
         <text class="section-count">{{totalCount}} 项</text>
       </view>
+      <view wx:if="{{isParent}}" class="task-create-trigger" bindtap="createTask">+ 新建</view>
     </view>
   </view>
 
@@ -76,7 +77,8 @@
             <text class="parent-task-title">{{item.title}}</text>
             <text class="parent-task-description">{{item.description}}</text>
           </view>
-          <parent-remind-button wx:if="{{item.canParentRemind}}" task-id="{{item.id}}" reminder-type="{{item.parentReminderType}}" label="{{item.parentReminderLabel}}" loading="{{remindingTaskId === item.id}}" bind:remind="remindTask" />
+          <view wx:if="{{item.isPersonalTodo && !item.completed}}" class="parent-todo-action" data-id="{{item.id}}" catchtap="completePersonalTodo">完成</view>
+          <parent-remind-button wx:elif="{{item.canParentRemind}}" task-id="{{item.id}}" reminder-type="{{item.parentReminderType}}" label="{{item.parentReminderLabel}}" loading="{{remindingTaskId === item.id}}" bind:remind="remindTask" />
           <view wx:else class="parent-task-status">{{item.parentStatusLabel}}</view>
         </view>
       </block>

@@ -27,6 +27,16 @@ async function getTodayTasks() {
   return body.tasks;
 }
 
+async function getChildren() {
+  const body = await request("/api/children");
+  return body.children || [];
+}
+
+async function createTask(data) {
+  const body = await request("/api/tasks", { method: "POST", data });
+  return body.task;
+}
+
 async function getRewardCenter() {
   const body = await request("/api/rewards");
   return body.center;
@@ -207,6 +217,7 @@ async function remindTask(taskId, taskDate, reminderType) {
 module.exports = {
   claimTask,
   completeTask,
+  createTask,
   createSubmission,
   finalizeSubmission,
   getNotifications,
@@ -220,6 +231,7 @@ module.exports = {
   getTaskPage,
   getTaskCalendar,
   getTodayTasks,
+  getChildren,
   getRewardCenter,
   requestRewardRedemption,
   updateTask,

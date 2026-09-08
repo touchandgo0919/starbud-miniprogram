@@ -1,0 +1,15 @@
+.create-page { min-height: 100vh; box-sizing: border-box; padding: 32rpx 28rpx 56rpx; background: #f5f6fa; }
+.create-hero { display: flex; padding: 18rpx 8rpx 34rpx; flex-direction: column; color: #073c2d; }
+.create-hero__eyebrow { color: #00915a; font-size: 24rpx; font-weight: 700; }
+.create-hero__title { margin-top: 8rpx; font-size: 44rpx; font-weight: 800; }
+.create-hero__copy { margin-top: 12rpx; color: #66736f; font-size: 25rpx; }
+.form-card { padding: 28rpx; border-radius: 24rpx; background: #ffffff; box-shadow: 0 8rpx 24rpx rgba(40, 52, 47, 0.05); }
+.field { margin-bottom: 26rpx; }
+.field__label { display: block; margin-bottom: 12rpx; color: #1a2e27; font-size: 26rpx; font-weight: 700; }
+.field__input, .picker-value { height: 78rpx; padding: 0 22rpx; box-sizing: border-box; border: 2rpx solid #e1e8e4; border-radius: 14rpx; background: #fbfcfb; color: #23352e; font-size: 27rpx; line-height: 74rpx; }
+.picker-value { display: flex; align-items: center; justify-content: space-between; }
+.picker-value text { color: #84908a; }
+.form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20rpx; }
+.voice-row { display: flex; min-height: 70rpx; margin: 2rpx 0 24rpx; align-items: center; justify-content: space-between; }
+.voice-row__hint { display: block; color: #89948f; font-size: 21rpx; }
+.submit-button { margin-top: 34rpx; border-radius: 16rpx; background: #00a967; color: #ffffff; font-size: 30rpx; font-weight: 800; }

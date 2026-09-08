@@ -4,6 +4,7 @@
     "pages/login/index",
     "pages/legal/index",
     "pages/tasks/index",
+    "pages/task-create/index",
     "pages/task-detail/index",
     "pages/submit/index",
     "pages/history/index",

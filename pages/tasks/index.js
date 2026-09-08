@@ -65,18 +65,20 @@ function taskViewModel(task, showChildName) {
   const completed = task.status === "completed" || task.reviewStatus === "completed" || Boolean(task.finalizedAt);
   const reviewed = Boolean(task.reviewedAt);
   const waitingReview = task.submissionStatus === "submitted" && !task.finalizedAt && !task.needsRevision;
+  const isPersonalTodo = Boolean(task.isPersonalTodo);
   const parentReminderType = task.needsRevision ? "revision" : task.claimedAt ? "complete" : "claim";
-  const canParentRemind = !completed && !waitingReview;
+  const canParentRemind = !isPersonalTodo && !completed && !waitingReview;
   const actionText = task.needsRevision ? "待修改" : waitingReview ? "待批改" : completed ? "已完成" : reviewed ? "已批改" : task.claimedAt ? "去完成" : "去领取";
   return {
     ...task,
+    isPersonalTodo,
     completed,
     reviewed,
     waitingReview,
     canParentRemind,
     parentReminderType,
     parentReminderLabel: parentReminderType === "revision" ? "催改" : parentReminderType === "claim" ? "催领" : "催完成",
-    parentStatusHint: parentReminderType === "revision" ? "待修改" : parentReminderType === "claim" ? "待领取" : "进行中",
+    parentStatusHint: isPersonalTodo ? (completed ? "已完成" : "待完成") : parentReminderType === "revision" ? "待修改" : parentReminderType === "claim" ? "待领取" : "进行中",
     parentStatusLabel: completed ? "已完成" : waitingReview ? "待批改" : "",
     canChildAct: !completed && !waitingReview && (!reviewed || task.needsRevision),
     actionText,
@@ -90,7 +92,7 @@ function taskViewModel(task, showChildName) {
           ? "task-control task-control--complete"
           : "task-control task-control--claim",
     subjectMark: task.title.slice(0, 1),
-    description: [showChildName && task.childName, task.voiceContent || "按时完成任务并拍照提交"]
+    description: [showChildName && task.childName, task.voiceContent || (isPersonalTodo ? "给自己的待办" : "按时完成任务并拍照提交")]
       .filter(Boolean)
       .join(" · "),
     dotClass: completed
@@ -240,6 +242,11 @@ Page({
     } finally {
       this.setData({ refreshing: false });
     }
+  },
+
+  createTask() {
+    if (!this.data.isParent) return;
+    wx.navigateTo({ url: "/pages/task-create/index" });
   },
 
   async loadTasks() {
@@ -438,6 +445,27 @@ Page({
     }
     setSelectedTask(task);
     wx.navigateTo({ url: `/pages/submit/index?taskId=${encodeURIComponent(task.id)}&taskDate=${encodeURIComponent(task.occurrenceDate || "")}` });
+  },
+
+  async completePersonalTodo(event) {
+    const task = this.data.tasks.find((item) => String(item.id) === String(event.currentTarget.dataset.id || ""));
+    if (!task || !task.isPersonalTodo || task.completed) return;
+    const result = await new Promise((resolve) => wx.showModal({
+      title: "完成待办",
+      content: `确认完成“${task.title}”吗？`,
+      confirmText: "完成",
+      success: resolve,
+      fail: resolve
+    }));
+    if (!result.confirm) return;
+    try {
+      await api.completeTask(task.id, task.occurrenceDate);
+      wx.showToast({ title: "待办已完成", icon: "success" });
+      getApp().globalData.taskDataDirty = true;
+      await this.refreshTaskPage();
+    } catch (error) {
+      wx.showToast({ title: error.message || "完成失败", icon: "none" });
+    }
   },
 
   handleTaskDetail(event) {
