@@ -15,7 +15,6 @@
 }
 
 .section-heading { display: flex; align-items: center; justify-content: space-between; }
-.task-create-trigger { padding: 10rpx 18rpx; border-radius: 999rpx; background: rgba(255, 255, 255, 0.16); color: #ffffff; font-size: 24rpx; font-weight: 700; }
 .parent-todo-action { min-width: 86rpx; padding: 12rpx 16rpx; border: 2rpx solid #00a967; border-radius: 12rpx; color: #008c53; font-size: 24rpx; font-weight: 700; text-align: center; }
 
 .calendar-panel {
@@ -93,6 +92,42 @@
   margin-top: 0;
   padding-bottom: 0;
   flex: 1;
+}
+
+.parent-task-toolbar {
+  display: flex;
+  min-height: 108rpx;
+  margin-bottom: 18rpx;
+  padding: 20rpx 16rpx 20rpx 24rpx;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 20rpx;
+}
+
+.parent-task-toolbar__title {
+  display: block;
+  color: #202d28;
+  font-size: 29rpx;
+  font-weight: 800;
+}
+
+.parent-task-toolbar__hint {
+  display: block;
+  margin-top: 6rpx;
+  color: #87918c;
+  font-size: 21rpx;
+}
+
+/* 复用全局次级按钮，仅收紧列表工具栏内的占位。 */
+.parent-task-toolbar .secondary-button {
+  flex: 0 0 170rpx;
+  margin-left: auto;
+  margin-right: 0;
+  width: 170rpx;
+  min-height: 64rpx;
+  padding: 0;
+  border-radius: 14rpx;
+  font-size: 24rpx;
 }
 
 .task-list {

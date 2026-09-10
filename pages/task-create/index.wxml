@@ -12,9 +12,18 @@
     </view>
     <view class="field">
       <text class="field__label">任务对象</text>
-      <picker mode="selector" range="{{targetNames}}" value="{{targetIndex}}" bindchange="onTargetChange">
-        <view class="picker-value">{{targetNames[targetIndex]}} <text>⌄</text></view>
-      </picker>
+      <view class="target-mode-row">
+        <view class="target-mode {{targetMode === 'self' ? 'target-mode--selected' : ''}}" data-mode="self" bindtap="chooseTargetMode">我（待办）</view>
+        <view class="target-mode {{targetMode === 'children' ? 'target-mode--selected' : ''}}" data-mode="children" bindtap="chooseTargetMode">儿童任务</view>
+      </view>
+      <checkbox-group wx:if="{{targetMode === 'children'}}" class="children-checklist" bindchange="onChildrenChange">
+        <label wx:for="{{children}}" wx:key="id" class="child-check-item">
+          <checkbox value="{{item.id}}" checked="{{item.selected}}" color="#0aa868" />
+          <text>{{item.name}}</text>
+        </label>
+        <text wx:if="{{!children.length}}" class="field__hint">还没有儿童成员，请先在家庭管理中添加。</text>
+      </checkbox-group>
+      <text wx:else class="field__hint">个人待办不要求附件，也不会发送催领或催改提醒。</text>
     </view>
     <view class="form-grid">
       <view class="field">
@@ -30,14 +39,34 @@
       <text class="field__label">重复方式</text>
       <picker mode="selector" range="{{repeatLabels}}" value="{{repeatIndex}}" bindchange="onRepeatChange"><view class="picker-value">{{repeatLabels[repeatIndex]}} <text>⌄</text></view></picker>
     </view>
+    <view wx:if="{{repeatIndex !== 0}}" class="field">
+      <text class="field__label">任务截止日期 <text class="field__optional">（不设则长期重复）</text></text>
+      <picker mode="date" start="{{date}}" value="{{endDate}}" bindchange="onEndDateChange"><view class="picker-value">{{endDate || '长期重复（不设截止）'}} <text>⌄</text></view></picker>
+    </view>
+    <view wx:if="{{targetMode === 'children'}}" class="option-row">
+      <view><text class="field__label">附件要求</text><text class="voice-row__hint">开启后需提交照片或录音</text></view>
+      <switch color="#00A967" checked="{{requiresPhotoUpload}}" bindchange="onAttachmentSwitch" />
+    </view>
     <view class="voice-row">
-      <view><text class="field__label">语音提醒</text><text class="voice-row__hint">待办默认不催领、不要求提交附件</text></view>
+      <view><text class="field__label">语音提醒</text><text class="voice-row__hint">关闭后只显示任务，不播放提醒</text></view>
       <switch color="#00A967" checked="{{voiceEnabled}}" bindchange="onVoiceSwitch" />
+    </view>
+    <view wx:if="{{voiceEnabled}}" class="field">
+      <text class="field__label">提醒次数</text>
+      <picker mode="selector" range="{{voiceReminderCounts}}" value="{{voiceReminderCountIndex}}" bindchange="onVoiceReminderCountChange"><view class="picker-value">语音提醒 {{voiceReminderCounts[voiceReminderCountIndex]}} 次 <text>⌄</text></view></picker>
+    </view>
+    <view wx:if="{{targetMode === 'children'}}" class="option-row">
+      <view><text class="field__label">催领取</text><text class="voice-row__hint">提醒后仍未领取时继续催领</text></view>
+      <switch color="#00A967" checked="{{claimReminderEnabled}}" disabled="{{!voiceEnabled}}" bindchange="onClaimReminderSwitch" />
+    </view>
+    <view wx:if="{{targetMode === 'children'}}" class="option-row">
+      <view><text class="field__label">催修改</text><text class="voice-row__hint">批改后未重新提交时继续催改</text></view>
+      <switch color="#00A967" checked="{{revisionReminderEnabled}}" disabled="{{!requiresPhotoUpload}}" bindchange="onRevisionReminderSwitch" />
     </view>
     <view class="field" wx:if="{{voiceEnabled}}">
       <text class="field__label">提醒内容</text>
-      <input class="field__input" value="{{voiceContent}}" maxlength="120" placeholder="留空时使用任务名称" bindinput="onVoiceInput" />
+      <textarea class="field__textarea" value="{{voiceContent}}" maxlength="120" placeholder="留空时使用任务名称" auto-height="{{true}}" bindinput="onVoiceInput" />
     </view>
   </view>
-  <button class="submit-button" loading="{{saving}}" bindtap="submit">保存任务</button>
+  <button class="primary-button" loading="{{saving}}" disabled="{{saving}}" bindtap="submit">保存任务</button>
 </view>

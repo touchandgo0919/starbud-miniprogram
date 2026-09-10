@@ -6,7 +6,6 @@
         <text>{{isParent ? '家庭任务' : '我的任务'}}</text>
         <text class="section-count">{{totalCount}} 项</text>
       </view>
-      <view wx:if="{{isParent}}" class="task-create-trigger" bindtap="createTask">+ 新建</view>
     </view>
   </view>
 
@@ -56,6 +55,13 @@
     bindscrolltolower="loadMoreTasks"
     lower-threshold="120"
   >
+    <view wx:if="{{isParent}}" class="parent-task-toolbar surface">
+      <view>
+        <text class="parent-task-toolbar__title">任务列表</text>
+        <text class="parent-task-toolbar__hint">可为孩子安排任务，也可给自己创建待办</text>
+      </view>
+      <button class="secondary-button" bindtap="createTask">+ 新建任务</button>
+    </view>
     <view wx:if="{{loading}}" class="loading-line">正在加载任务…</view>
     <view wx:elif="{{error}}" class="empty-state surface">
       <text class="empty-state__mark">!</text>
@@ -66,7 +72,7 @@
     <view wx:elif="{{!tasks.length}}" class="empty-state surface">
       <text class="empty-state__mark">✓</text>
       <text class="empty-state__title">该日期还没有任务</text>
-      <text class="empty-state__copy">可以先休息一下，任务会由家长在网页端安排。</text>
+      <text class="empty-state__copy">{{isParent ? '点击上方“新建任务”即可安排任务或创建待办。' : '可以先休息一下，任务会由家长安排。'}}</text>
     </view>
     <view wx:else class="task-list task-list--{{isParent ? 'parent' : 'child'}} surface">
       <block wx:if="{{isParent}}">
