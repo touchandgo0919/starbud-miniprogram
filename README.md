@@ -6,16 +6,15 @@
 
 - 网页端：家长创建家庭、安排和维护任务。
 - 电脑 App：安装在儿童电脑上，负责定时语音提醒。
-- 微信小程序：儿童领取今日任务、拍照提交作业、查看提交记录。
-
-小程序不提供任务创建、家庭管理或语音提醒设置。
+- 微信小程序：儿童领取今日任务、拍照提交作业、查看提交记录；家长还可创建儿童任务或个人待办。
 
 ## 本地开发
 
 1. 使用微信开发者工具导入本目录。
 2. 确认 `project.config.json` 中的 AppID。
-3. 在微信公众平台把后端域名加入 `request`、`uploadFile` 和
-   `downloadFile` 合法域名。
+3. 在微信公众平台把 `https://starbud-api.zhaojianing.com` 加入 `request`、
+   `uploadFile` 和 `downloadFile` 合法域名；如有 R2 自定义文件域名，也须使用
+   `*.zhaojianing.com` 并加入 `downloadFile` 合法域名。
 4. 如需切换后端地址，修改 `config.js`。
 5. 运行静态检查：
 

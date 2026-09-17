@@ -314,6 +314,18 @@ describe("mini-program API facade", () => {
     assert.ok(submission.reviewRounds[0].audios[0].url.startsWith("https://"));
     assert.ok(submission.reviewRounds[0].reviewImages[0].url.startsWith("https://"));
   });
+
+  test("rewrites legacy Starbud file hosts to the zhaojianing.com domain", () => {
+    const { absoluteUrl } = require("../utils/request");
+    assert.equal(
+      absoluteUrl("https://starbud-api.zhaoyouning.com/api/submission-audio/a1?token=x"),
+      "https://starbud-api.zhaojianing.com/api/submission-audio/a1?token=x"
+    );
+    assert.equal(
+      absoluteUrl("https://files.zhaoyouning.com/submissions/a1.webm"),
+      "https://files.zhaojianing.com/submissions/a1.webm"
+    );
+  });
 });
 
 describe("task guidance ladder", () => {

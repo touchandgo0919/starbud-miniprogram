@@ -2,6 +2,11 @@ const { API_BASE_URL } = require("../config");
 const { clearSession, getSession } = require("./storage");
 const accessSessionId = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
+function normalizeStarbudUrl(value) {
+  if (typeof value !== "string") return value;
+  return value.replace(/^(https?:\/\/[^/:]+(?:\.[^/:]+)*)\.zhaoyouning\.com(?=[:/]|$)/i, "$1.zhaojianing.com");
+}
+
 function redirectToLogin() {
   clearSession();
   wx.reLaunch({ url: "/pages/login/index" });
@@ -83,7 +88,8 @@ function upload(path, filePath, name = "photo", formData) {
 }
 
 function absoluteUrl(path) {
-  if (!path || /^https?:\/\//.test(path)) return path;
+  if (!path) return path;
+  if (/^https?:\/\//.test(path)) return normalizeStarbudUrl(path);
   return `${API_BASE_URL}${path}`;
 }
 
