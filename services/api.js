@@ -104,8 +104,8 @@ async function createSubmission(taskId, note, taskDate) {
   return body.submission;
 }
 
-async function uploadSubmissionPhoto(submissionId, filePath) {
-  const body = await upload(`/api/submissions/${submissionId}/photos`, filePath);
+async function uploadSubmissionPhoto(submissionId, filePath, uploadId) {
+  const body = await upload(`/api/submissions/${submissionId}/photos`, filePath, "photo", uploadId ? { uploadId } : undefined);
   return body.photo;
 }
 
@@ -188,6 +188,28 @@ async function getSubmissionPage({ page, pageSize, date, dateFrom, dateTo, keywo
   };
 }
 
+// 家长手机端批改：只列出已提交、尚未批改的作业。
+async function getPendingReviews({ page = 1, pageSize = 20 } = {}) {
+  const body = await request(`/api/submissions?status=submitted&reviewStatus=pending&page=${page}&pageSize=${pageSize}`);
+  return {
+    submissions: body.submissions.map(normalizeSubmissionUrls),
+    pagination: body.pagination
+  };
+}
+
+async function submitCommentReview(submissionId, feedback) {
+  const body = await request(`/api/submissions/${submissionId}/comment-review`, {
+    method: "POST",
+    data: { feedback }
+  });
+  return body.submission;
+}
+
+async function finalizeSubmissionReview(submissionId) {
+  const body = await request(`/api/submissions/${submissionId}/finalize-review`, { method: "POST" });
+  return body.submission;
+}
+
 async function getNotifications() {
   const body = await request("/api/notifications");
   return body.notifications;
@@ -220,7 +242,9 @@ module.exports = {
   createTask,
   createSubmission,
   finalizeSubmission,
+  finalizeSubmissionReview,
   getNotifications,
+  getPendingReviews,
   getChildHome,
   getChildNextStep,
   getSubmissions,
@@ -237,6 +261,7 @@ module.exports = {
   updateTask,
   deleteTask,
   remindTask,
+  submitCommentReview,
   login,
   registerParent,
   logout,

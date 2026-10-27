@@ -1,0 +1,66 @@
+<view class="review-page">
+  <view class="review-header">
+    <text class="review-header__title">待批改作业</text>
+    <text class="review-header__count">{{total}} 份</text>
+  </view>
+  <text class="review-header__hint">在手机上查看照片和录音，可以直接通过，也可以写下修改意见发给孩子。需要在图片上标注时，请使用网页版。</text>
+
+  <view wx:if="{{loading}}" class="review-state">正在加载…</view>
+  <view wx:elif="{{error}}" class="review-state review-state--error">
+    <text>{{error}}</text>
+    <button class="review-retry" bindtap="load">重试</button>
+  </view>
+  <view wx:elif="{{!items.length}}" class="review-state">
+    <text class="review-state__mark">✓</text>
+    <text>没有待批改的作业</text>
+  </view>
+
+  <view wx:for="{{items}}" wx:key="id" class="review-card">
+    <view class="review-card__head">
+      <view>
+        <text class="review-card__title">{{item.taskTitle}}</text>
+        <text class="review-card__meta">{{item.childName}} · {{item.taskDate}} · {{item.roundLabel}}</text>
+      </view>
+      <text class="review-card__time">{{item.submittedLabel}}</text>
+    </view>
+
+    <view wx:if="{{item.photoUrls.length}}" class="review-card__photos">
+      <image
+        wx:for="{{item.photoUrls}}"
+        wx:for-item="url"
+        wx:key="*this"
+        class="review-card__photo"
+        src="{{url}}"
+        mode="aspectFill"
+        data-id="{{item.id}}"
+        data-url="{{url}}"
+        bindtap="previewPhoto"
+      />
+    </view>
+    <view wx:if="{{item.audioUrl}}" class="review-card__audio {{playingId === item.id ? 'is-playing' : ''}}" data-id="{{item.id}}" bindtap="toggleAudio">
+      <text>{{playingId === item.id ? '❚❚ 停止' : '▶ 播放录音'}}</text>
+      <text>{{item.audioDuration}}</text>
+    </view>
+    <text wx:if="{{item.note}}" class="review-card__note">孩子备注：{{item.note}}</text>
+
+    <view wx:if="{{activeId === item.id}}" class="review-card__feedback">
+      <textarea
+        class="review-card__textarea"
+        value="{{feedback}}"
+        placeholder="写下需要修改的地方，例如：第 2 题再检查进位"
+        placeholder-class="review-card__placeholder"
+        maxlength="500"
+        auto-focus
+        show-confirm-bar="{{false}}"
+        bindinput="onFeedbackInput"
+      />
+      <button class="review-button review-button--revision" loading="{{savingId === item.id}}" disabled="{{savingId === item.id}}" data-id="{{item.id}}" bindtap="requestRevision">发送修改意见</button>
+    </view>
+
+    <view class="review-card__actions">
+      <button class="review-button review-button--ghost" data-id="{{item.id}}" bindtap="openFeedback">{{activeId === item.id ? '收起' : '要求修改'}}</button>
+      <button class="review-button review-button--approve" disabled="{{savingId === item.id}}" data-id="{{item.id}}" bindtap="approve">通过并完成</button>
+    </view>
+  </view>
+  <view wx:if="{{loadingMore}}" class="review-footer">正在加载更多作业…</view>
+</view>

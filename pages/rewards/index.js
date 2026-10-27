@@ -1,11 +1,40 @@
 const api = require("../../services/api");
 
+// 为每个奖励补充“还差多少分”和进度，并挑出最接近的下一个目标，让孩子知道还需要做什么。
+function rewardViewModel(center) {
+  if (!center) return center;
+  const balance = Number(center.balance) || 0;
+  const rewards = (center.rewards || []).filter((reward) => reward.active).map((reward) => {
+    const pointCost = Number(reward.pointCost) || 0;
+    const shortfall = Math.max(0, pointCost - balance);
+    return {
+      ...reward,
+      affordable: shortfall === 0,
+      shortfall,
+      progress: pointCost ? Math.min(100, Math.round((balance / pointCost) * 100)) : 100
+    };
+  });
+  const nextGoal = rewards
+    .filter((reward) => !reward.affordable)
+    .sort((left, right) => left.shortfall - right.shortfall)[0] || null;
+  const taskPoints = Number(center.settings && center.settings.taskPoints) || 0;
+  return {
+    ...center,
+    rewards,
+    nextGoal: nextGoal
+      ? { title: nextGoal.title, shortfall: nextGoal.shortfall, tasksNeeded: taskPoints ? Math.ceil(nextGoal.shortfall / taskPoints) : 0 }
+      : null
+  };
+}
+
+module.exports = { rewardViewModel };
+
 Page({
   data: { center: null, loading: true },
   onShow() { this.load(); },
   async load() {
     this.setData({ loading: true });
-    try { this.setData({ center: await api.getRewardCenter() }); }
+    try { this.setData({ center: rewardViewModel(await api.getRewardCenter()) }); }
     catch (error) { wx.showToast({ title: error.message || "加载失败", icon: "none" }); }
     finally { this.setData({ loading: false }); }
   },

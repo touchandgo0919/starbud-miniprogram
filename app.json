@@ -8,6 +8,7 @@
     "pages/task-detail/index",
     "pages/submit/index",
     "pages/history/index",
+    "pages/review/index",
     "pages/rewards/index",
     "pages/profile/index"
   ],

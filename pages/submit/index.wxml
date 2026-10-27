@@ -11,6 +11,26 @@
     </view>
   </view>
 
+  <view wx:if="{{latestFeedback}}" class="latest-feedback surface">
+    <view class="latest-feedback__head">
+      <text class="latest-feedback__title">家长的评价</text>
+      <text class="latest-feedback__meta">第 {{latestFeedback.sequence}} 次批改 · {{latestFeedback.reviewedAt}}</text>
+    </view>
+    <text wx:if="{{latestFeedback.feedback}}" class="latest-feedback__text">{{latestFeedback.feedback}}</text>
+    <view wx:if="{{latestFeedback.images.length}}" class="latest-feedback__images">
+      <image
+        wx:for="{{latestFeedback.images}}"
+        wx:key="*this"
+        class="latest-feedback__image"
+        src="{{item}}"
+        mode="aspectFill"
+        data-url="{{item}}"
+        bindtap="previewFeedbackImage"
+      />
+    </view>
+    <text class="latest-feedback__hint">按照评价修改后，再拍照或录音提交。</text>
+  </view>
+
   <view class="attachment-tip">图片和录音至少提交一项，录音最多 3 分钟</view>
   <view wx:if="{{recoveredDraft}}" class="draft-recovery-note">已恢复草稿附件，可继续提交或补传照片、重新录音。</view>
 

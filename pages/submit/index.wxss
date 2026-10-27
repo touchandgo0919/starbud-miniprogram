@@ -339,3 +339,57 @@
   font-size: 23rpx;
   text-align: center;
 }
+
+.latest-feedback {
+  margin-top: 24rpx;
+  padding: 24rpx;
+  border-left: 8rpx solid #e5484d;
+}
+
+.latest-feedback__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16rpx;
+}
+
+.latest-feedback__title {
+  color: #18221f;
+  font-size: 30rpx;
+  font-weight: 750;
+}
+
+.latest-feedback__meta {
+  color: #7a817e;
+  font-size: 22rpx;
+}
+
+.latest-feedback__text {
+  display: block;
+  margin-top: 14rpx;
+  color: #18221f;
+  font-size: 28rpx;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.latest-feedback__images {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin-top: 16rpx;
+}
+
+.latest-feedback__image {
+  width: 150rpx;
+  height: 150rpx;
+  border-radius: 14rpx;
+  background: #eef3f0;
+}
+
+.latest-feedback__hint {
+  display: block;
+  margin-top: 14rpx;
+  color: #c2410c;
+  font-size: 23rpx;
+}

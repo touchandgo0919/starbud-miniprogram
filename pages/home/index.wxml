@@ -46,6 +46,14 @@
         </view>
       </view>
 
+      <view class="parent-review-entry surface {{pendingReviewCount ? 'parent-review-entry--active' : ''}}" bindtap="openReviews">
+        <view class="parent-review-entry__copy">
+          <text>批改作业</text>
+          <text>{{pendingReviewCount ? '有 ' + pendingReviewCount + ' 份作业等你批改' : '暂无待批改的作业'}}</text>
+        </view>
+        <text class="parent-review-entry__action">{{pendingReviewCount ? '去批改' : '查看'}}</text>
+      </view>
+
       <view class="section-label parent-section-label"><text>未完成项</text><text bindtap="openTasks">查看全部任务</text></view>
       <scroll-view class="parent-task-scroll" scroll-y refresher-enabled="{{true}}" refresher-triggered="{{refreshing}}" bindrefresherrefresh="onParentListRefresh">
         <view wx:if="{{!parentHome.pendingTasks.length}}" class="parent-empty surface">

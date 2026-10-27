@@ -50,7 +50,11 @@ function request(path, options = {}) {
   });
 }
 
-function upload(path, filePath, name = "photo", formData) {
+// 弱网下上传可能在没有任何 HTTP 响应时中断；仅对这类网络失败自动重试，
+// 服务端明确返回的错误（如 4xx）不重试。
+const UPLOAD_RETRY_DELAYS_MS = [1000, 2500];
+
+function uploadOnce(path, filePath, name, formData) {
   const session = getSession();
   return new Promise((resolve, reject) => {
     const options = {
@@ -79,12 +83,29 @@ function upload(path, filePath, name = "photo", formData) {
         reject(new Error(errorMessage(body, response.statusCode)));
       },
       fail(error) {
-        reject(new Error(error.errMsg || "照片上传失败，请稍后重试。"));
+        const networkError = new Error(error.errMsg || "照片上传失败，请稍后重试。");
+        networkError.networkFailure = true;
+        reject(networkError);
       }
     };
     if (formData) options.formData = formData;
     wx.uploadFile(options);
   });
+}
+
+function wait(milliseconds) {
+  return new Promise((resolve) => setTimeout(resolve, milliseconds));
+}
+
+async function upload(path, filePath, name = "photo", formData, retryDelays = UPLOAD_RETRY_DELAYS_MS) {
+  for (let attempt = 0; ; attempt += 1) {
+    try {
+      return await uploadOnce(path, filePath, name, formData);
+    } catch (error) {
+      if (!error.networkFailure || attempt >= retryDelays.length) throw error;
+      await wait(retryDelays[attempt]);
+    }
+  }
 }
 
 function absoluteUrl(path) {

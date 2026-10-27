@@ -272,9 +272,10 @@ describe("mini-program API facade", () => {
   test("uses uploadFile fields for photos and audio duration", async () => {
     const api = require("../services/api");
     nextUploadResponse = { statusCode: 201, data: JSON.stringify({ photo: { id: "p1" } }) };
-    await api.uploadSubmissionPhoto("s1", "/tmp/photo.png");
+    await api.uploadSubmissionPhoto("s1", "/tmp/photo.png", "photo_retry_test_20261027_001");
     assert.equal(uploadCalls[0].name, "photo");
     assert.equal(uploadCalls[0].filePath, "/tmp/photo.png");
+    assert.deepEqual(uploadCalls[0].formData, { uploadId: "photo_retry_test_20261027_001" });
 
     nextUploadResponse = { statusCode: 201, data: JSON.stringify({ audio: { id: "a1" } }) };
     await api.uploadSubmissionAudio("s1", "/tmp/audio.mp3", 2300);
@@ -513,5 +514,143 @@ describe("login page", () => {
     assert.equal(storage.get("starbud.childSession").token, "parent-token");
     assert.deepEqual(toastCalls[0], { title: "注册成功", icon: "success" });
     assert.deepEqual(navigationCalls.at(-1), ["switchTab", { url: "/pages/home/index" }]);
+  });
+});
+
+describe("weak-network uploads", () => {
+  test("retries uploads that fail before the server answers", async () => {
+    const { upload } = require("../utils/request");
+    const responses = [
+      { fail: { errMsg: "uploadFile:fail timeout" } },
+      { statusCode: 201, data: JSON.stringify({ photo: { id: "p1" } }) }
+    ];
+    const originalUploadFile = global.wx.uploadFile;
+    global.wx.uploadFile = (options) => {
+      uploadCalls.push(options);
+      const response = responses.shift();
+      queueMicrotask(() => response.fail ? options.fail(response.fail) : options.success(response));
+    };
+    try {
+      const body = await upload("/api/submissions/s1/photos", "/tmp/photo.png", "photo", undefined, [0, 0]);
+      assert.deepEqual(body, { photo: { id: "p1" } });
+      assert.equal(uploadCalls.length, 2);
+    } finally {
+      global.wx.uploadFile = originalUploadFile;
+    }
+  });
+
+  test("does not retry errors returned by the server", async () => {
+    const { upload } = require("../utils/request");
+    nextUploadResponse = { statusCode: 400, data: JSON.stringify({ error: "最多上传 8 张照片" }) };
+    await assert.rejects(upload("/api/submissions/s1/photos", "/tmp/photo.png", "photo", undefined, [0, 0]), /最多上传 8 张照片/);
+    assert.equal(uploadCalls.length, 1);
+  });
+});
+
+describe("parent mobile review", () => {
+  function loadReviewModule() {
+    global.Page = () => {};
+    delete require.cache[require.resolve("../pages/review/index")];
+    return require("../pages/review/index");
+  }
+
+  test("requests only submitted, unreviewed work and sends text-only revision feedback", async () => {
+    const api = require("../services/api");
+    nextRequestResponse = { statusCode: 200, data: { submissions: [], pagination: { page: 1, pageSize: 20, total: 0, hasMore: false } } };
+    await api.getPendingReviews({ page: 1, pageSize: 20 });
+    assert.match(requestCalls[0].url, /\/api\/submissions\?status=submitted&reviewStatus=pending&page=1&pageSize=20$/);
+
+    nextRequestResponse = { statusCode: 200, data: { submission: { id: "s1" } } };
+    await api.submitCommentReview("s1", "第二题再检查");
+    assert.match(requestCalls[1].url, /\/api\/submissions\/s1\/comment-review$/);
+    assert.equal(requestCalls[1].method, "POST");
+    assert.deepEqual(requestCalls[1].data, { feedback: "第二题再检查" });
+
+    await api.finalizeSubmissionReview("s1");
+    assert.match(requestCalls[2].url, /\/api\/submissions\/s1\/finalize-review$/);
+  });
+
+  test("requires written feedback before asking for changes", () => {
+    const { validateFeedback, reviewItemViewModel } = loadReviewModule();
+    assert.equal(validateFeedback("   ").ok, false);
+    assert.equal(validateFeedback("x".repeat(501)).ok, false);
+    assert.deepEqual(validateFeedback(" 再读一遍 "), { ok: true, feedback: "再读一遍" });
+
+    const item = reviewItemViewModel({
+      id: "s1", taskId: "t1", taskDate: "2026-10-19", taskTitle: "英语朗读", childName: "佑宁",
+      note: "", submittedAt: "2026-10-19 19:05:00",
+      photos: [{ url: "https://api/photo-1" }], audio: { url: "https://api/audio-1", durationMs: 65000 },
+      reviewRounds: [{ id: "r1" }]
+    });
+    assert.equal(item.roundLabel, "第 2 次提交");
+    assert.equal(item.audioDuration, "1:05");
+    assert.equal(item.submittedLabel, "10-19 19:05");
+  });
+
+  test("loads every page of pending reviews without hiding items after the first 20", async () => {
+    let definition;
+    global.Page = (config) => { definition = config; };
+    delete require.cache[require.resolve("../pages/review/index")];
+    require("../pages/review/index");
+    const page = {
+      data: { ...definition.data },
+      setData(update) { Object.assign(this.data, update); },
+      load: definition.load,
+      loadMore: definition.loadMore
+    };
+    const submission = (id) => ({ id, taskId: "t1", taskDate: "2026-10-27", taskTitle: id, photos: [], audio: null });
+    nextRequestResponse = { statusCode: 200, data: {
+      submissions: [submission("s1")],
+      pagination: { page: 1, pageSize: 20, total: 2, hasMore: true }
+    } };
+    await page.load();
+    nextRequestResponse = { statusCode: 200, data: {
+      submissions: [submission("s2")],
+      pagination: { page: 2, pageSize: 20, total: 2, hasMore: false }
+    } };
+    await page.loadMore();
+    assert.deepEqual(page.data.items.map((item) => item.id), ["s1", "s2"]);
+    assert.equal(page.data.hasMore, false);
+    assert.match(requestCalls[1].url, /page=2&pageSize=20$/);
+  });
+});
+
+describe("reward progress", () => {
+  test("shows how many points are missing and picks the closest next goal", () => {
+    global.Page = () => {};
+    delete require.cache[require.resolve("../pages/rewards/index")];
+    const { rewardViewModel } = require("../pages/rewards/index");
+    const center = rewardViewModel({
+      balance: 6,
+      settings: { taskPoints: 2, streakDays: 3, streakBonusPoints: 2 },
+      rewards: [
+        { id: "r1", title: "贴纸", pointCost: 5, active: true },
+        { id: "r2", title: "周末电影", pointCost: 10, active: true },
+        { id: "r3", title: "乐高", pointCost: 30, active: true },
+        { id: "r4", title: "已下架", pointCost: 1, active: false }
+      ],
+      redemptions: []
+    });
+    assert.equal(center.rewards.length, 3);
+    assert.equal(center.rewards[0].affordable, true);
+    assert.equal(center.rewards[1].shortfall, 4);
+    assert.equal(center.rewards[1].progress, 60);
+    assert.deepEqual(center.nextGoal, { title: "周末电影", shortfall: 4, tasksNeeded: 2 });
+  });
+});
+
+describe("resubmission feedback", () => {
+  test("shows the newest parent comment and review images on the resubmit page", () => {
+    global.Page = () => {};
+    delete require.cache[require.resolve("../pages/submit/index")];
+    const { latestReviewFeedback } = require("../pages/submit/index");
+    assert.equal(latestReviewFeedback({ reviewRounds: [] }), null);
+    assert.equal(latestReviewFeedback({ reviewRounds: [{ sequence: 1, feedback: " ", reviewImageUrls: [] }] }), null);
+    assert.deepEqual(latestReviewFeedback({
+      reviewRounds: [
+        { sequence: 1, feedback: "旧评价", reviewImageUrls: [], reviewedAt: "2026-10-18 20:00:00" },
+        { sequence: 2, feedback: "第 3 题单位漏写", reviewImageUrls: ["https://api/review-1"], reviewedAt: "2026-10-19 20:15:00" }
+      ]
+    }), { sequence: 2, feedback: "第 3 题单位漏写", images: ["https://api/review-1"], reviewedAt: "10-19 20:15" });
   });
 });

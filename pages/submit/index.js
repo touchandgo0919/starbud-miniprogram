@@ -8,6 +8,21 @@ const {
 const { localDateKey } = require("../../utils/date");
 const { useSpeakerOutput } = require("../../utils/audio");
 
+function latestReviewFeedback(submission) {
+  const rounds = (submission && submission.reviewRounds) || [];
+  const round = rounds[rounds.length - 1];
+  if (!round) return null;
+  const images = round.reviewImageUrls || [];
+  const feedback = String(round.feedback || "").trim();
+  if (!feedback && !images.length) return null;
+  return {
+    sequence: round.sequence || rounds.length,
+    feedback,
+    images,
+    reviewedAt: String(round.reviewedAt || "").slice(5, 16)
+  };
+}
+
 Page({
   data: {
     task: null,
@@ -25,6 +40,7 @@ Page({
     note: "",
     resubmitSubmissionId: "",
     reopenOnSubmit: false,
+    latestFeedback: null,
     recoveredDraft: false,
     submitting: false,
     uploadProgress: ""
@@ -82,12 +98,14 @@ Page({
   },
 
   async restoreExistingDraft(task, resubmitSubmissionId) {
-    if (resubmitSubmissionId) return;
     try {
       const submission = await api.getTaskSubmission(
         task.id,
         task.occurrenceDate || localDateKey(new Date())
       );
+      // 重新提交前把家长最近一次的评价放在页面顶部，孩子不必返回详情页对照修改。
+      this.setData({ latestFeedback: latestReviewFeedback(submission) });
+      if (resubmitSubmissionId) return;
       if (submission.status !== "draft" || (!submission.photos.length && !submission.audio)) return;
       this.setData({
         resubmitSubmissionId: submission.id,
@@ -496,6 +514,11 @@ Page({
     });
   },
 
+  previewFeedbackImage(event) {
+    const images = (this.data.latestFeedback && this.data.latestFeedback.images) || [];
+    wx.previewImage({ current: event.currentTarget.dataset.url, urls: images });
+  },
+
   onNoteInput(event) {
     this.setData({ note: event.detail.value });
   },
@@ -511,7 +534,7 @@ Page({
     wx.showModal({
       title: "确认提交作业？",
       content: this.data.existingPhotos.length || this.data.existingAudio
-        ? `已恢复 ${this.data.existingPhotos.length} 张照片${this.data.photos.length ? `，将补传 ${this.data.photos.length} 张` : ""}，确认提交吗？`
+        ? `已保存 ${this.data.existingPhotos.length} 张照片${this.data.existingAudio ? "和录音" : ""}${this.data.photos.length ? `，将补传 ${this.data.photos.length} 张` : ""}，确认提交吗？`
         : `将上传 ${this.data.photos.length} 张照片${this.data.audio ? "和 1 段录音" : ""}，确认提交吗？`,
       confirmText: "确认提交",
       confirmColor: "#0AA868",
@@ -530,18 +553,37 @@ Page({
           ? { id: this.data.resubmitSubmissionId, status: "draft" }
           : await api.createSubmission(this.data.task.id, this.data.note, this.data.task.occurrenceDate);
       if (submission.status !== "submitted") {
-        if (this.data.resubmitSubmissionId) {
+        const hadSubmissionId = Boolean(this.data.resubmitSubmissionId);
+        // 记住已创建或已重新打开的提交单：上传中途失败后再次点击会继续使用同一提交单。
+        this.setData({ resubmitSubmissionId: submission.id, reopenOnSubmit: false });
+        if (hadSubmissionId) {
           await api.updateSubmissionNote(submission.id, this.data.note);
         }
-        for (let index = 0; index < this.data.photos.length; index += 1) {
+        const totalPhotos = this.data.photos.length;
+        while (this.data.photos.length) {
+          const pendingPhoto = this.data.photos[0];
+          const photo = pendingPhoto.uploadId
+            ? pendingPhoto
+            : { ...pendingPhoto, uploadId: `photo_${Date.now().toString(36)}_${Math.random().toString(36).slice(2)}_${Math.random().toString(36).slice(2)}` };
+          if (!pendingPhoto.uploadId) this.setData({ photos: [photo, ...this.data.photos.slice(1)] });
           this.setData({
-            uploadProgress: `正在上传第 ${index + 1} / ${this.data.photos.length} 张照片…`
+            uploadProgress: `正在上传第 ${totalPhotos - this.data.photos.length + 1} / ${totalPhotos} 张照片…`
           });
-          await api.uploadSubmissionPhoto(submission.id, this.data.photos[index].path);
+          const uploaded = await api.uploadSubmissionPhoto(submission.id, photo.path, photo.uploadId);
+          // 上传成功的照片转为“已上传”，重试时不会重复上传。
+          this.setData({
+            existingPhotos: [...this.data.existingPhotos, { ...(uploaded || {}), id: (uploaded && uploaded.id) || photo.path, url: photo.path }],
+            photos: this.data.photos.slice(1)
+          });
         }
         if (this.data.audio) {
           this.setData({ uploadProgress: "正在上传录音…" });
-          await api.uploadSubmissionAudio(submission.id, this.data.audio.path, this.data.audio.duration * 1_000);
+          const durationMs = this.data.audio.duration * 1_000;
+          const uploadedAudio = await api.uploadSubmissionAudio(submission.id, this.data.audio.path, durationMs);
+          this.setData({
+            existingAudio: { ...(uploadedAudio || {}), durationMs, url: this.data.audio.path },
+            audio: null
+          });
         }
         this.setData({ uploadProgress: "正在确认提交…" });
         await api.finalizeSubmission(submission.id);
@@ -555,9 +597,10 @@ Page({
         wx.switchTab({ url: "/pages/history/index" });
       }, 1200);
     } catch (error) {
+      const savedCount = this.data.existingPhotos.length + (this.data.existingAudio ? 1 : 0);
       wx.showModal({
         title: "提交失败",
-        content: error.message || "请检查网络后重试。",
+        content: `${error.message || "请检查网络后重试。"}${savedCount ? `\n已上传的 ${savedCount} 项附件已保存，再次点击提交会继续上传剩余内容。` : ""}`,
         showCancel: false
       });
     } finally {
@@ -565,3 +608,5 @@ Page({
     }
   }
 });
+
+module.exports = { latestReviewFeedback };

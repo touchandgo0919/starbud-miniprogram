@@ -79,6 +79,7 @@ Page({
     home: null,
     rewardBalance: 0,
     parentHome: null,
+    pendingReviewCount: 0,
     remindingTaskId: "",
     loading: true,
     refreshing: false,
@@ -138,7 +139,14 @@ Page({
   async loadParentHome() {
     this.setData({ loading: !this.data.parentHome, error: "" });
     try {
-      this.setData({ parentHome: parentHomeViewModel(await api.getTodayTasks()) });
+      const [tasks, pendingReviewCount] = await Promise.all([
+        api.getTodayTasks(),
+        // 待批改数量只用于首页入口，加载失败时不影响今日任务展示。
+        api.getPendingReviews({ page: 1, pageSize: 1 })
+          .then((page) => (page.pagination ? page.pagination.total : page.submissions.length))
+          .catch(() => 0)
+      ]);
+      this.setData({ parentHome: parentHomeViewModel(tasks), pendingReviewCount });
     } catch (error) {
       this.setData({ error: error.message || "首页加载失败。" });
     } finally {
@@ -211,6 +219,10 @@ Page({
 
   openTasks() {
     wx.switchTab({ url: "/pages/tasks/index" });
+  },
+
+  openReviews() {
+    wx.navigateTo({ url: "/pages/review/index" });
   },
 
   openRewards() {
